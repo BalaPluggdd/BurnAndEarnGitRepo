@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00796B</color>
+    <color name="primary_light">#B2DFDB</color>
+    <color name="colorAccent">#FF5722</color>
+    <color name="selected_colorAccent">#95FF5722</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
+    <color name="google_plus_red">#dd4b39</color>
+    <color name="selected_google_plus_red">#95dd4b39</color>
+    <color name="grey">#bababa</color>
+    <color name="light_grey">#d3d3d3</color>
+    <color name="app_text_color">#343434</color>
+    <color name="blue">#00BBD3</color>
+    <color name="red">#E65100</color>
+    <color name="dark_green">#0C7153</color>
+    <color name="darker_grey">#666666</color>
+</resources>

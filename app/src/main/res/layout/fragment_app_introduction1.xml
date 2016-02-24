@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/app_tour_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clipChildren="false"
+    android:background="@color/blue"
+    android:paddingTop="28dp"
+    android:paddingBottom="48dp">
+
+    <ImageView
+        android:id="@+id/img_app_tour1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_app_tour1"
+        android:layout_centerInParent="true"/>
+
+    <ImageView
+        android:id="@+id/img_app_tour_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_circle_logo"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_google_fit"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="-30dp"
+        android:layout_above="@id/img_app_tour1"/>
+
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/app_tour1_text_header"
+        android:layout_marginTop="5dp"
+        android:textAppearance="@style/AppTourHeadingAppearance"
+        android:layout_below="@id/img_app_tour1"
+        app:typeface="robotoBoldCondensed"/>
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_content"
+        android:text="@string/app_tour1_content_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@id/txt_app_tour_header"
+        android:textAppearance="@style/AppTourContentAppearance"
+        android:layout_marginTop="5dp"
+        app:typeface="robotoCondensed"/>
+
+</RelativeLayout>

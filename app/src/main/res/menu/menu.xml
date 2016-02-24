@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="gm.activities.ViewAllActivity">
+    <item
+        android:id="@+id/action_offers_and_rewards"
+        android:orderInCategory="100"
+        android:title="@string/action_offers_and_rewards"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_my_offers"
+        android:orderInCategory="100"
+        android:title="@string/my_offers"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_how_it_works"
+        android:orderInCategory="101"
+        android:title="@string/action_how_it_works"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about_us"
+        android:orderInCategory="102"
+        android:title="@string/action_about_us"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_contact_us"
+        android:orderInCategory="103"
+        android:title="@string/action_contact_us"
+        app:showAsAction="never" />
+
+</menu>

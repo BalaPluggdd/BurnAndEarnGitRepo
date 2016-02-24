@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/app_tour_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clipChildren="false"
+    android:background="@color/dark_green"
+    android:paddingTop="28dp"
+    android:paddingBottom="48dp">
+
+    <ImageView
+        android:id="@+id/img_app_tour_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_circle_logo"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"/>
+
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_content"
+        android:text="@string/app_tour3_content_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="@style/AppTourContentAppearance"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="15dp"
+        app:typeface="robotoCondensed"/>
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/txt_app_tour_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/app_tour3_text_header"
+        android:textAppearance="@style/AppTourHeadingAppearance"
+        app:typeface="robotoBoldCondensed"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/img_app_tour_logo"
+        android:layout_above="@id/txt_app_tour_header">
+
+        <ImageView
+            android:id="@+id/img_app_tour1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_app_tour3"
+            android:layout_alignParentBottom="true" />
+
+
+        <LinearLayout
+            android:id="@+id/percentage_image_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_percentage"
+                >
+
+            </ImageView>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rupee_image_container"
+            android:layout_width="match_parent"
+            android:layout_below="@id/percentage_image_container"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_rupee"
+                >
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            </ImageView>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_below="@id/rupee_image_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_coins"
+                >
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            </ImageView>
+
+
+
+        </LinearLayout>
+
+
+
+
+    </RelativeLayout>
+
+
+
+
+
+</RelativeLayout>

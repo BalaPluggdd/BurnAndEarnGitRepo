@@ -1,0 +1,380 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_app_background"
+    android:orientation="vertical"
+    tools:context="com.pluggdd.burnandearn.view.fragment.DashboardFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0.75">
+
+        <com.hookedonplay.decoviewlib.DecoView
+            android:id="@+id/deco_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <ProgressBar
+                android:id="@+id/activities_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/activities_view_pager"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+            </android.support.v4.view.ViewPager>
+
+
+            <RelativeLayout
+                android:id="@+id/viewpager_indicator_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                android:paddingBottom="25dp">
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator1_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/viewpager_indicator_selected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator2_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_toRightOf="@id/viewpager_indicator1_image"
+                    android:src="@drawable/viewpager_indicator_unselected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator3_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_toRightOf="@id/viewpager_indicator2_image"
+                    android:src="@drawable/viewpager_indicator_unselected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator4_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/viewpager_indicator3_image"
+                    android:src="@drawable/viewpager_indicator_unselected" />
+
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/walking_activity_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/img_walking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/ic_walking" />
+
+                <ProgressBar
+                    android:id="@+id/walking_progress_bar"
+                    style="?android:attr/android:progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/img_walking"
+                    android:layout_centerInParent="true" />
+
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_walking_activity_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/img_walking"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:text="fdf"
+                    android:visibility="gone"
+                    app:typeface="robotoCondensed"/>
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_walking_activity_dimension"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_walking_activity_value"
+                    android:layout_toRightOf="@id/img_walking"
+                    android:textColor="@color/darker_grey"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:typeface="robotoCondensed"/>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/running_activity_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/img_running"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/ic_running" />
+
+                <ProgressBar
+                    android:id="@+id/running_progress_bar"
+                    style="?android:attr/android:progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/img_running"
+                    android:layout_centerInParent="true" />
+
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_running_activity_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/img_running"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:typeface="robotoCondensed"/>
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_running_activity_dimension"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_running_activity_value"
+                    android:layout_toRightOf="@id/img_running"
+                    android:textColor="@color/darker_grey"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:typeface="robotoCondensed"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/biking_activity_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/img_cycling"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/ic_cycling" />
+
+                <ProgressBar
+                    android:id="@+id/cycling_progress_bar"
+                    style="?android:attr/android:progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/img_cycling"
+                    android:layout_centerInParent="true" />
+
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_cycling_activity_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/img_cycling"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:typeface="robotoCondensed"/>
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_cycling_activity_dimension"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_cycling_activity_value"
+                    android:layout_toRightOf="@id/img_cycling"
+                    android:textColor="@color/darker_grey"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:typeface="robotoCondensed"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/offer_list_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_centerInParent="true"/>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:cardElevation="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:orientation="horizontal">
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1000"
+                    android:textColor="@android:color/white"
+                    android:paddingLeft="7dp"
+                    android:paddingRight="7dp"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    android:background="@drawable/ic_hexagonal_shape"
+                    app:typeface="robotoCondensedItalic"/>
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Points earned"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    app:typeface="robotoCondensedItalic"/>
+
+           </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:elevation="10dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="3dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/cardview_background">
+
+                <RelativeLayout
+                    android:id="@+id/business_offer_footer_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:background="@drawable/cardview_business_offers_details_background"
+                    >
+
+                    <Button
+                        android:id="@+id/btn_redeem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/selector_button"
+                        android:elevation="3dp"
+                        android:text="@string/redeem"
+                        android:textColor="@color/colorAccent" />
+
+
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:ellipsize="end"
+                        android:layout_toLeftOf="@id/btn_redeem"
+                        android:maxLines="2"
+                        android:gravity="left"
+                        android:text="10% offer for 1000 points"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="20sp" />
+
+
+                </RelativeLayout>
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/business_offer_footer_container"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:background="@drawable/transparent_background"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="Amazon"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
+
+
+                <ImageView
+                    android:id="@+id/restaurent_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@id/business_offer_footer_container"
+                    android:src="@drawable/ic_amazon_logo"
+                    android:transitionName="@string/image_transition" />
+
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+    </LinearLayout>
+</LinearLayout>

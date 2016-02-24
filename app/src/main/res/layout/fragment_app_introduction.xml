@@ -1,0 +1,128 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/intro_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+            </android.support.v4.view.ViewPager>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/light_grey"
+                android:layout_above="@+id/viewpager_indicator">
+
+            </View>
+
+            <RelativeLayout
+                android:id="@+id/viewpager_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                >
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_skip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/skip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerInParent="true"
+                    android:layout_alignBaseline="@+id/viewpager_indicator1_image"
+                    android:textColor="@android:color/white"
+                    android:layout_marginLeft="30dp"
+                    android:textSize="24sp"/>
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator1_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/viewpager_indicator2_image"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/viewpager_indicator_selected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator2_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/viewpager_indicator_unselected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator3_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/viewpager_indicator2_image"
+                    android:src="@drawable/viewpager_indicator_unselected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_forward_close_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:gravity="right"
+                    android:clickable="true"
+                    android:layout_marginRight="20dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:src="@drawable/ic_next"/>
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_done"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/done"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="30dp"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"
+                    android:textSize="24sp"/>
+
+
+
+            </RelativeLayout>
+
+
+
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!--<com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/footer_text"
+        style="@android:style/TextAppearance.DeviceDefault.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:padding="5dp"
+        android:text="@string/how_it_works"
+        android:textColor="@android:color/black" />
+-->
+
+</RelativeLayout>

@@ -1,0 +1,29 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="MaterialThemeBase">
+        <!-- Customize your theme here. -->
+
+    </style>
+
+    <style name="MaterialThemeBase" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
+    <style name="AppTourHeadingAppearance" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">@dimen/app_tour_heading</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="AppTourContentAppearance" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/app_tour_content</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+
+
+</resources>

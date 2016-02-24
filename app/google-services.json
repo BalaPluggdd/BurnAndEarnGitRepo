@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_id": "burnandearn-cc6a5",
+    "project_number": "322102541933",
+    "name": "BurnAndEarn"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322102541933:android:e623d713561921a6",
+        "client_id": "android:com.pluggdd.burnandearn",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.pluggdd.burnandearn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322102541933-4tqvcttb0o7oldphqre0v7bo5qb5386p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pluggdd.burnandearn",
+            "certificate_hash": "A2FC295410623EF2E08D047489EC4663EBAEA029"
+          }
+        },
+        {
+          "client_id": "322102541933-438dhtcun50k1gt3ruifhmoiaagp7c5d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

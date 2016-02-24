@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/app_tour_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clipChildren="false"
+    android:background="@color/red"
+    android:paddingTop="28dp"
+    android:paddingBottom="48dp">
+
+    <ImageView
+        android:id="@+id/img_app_tour2_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_circle_logo"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"/>
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_content"
+        android:text="@string/app_tour2_content_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="@style/AppTourContentAppearance"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        app:typeface="robotoCondensed"/>
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/txt_app_tour_content"
+        android:gravity="center"
+        android:text="@string/app_tour2_text_header"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="10dp"
+        android:textStyle="bold"
+        android:textAppearance="@style/AppTourHeadingAppearance"
+        android:layout_below="@id/img_app_tour1"
+        app:typeface="robotoBoldCondensed"/>
+
+
+
+    <LinearLayout
+        android:id="@+id/activities_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:layout_above="@id/txt_app_tour_header">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_biking_intro"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_walking_intro"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_running_intro"
+             />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_app_tour2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_app_tour2"
+        android:layout_above="@id/activities_container"
+        android:layout_below="@id/img_app_tour2_logo"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingRight="50dp"
+        android:layout_centerInParent="true"/>
+
+
+</RelativeLayout>
