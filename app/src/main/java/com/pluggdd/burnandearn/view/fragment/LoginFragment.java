@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -158,7 +159,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                                     //836913896406276
                                     mPreferenceManager.setStringValue(getString(R.string.profile_image_url), "https://graph.facebook.com/" + facebook_id + "/picture?type=large&width=400&height=400");
                                     if (new NetworkCheck().ConnectivityCheck(getContext())) {
-                                        navigateToDashboard();
+                                         signUp(mProgressDialog,"facebook",first_name,last_name,email_id,facebook_id);
                                     } else {
                                         Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                                     }
@@ -263,7 +264,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        mFBCallBackManager.onActivityResult(requestCode, resultCode, data);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == GOOGLE_PLUS_SIGN_REQUEST_CODE) {
             if (resultCode != getActivity().RESULT_OK) {
@@ -282,10 +283,12 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
             mPreferenceManager.setStringValue(getString(R.string.first_name), acct.getDisplayName());
             mPreferenceManager.setStringValue(getString(R.string.last_name), "");
             mPreferenceManager.setStringValue(getString(R.string.email), acct.getEmail());
-            mPreferenceManager.setStringValue(getString(R.string.profile_image_url),acct.getPhotoUrl() != null ? acct.getPhotoUrl().toString() : "");
-            navigateToDashboard();
-            //Snackbar.make(mView, "success", Snackbar.LENGTH_SHORT).show();
-            mProgressDialog.dismiss();
+            mPreferenceManager.setStringValue(getString(R.string.profile_image_url), acct.getPhotoUrl() != null ? acct.getPhotoUrl().toString() : "");
+            if (new NetworkCheck().ConnectivityCheck(getContext())) {
+                signUp(mProgressDialog,"google",acct.getDisplayName(),"",acct.getEmail(),"");
+            } else {
+                Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+            }
         } else {
             // Signed out, show unauthenticated UI.
             Snackbar.make(mView, "Google sign in error please try after sometime", Snackbar.LENGTH_SHORT).show();
@@ -303,6 +306,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleAPIClient);
                 mPreferenceManager.setStringValue(getString(R.string.first_name), currentPerson.getDisplayName());
                 mPreferenceManager.setStringValue(getString(R.string.last_name), "");
+                String email = Plus.AccountApi.getAccountName(mGoogleAPIClient);
                 mPreferenceManager.setStringValue(getString(R.string.email), Plus.AccountApi.getAccountName(mGoogleAPIClient));
                 mPreferenceManager.setStringValue(getString(R.string.profile_image_url), currentPerson.getImage().getUrl());
                 navigateToDashboard();
@@ -318,6 +322,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     }
 
     private void navigateToDashboard() {
+        mPreferenceManager.setBooleanValue(getString(R.string.is_user_logged_in),true);
         Bundle extras = new Bundle();
         extras.putString(getString(R.string.page_flag), LoginFragment.class.getSimpleName());
         extras.putString(getString(R.string.button_pressed),getString(R.string.social_login));
@@ -374,6 +379,50 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 return;
             }
         }
+    }
+
+    private void signUp(final ProgressDialog mLoadingProgress,final String social_login,final String firstName, final String lastName, final String email, final String facebook_id/*, final String image_data*/){
+        mLoadingProgress.show();
+        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
+        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.USER_CREATE, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("response", response);
+                mLoadingProgress.dismiss();
+                if (response != null) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.optString("msg").equalsIgnoreCase("Registration Successfull") || responseJson.optString("msg").trim().equalsIgnoreCase("Alredy Exist") || responseJson.optString("msg").trim().equalsIgnoreCase("Alredy Exist And Updated")) {
+                            new PreferencesManager(getActivity()).setStringValue(getString(R.string.user_id), responseJson.optString("userid"));
+                            navigateToDashboard();
+                        } else {
+                            Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                mLoadingProgress.dismiss();
+                Snackbar.make(mView, "Unable to connect to server", Snackbar.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("firstName", firstName);
+                params.put("lastName", lastName);
+                params.put("emailId", email);
+                if(social_login.equalsIgnoreCase("facebook"))
+                    params.put("facebookId", facebook_id);
+                //params.put("image", image_data);
+                return params;
+            }
+        }));
     }
 
     private boolean isPackageInstalled(String packagename) {

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        android:layout_weight="0.75">
+        android:layout_weight="0.60">
 
         <com.hookedonplay.decoviewlib.DecoView
             android:id="@+id/deco_view"
@@ -33,7 +33,7 @@
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/activities_view_pager"
-                android:layout_width="200dp"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:visibility="gone">
 
@@ -46,8 +46,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:visibility="gone"
-                android:paddingBottom="25dp">
+                android:paddingBottom="25dp"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/viewpager_indicator1_image"
@@ -118,8 +118,8 @@
                     style="?android:attr/android:progressBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/img_walking"
-                    android:layout_centerInParent="true" />
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/img_walking" />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -127,11 +127,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/img_walking"
+                    android:text="fdf"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
-                    android:text="fdf"
                     android:visibility="gone"
-                    app:typeface="robotoCondensed"/>
+                    app:typeface="robotoCondensed" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_walking_activity_dimension"
@@ -142,7 +142,7 @@
                     android:textColor="@color/darker_grey"
                     android:textSize="20sp"
                     android:visibility="gone"
-                    app:typeface="robotoCondensed"/>
+                    app:typeface="robotoCondensed" />
 
 
             </RelativeLayout>
@@ -166,8 +166,8 @@
                     style="?android:attr/android:progressBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/img_running"
-                    android:layout_centerInParent="true" />
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/img_running" />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -178,7 +178,7 @@
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
                     android:visibility="gone"
-                    app:typeface="robotoCondensed"/>
+                    app:typeface="robotoCondensed" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_running_activity_dimension"
@@ -189,7 +189,7 @@
                     android:textColor="@color/darker_grey"
                     android:textSize="20sp"
                     android:visibility="gone"
-                    app:typeface="robotoCondensed"/>
+                    app:typeface="robotoCondensed" />
 
             </RelativeLayout>
 
@@ -212,8 +212,8 @@
                     style="?android:attr/android:progressBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/img_cycling"
-                    android:layout_centerInParent="true" />
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/img_cycling" />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -224,7 +224,7 @@
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
                     android:visibility="gone"
-                    app:typeface="robotoCondensed"/>
+                    app:typeface="robotoCondensed" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_cycling_activity_dimension"
@@ -235,7 +235,7 @@
                     android:textColor="@color/darker_grey"
                     android:textSize="20sp"
                     android:visibility="gone"
-                    app:typeface="robotoCondensed"/>
+                    app:typeface="robotoCondensed" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -249,8 +249,8 @@
                 style="@style/Widget.AppCompat.ProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true"
+                android:layout_gravity="center" />
 
         </RelativeLayout>
 
@@ -267,41 +267,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/colorAccent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp">
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1000"
-                    android:textColor="@android:color/white"
-                    android:paddingLeft="7dp"
-                    android:paddingRight="7dp"
-                    android:textSize="20sp"
+                    android:background="@drawable/ic_points_earned_background"
                     android:gravity="center"
-                    android:background="@drawable/ic_hexagonal_shape"
-                    app:typeface="robotoCondensedItalic"/>
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="1000"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:typeface="robotoCondensed" />
+
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
                     android:text="Points earned"
                     android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    app:typeface="robotoCondensedItalic"/>
+                    android:textSize="22sp"
+                    app:typeface="robotoCondensed" />
 
-           </LinearLayout>
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
             android:elevation="10dp"
             android:orientation="vertical"
             android:visibility="visible"
-            app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="5dp"
             app:cardElevation="3dp">
 
@@ -318,14 +324,15 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="2dp"
                     android:layout_marginRight="2dp"
-                    android:background="@drawable/cardview_business_offers_details_background"
-                    >
+                    android:background="@android:color/white"
+                    android:padding="2dp">
 
                     <Button
                         android:id="@+id/btn_redeem"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
                         android:layout_marginRight="5dp"
                         android:background="@drawable/selector_button"
                         android:elevation="3dp"
@@ -337,16 +344,24 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:ellipsize="end"
                         android:layout_toLeftOf="@id/btn_redeem"
-                        android:maxLines="2"
+                        android:ellipsize="end"
                         android:gravity="left"
+                        android:maxLines="2"
                         android:text="10% offer for 1000 points"
                         android:textColor="@color/colorPrimaryDark"
                         android:textSize="20sp" />
 
 
                 </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/restaurent_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@id/business_offer_footer_container"
+                    android:src="@drawable/ic_amazon_logo"
+                    android:transitionName="@string/image_transition" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:layout_width="match_parent"
@@ -360,17 +375,6 @@
                     android:text="Amazon"
                     android:textColor="@android:color/white"
                     android:textSize="24sp" />
-
-
-                <ImageView
-                    android:id="@+id/restaurent_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_above="@id/business_offer_footer_container"
-                    android:src="@drawable/ic_amazon_logo"
-                    android:transitionName="@string/image_transition" />
-
-
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>

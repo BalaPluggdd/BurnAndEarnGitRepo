@@ -23,9 +23,11 @@ public class TotalStepsCountFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_STEPS_TAKEN = "steps_taken";
+    private static final String ARG_DATE_FILTER = "date_filter";
 
     // TODO: Rename and change types of parameters
     private int mStepsTaken;
+    private String mDateFilter;
 
     private TextView mTotalStepsCountText;
 
@@ -40,13 +42,15 @@ public class TotalStepsCountFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param steps_taken Parameter 1.
+     * @param dateFilter
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalStepsCountFragment newInstance(int steps_taken) {
+    public static TotalStepsCountFragment newInstance(int steps_taken, String dateFilter) {
         TotalStepsCountFragment fragment = new TotalStepsCountFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_STEPS_TAKEN,steps_taken);
+        args.putString(ARG_DATE_FILTER, dateFilter);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,6 +60,7 @@ public class TotalStepsCountFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mStepsTaken = getArguments().getInt(ARG_STEPS_TAKEN);
+            mDateFilter = getArguments().getString(ARG_DATE_FILTER);
         }
     }
 
@@ -64,7 +69,7 @@ public class TotalStepsCountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_activities_text, container, false);
         mTotalStepsCountText = (TextView) view.findViewById(R.id.txt_activities_detail);
-        String calories_text = mStepsTaken + " steps \n today";
+        String calories_text = mStepsTaken + " steps \n " + mDateFilter;
         mTotalStepsCountText.setText(calories_text);
         return view;
     }

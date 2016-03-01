@@ -23,9 +23,11 @@ public class TotalDistanceTravelledFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_DISTANCE_TRAVELLED = "distance_travelled";
+    private static final String ARG_DATE_FILTER = "date_filter";
 
     // TODO: Rename and change types of parameters
     private double mDistanceTravelled;
+    private String mDateFilter;
 
     private FragmentInteraction mListener;
 
@@ -40,13 +42,15 @@ public class TotalDistanceTravelledFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param distance_travelled Parameter 1.
+     * @param dateFilter
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalDistanceTravelledFragment newInstance(double distance_travelled) {
+    public static TotalDistanceTravelledFragment newInstance(double distance_travelled, String dateFilter) {
         TotalDistanceTravelledFragment fragment = new TotalDistanceTravelledFragment();
         Bundle args = new Bundle();
         args.putDouble(ARG_DISTANCE_TRAVELLED, distance_travelled);
+        args.putString(ARG_DATE_FILTER, dateFilter);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,6 +60,7 @@ public class TotalDistanceTravelledFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mDistanceTravelled = getArguments().getDouble(ARG_DISTANCE_TRAVELLED);
+            mDateFilter = getArguments().getString(ARG_DATE_FILTER);
         }
     }
 
@@ -64,7 +69,7 @@ public class TotalDistanceTravelledFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_activities_text, container, false);
         mTotalDistanceTravelledText = (TextView) view.findViewById(R.id.txt_activities_detail);
-        String calories_text = String.format("%.2f",mDistanceTravelled) + " km \n today";
+        String calories_text = String.format("%.2f",mDistanceTravelled) + " km \n " + mDateFilter;
         mTotalDistanceTravelledText.setText(calories_text);
         return view;
     }

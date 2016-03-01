@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.view.fragment.AppIntroductionFragment;
 import com.pluggdd.burnandearn.view.fragment.DashboardFragment;
 import com.pluggdd.burnandearn.view.fragment.LoginFragment;
@@ -34,24 +35,38 @@ public class BurnAndEarnMainActivity extends AppCompatActivity implements Fragme
     private ImageView mBackImage;
     private TextView mToolBarTitle;
     private MenuItem mOffersAndRewardsMenu, mHowItWorksMenu,mMyOffersMenu ,mAboutUsMenu, mContactUsMenu;
+    private PreferencesManager mPreferenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_burn_and_earn_main);
-        // To set translucent status bar
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
         mActivitiesTimeSpinner = (Spinner) findViewById(R.id.activities_time_spinner);
         mBackImage = (ImageView) findViewById(R.id.img_back);
         mToolBarTitle = (TextView) findViewById(R.id.txt_title);
         setSupportActionBar(mToolBar);
         mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
-        mToolBar.setVisibility(View.GONE);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+        mPreferenceManager = new PreferencesManager(this);
         // To add Login fragment as first fragment in transaction
-        mFragmentHelper.addFragment(R.id.fragment_container, new LoginFragment());
+        if(!mPreferenceManager.getBooleanValue(getString(R.string.is_user_logged_in))){ // If user does n't logged in
+            // To set translucent status bar
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            mToolBar.setVisibility(View.GONE);
+            mFragmentHelper.addFragment(R.id.fragment_container, new LoginFragment());
+        }else if(!mPreferenceManager.getBooleanValue(getString(R.string.is_how_its_works_learned))){ // If user logged in and does n't learned how it will work
+            // To set translucent status bar
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            mToolBar.setVisibility(View.GONE);
+            mFragmentHelper.addFragment(R.id.fragment_container, new AppIntroductionFragment());
+        }else{
+            mToolBar.setVisibility(View.VISIBLE);
+            mActivitiesTimeSpinner.setVisibility(View.VISIBLE);
+            getSupportActionBar().setTitle("");
+            mFragmentHelper.addFragment(R.id.fragment_container, new DashboardFragment());
+        }
 
         mBackImage.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.nineoldandroids.view.ViewHelper;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 
 
 /**
@@ -27,6 +28,7 @@ public class AppIntroductionFragment extends Fragment {
     private ViewPager mAppIntroViewPager;
     private TextView mSkipText,mDoneText;
     private ImageView mViewPagerIndicator1Image,mViewPagerIndicator2Image,mViewPagerIndicator3Image,mViewPagerForwardCloseImage;
+    private PreferencesManager mPreferenceManager;
 
     public AppIntroductionFragment() {
         // Required empty public constructor
@@ -50,7 +52,8 @@ public class AppIntroductionFragment extends Fragment {
         mSkipText = (TextView) view.findViewById(R.id.txt_skip);
         mDoneText = (TextView) view.findViewById(R.id.txt_done);
         mAppIntroViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
-        mAppIntroViewPager.setPageTransformer(true,new CrossfadePageTransformer());
+        mAppIntroViewPager.setPageTransformer(true, new CrossfadePageTransformer());
+        mPreferenceManager = new PreferencesManager(getContext());
 
         mAppIntroViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -101,6 +104,7 @@ public class AppIntroductionFragment extends Fragment {
         mSkipText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
                 mFragmentInteraction.changeFragment(bundle);
@@ -110,6 +114,7 @@ public class AppIntroductionFragment extends Fragment {
         mDoneText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
                 mFragmentInteraction.changeFragment(bundle);

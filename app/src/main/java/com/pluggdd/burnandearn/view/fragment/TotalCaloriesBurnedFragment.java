@@ -23,9 +23,11 @@ public class TotalCaloriesBurnedFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_CALORIES_BURNED = "calories_burned";
+    private static final String ARG_DATE_FILTER = "date_filter";
 
     // TODO: Rename and change types of parameters
     private double mCaloriesBurned;
+    private String mDateFilter;
 
     private FragmentInteraction mListener;
     private TextView mTotalCaloriedBurnedText;
@@ -39,13 +41,15 @@ public class TotalCaloriesBurnedFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param calories_burned Parameter 1.
+     * @param dateFilter
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalCaloriesBurnedFragment newInstance(double calories_burned) {
+    public static TotalCaloriesBurnedFragment newInstance(double calories_burned, String dateFilter) {
         TotalCaloriesBurnedFragment fragment = new TotalCaloriesBurnedFragment();
         Bundle args = new Bundle();
         args.putDouble(ARG_CALORIES_BURNED, calories_burned);
+        args.putString(ARG_DATE_FILTER, dateFilter);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,6 +59,7 @@ public class TotalCaloriesBurnedFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mCaloriesBurned = getArguments().getDouble(ARG_CALORIES_BURNED);
+            mDateFilter = getArguments().getString(ARG_DATE_FILTER);
         }
     }
 
