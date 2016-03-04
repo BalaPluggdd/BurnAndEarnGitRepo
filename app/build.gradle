@@ -40,5 +40,7 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.github.bmarrdev:android-DecoView-charting:v0.9.3'
     compile 'com.google.android.gms:play-services:8.3.0'
-
+    compile ('cn.trinea.android.view.autoscrollviewpager:android-auto-scroll-view-pager:1.1.2') {
+        exclude module: 'support-v4'
+    }
 }

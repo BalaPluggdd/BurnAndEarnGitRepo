@@ -22,6 +22,7 @@ import com.pluggdd.burnandearn.view.fragment.DashboardFragment;
 import com.pluggdd.burnandearn.view.fragment.LoginFragment;
 import com.pluggdd.burnandearn.view.fragment.OfferDetailFragment;
 import com.pluggdd.burnandearn.view.fragment.OffersAndRewardsFragment;
+import com.pluggdd.burnandearn.view.fragment.TotalPointsEarnedFragment;
 
 /**
  * Activity to hold Burn and Earn fragments..

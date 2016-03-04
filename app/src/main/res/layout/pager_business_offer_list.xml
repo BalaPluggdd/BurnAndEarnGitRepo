@@ -1,0 +1,63 @@
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_gravity="center"
+    android:layout_height="match_parent">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_business_logo"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_running" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_toLeftOf="@id/img_business_logo"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:id="@+id/txt_offer_promo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Pamper yourself with a complementary foot message at "
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            app:typeface="robotoCondensed" />
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:id="@+id/txt_business_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:gravity="center"
+            android:text="Thai Massage"
+            android:textColor="@color/orange"
+            android:textSize="24sp"
+            app:typeface="robotoCondensed" />
+
+        <Button
+            android:id="@+id/btn_grab_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/orange"
+            android:minHeight="30dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:paddingTop="5dp"
+            android:text="@string/grap_now"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

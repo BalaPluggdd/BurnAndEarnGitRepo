@@ -28,9 +28,8 @@ public class TotalCaloriesBurnedFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private double mCaloriesBurned;
     private String mDateFilter;
-
     private FragmentInteraction mListener;
-    private TextView mTotalCaloriedBurnedText;
+    private TextView mTotalCaloriedBurnedText,mCaloriesBurntText,mCaloriesUnitText;
 
     public TotalCaloriesBurnedFragment() {
         // Required empty public constructor
@@ -67,9 +66,12 @@ public class TotalCaloriesBurnedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_activities_text, container, false);
+        mCaloriesBurntText = (TextView) view.findViewById(R.id.txt_activities_header);
         mTotalCaloriedBurnedText = (TextView) view.findViewById(R.id.txt_activities_detail);
-        String calories_text = Math.round(mCaloriesBurned) + " Calories \n Burned";
-        mTotalCaloriedBurnedText.setText(calories_text);
+        mCaloriesUnitText = (TextView) view.findViewById(R.id.txt_activities_unit);
+        mCaloriesBurntText.setText(getString(R.string.calories_burnt));
+        mTotalCaloriedBurnedText.setText(String.valueOf(Math.round(mCaloriesBurned)));
+        mCaloriesUnitText.setText(getString(R.string.calories_unit));
         return view;
     }
 

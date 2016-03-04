@@ -31,7 +31,7 @@ public class TotalDistanceTravelledFragment extends Fragment {
 
     private FragmentInteraction mListener;
 
-    private TextView mTotalDistanceTravelledText;
+    private TextView mTotalDistanceTravelledText,mDistaceTravelledText,mDistanceUnitText;
 
     public TotalDistanceTravelledFragment() {
         // Required empty public constructor
@@ -69,8 +69,11 @@ public class TotalDistanceTravelledFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_activities_text, container, false);
         mTotalDistanceTravelledText = (TextView) view.findViewById(R.id.txt_activities_detail);
-        String calories_text = String.format("%.2f",mDistanceTravelled) + " km \n " + mDateFilter;
-        mTotalDistanceTravelledText.setText(calories_text);
+        mDistaceTravelledText = (TextView) view.findViewById(R.id.txt_activities_header);
+        mDistanceUnitText = (TextView) view.findViewById(R.id.txt_activities_unit);
+        mDistaceTravelledText.setText(getString(R.string.distance_travelled));
+        mTotalDistanceTravelledText.setText(String.format("%.2f",mDistanceTravelled));
+        mDistanceUnitText.setText(getString(R.string.distance_dimension));
         return view;
     }
 

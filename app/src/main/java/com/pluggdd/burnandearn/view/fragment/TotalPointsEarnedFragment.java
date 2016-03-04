@@ -1,12 +1,16 @@
 package com.pluggdd.burnandearn.view.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hookedonplay.decoviewlib.DecoView;
+import com.hookedonplay.decoviewlib.charts.SeriesItem;
+import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 
@@ -59,7 +63,14 @@ public class TotalPointsEarnedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_activities_text, container, false);
+        View view = inflater.inflate(R.layout.fragment_test, container, false);
+        DecoView mCircularProgressDecoView = (DecoView) view.findViewById(R.id.deco_view);
+        SeriesItem initial_grey_circle_progress = new SeriesItem.Builder(Color.parseColor("#a9a9a9"))
+                .setRange(0, 100, 0)
+                .build();
+       int  mBackIndex = mCircularProgressDecoView.addSeries(initial_grey_circle_progress);
+        mCircularProgressDecoView.addEvent(new DecoEvent.Builder(100).setIndex(mBackIndex).build());
+        return view;
     }
 
      @Override

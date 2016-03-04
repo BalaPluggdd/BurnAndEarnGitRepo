@@ -29,7 +29,7 @@ public class TotalStepsCountFragment extends Fragment {
     private int mStepsTaken;
     private String mDateFilter;
 
-    private TextView mTotalStepsCountText;
+    private TextView mTotalStepsCountText,mStepCountText,mStepUnitText;
 
     private FragmentInteraction mListener;
 
@@ -69,8 +69,13 @@ public class TotalStepsCountFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_activities_text, container, false);
         mTotalStepsCountText = (TextView) view.findViewById(R.id.txt_activities_detail);
-        String calories_text = mStepsTaken + " steps \n " + mDateFilter;
-        mTotalStepsCountText.setText(calories_text);
+        mStepCountText = (TextView) view.findViewById(R.id.txt_activities_header);
+        mStepUnitText = (TextView) view.findViewById(R.id.txt_activities_unit);
+        mStepCountText.setText(getString(R.string.steps_taken));
+        mTotalStepsCountText.setText(String.valueOf(mStepsTaken));
+        mStepUnitText.setText(getString(R.string.steps_text));
+
+
         return view;
     }
 

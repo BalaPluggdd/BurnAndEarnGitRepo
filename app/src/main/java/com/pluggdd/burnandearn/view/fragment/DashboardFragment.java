@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.print.PageRange;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -19,7 +20,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,8 +56,11 @@ import com.hookedonplay.decoviewlib.charts.SeriesItem;
 import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.activity.OfferDetailActivity;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
+import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,6 +68,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
 
 /**
  * Fragment to show acitivity details and offers
@@ -74,11 +82,15 @@ public class DashboardFragment extends Fragment {
     private View mView;
     private DecoView mCircularProgressDecoView;
     private ViewPager mActivitiesViewPager;
-    private RelativeLayout mViewPagerIndicatorContainer, mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer;
-    private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image, mViewPagerIndicator4Image;
+    private AutoScrollViewPager mBusinessOfferListViewPager;
+    private CardView mBusinessOfferListPagerContainer;
+    private RelativeLayout mViewPagerIndicatorContainer, mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer,mOfferListProgressBarContainer;
+    private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image;
     private Button mRedeemButton;
-    private ProgressBar mActivitiesProgressBar, mCyclingActivityProgressBar, mWalkingActivityProgressBar, mRunningActivityProgressBar;
+    private ProgressBar mActivitiesProgressBar, mCyclingActivityProgressBar, mWalkingActivityProgressBar, mRunningActivityProgressBar,mProfileImageProgressBar;
     private TextView mWalkingActivityValueText, mRunningActivityValueText, mCyclingActivityValueText, mWalkingActivityDimesionText, mRunningActivityDimensionText, mCyclingActivityDimensionText;
+    private View mWalkingActivityBorder,mRunningActivityBorder,mCyclingActivityBorder;
+    private ImageView mProfileImage;
     private GoogleApiClient mGoogleAPIClient;
     private ArrayList<FitnessActivity> mFitnessActivityList = new ArrayList<>(3);
     private int mTotalStepCount = 0;
@@ -86,8 +98,8 @@ public class DashboardFragment extends Fragment {
     private int mBackIndex;
     private int mWalkingActivityIndex, mRunningActivityIndex, mBikingActivityIndex;
     private Spinner mDateFilterSpinner;
-    private boolean mIsPermissionRequestRaised,mIsGetFitnessDataAsyncRunning;
-
+    private boolean mIsPermissionRequestRaised, mIsGetFitnessDataAsyncRunning;
+    private PicassoImageLoaderHelper mImageLoaderHelper;
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -99,6 +111,8 @@ public class DashboardFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_dashboard, container, false);
         mCircularProgressDecoView = (DecoView) mView.findViewById(R.id.deco_view);
         mActivitiesViewPager = (ViewPager) mView.findViewById(R.id.activities_view_pager);
+        mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
+        mProfileImageProgressBar = (ProgressBar) mView.findViewById(R.id.profile_progress_bar);
         mActivitiesProgressBar = (ProgressBar) mView.findViewById(R.id.activities_progress_bar);
         mCyclingActivityProgressBar = (ProgressBar) mView.findViewById(R.id.cycling_progress_bar);
         mWalkingActivityProgressBar = (ProgressBar) mView.findViewById(R.id.walking_progress_bar);
@@ -107,9 +121,11 @@ public class DashboardFragment extends Fragment {
         mViewPagerIndicator1Image = (ImageView) mView.findViewById(R.id.viewpager_indicator1_image);
         mViewPagerIndicator2Image = (ImageView) mView.findViewById(R.id.viewpager_indicator2_image);
         mViewPagerIndicator3Image = (ImageView) mView.findViewById(R.id.viewpager_indicator3_image);
-        mViewPagerIndicator4Image = (ImageView) mView.findViewById(R.id.viewpager_indicator4_image);
         mWalkingActivityContainer = (RelativeLayout) mView.findViewById(R.id.walking_activity_container);
         mWalkingActivityValueText = (TextView) mView.findViewById(R.id.txt_walking_activity_value);
+        mWalkingActivityBorder = mView.findViewById(R.id.txt_walking_activity_border);
+        mRunningActivityBorder = mView.findViewById(R.id.txt_running_activity_border);
+        mCyclingActivityBorder = mView.findViewById(R.id.txt_cycling_activity_border);
         mWalkingActivityDimesionText = (TextView) mView.findViewById(R.id.txt_walking_activity_dimension);
         mRunningActivityContainer = (RelativeLayout) mView.findViewById(R.id.running_activity_container);
         mRunningActivityValueText = (TextView) mView.findViewById(R.id.txt_running_activity_value);
@@ -117,10 +133,13 @@ public class DashboardFragment extends Fragment {
         mBikingActivityContainer = (RelativeLayout) mView.findViewById(R.id.biking_activity_container);
         mCyclingActivityValueText = (TextView) mView.findViewById(R.id.txt_cycling_activity_value);
         mCyclingActivityDimensionText = (TextView) mView.findViewById(R.id.txt_cycling_activity_dimension);
-        mRedeemButton = (Button) mView.findViewById(R.id.btn_redeem);
+        mBusinessOfferListPagerContainer = (CardView) mView.findViewById(R.id.business_offer_list_pager_container);
+        mBusinessOfferListViewPager = (AutoScrollViewPager) mView.findViewById(R.id.business_offer_list_pager);
+        mOfferListProgressBarContainer = (RelativeLayout) mView.findViewById(R.id.offer_list_progress_bar_container);
         mDateFilterSpinner = (Spinner) getActivity().findViewById(R.id.toolbar).findViewById(R.id.activities_time_spinner);
+        mImageLoaderHelper = new PicassoImageLoaderHelper(getContext(),mProfileImage,mProfileImageProgressBar);
+        mImageLoaderHelper.loadImage(new PreferencesManager(getContext()).getStringValue(getString(R.string.profile_image_url)));
         initializeActivitiesList();
-
         checkAndBuildGoogleApiClient();
 
        /* // Check and request for location and get accounts permission
@@ -134,20 +153,20 @@ public class DashboardFragment extends Fragment {
             buildGoogleFitnessClient();
         }*/
         // Initial set up for circular decoview
-        createBackgroundSeries();
+         createBackgroundSeries();
         createBikingActivitySeries();
         createRunningActivitySeries();
         createWalkingActivitySeries();
 
 
-        mRedeemButton.setOnClickListener(new View.OnClickListener() {
+       /* mRedeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.page_flag), DashboardFragment.this.getClass().getSimpleName());
                 mListener.changeFragment(bundle);
             }
-        });
+        });*/
 
         mActivitiesViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -165,24 +184,14 @@ public class DashboardFragment extends Fragment {
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
-                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         updateFitnessActivities(position);
                         break;
                     case 2:
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_selected);
-                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         updateFitnessActivities(position);
                         break;
-                    case 3:
-                        mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
-                        mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
-                        mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
-                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_selected);
-                        //updateFitnessActivities(position);
-                        break;
-
                 }
             }
 
@@ -212,8 +221,8 @@ public class DashboardFragment extends Fragment {
                         start_time = day_start_time.getTimeInMillis();
                         end_time = Calendar.getInstance().getTimeInMillis();
                         Log.i("Fitness Async", "called from today spinner");
-                        if(!mIsGetFitnessDataAsyncRunning)
-                           new FitnessDataAsync().execute(start_time, end_time);
+                        if (!mIsGetFitnessDataAsyncRunning)
+                            new FitnessDataAsync().execute(start_time, end_time);
                         break;
                     case 1: // Yesterday
                         day_start_time.add(Calendar.DAY_OF_MONTH, -1);
@@ -223,7 +232,7 @@ public class DashboardFragment extends Fragment {
                         day_start_time.set(Calendar.MILLISECOND, 0);
                         start_time = day_start_time.getTimeInMillis();
                         end_time = end_time_calc.getTimeInMillis();
-                        Log.i("Data Check",day_start_time.getTime().toString() +  " "+end_time_calc.getTime().toString());
+                        Log.i("Data Check", day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
                         new FitnessDataAsync().execute(start_time, end_time);
                         break;
                     case 2: // Last Week
@@ -234,7 +243,7 @@ public class DashboardFragment extends Fragment {
                         day_start_time.set(Calendar.MILLISECOND, 0);
                         start_time = day_start_time.getTimeInMillis();
                         end_time = end_time_calc.getTimeInMillis();
-                        Log.i("Data Check",day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
+                        Log.i("Data Check", day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
                         new FitnessDataAsync().execute(start_time, end_time);
                         break;
                     case 3: // Last Month
@@ -245,7 +254,7 @@ public class DashboardFragment extends Fragment {
                         day_start_time.set(Calendar.MILLISECOND, 0);
                         start_time = day_start_time.getTimeInMillis();
                         end_time = end_time_calc.getTimeInMillis();
-                        Log.i("Data Check",day_start_time.getTime().toString()+ " " + end_time_calc.getTime().toString());
+                        Log.i("Data Check", day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
                         new FitnessDataAsync().execute(start_time, end_time);
                         break;
                 }
@@ -266,7 +275,6 @@ public class DashboardFragment extends Fragment {
         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_selected);
         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
-        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         updateFitnessActivities(0);
     }
 
@@ -337,31 +345,34 @@ public class DashboardFragment extends Fragment {
                 // To calculate walking calories percentage in total calories
                 int walking_calories_percentage = 0, running_calories_percentage = 0, biking_calories_percentage = 0;
                 double walking_calories_expended = mFitnessActivityList.get(0).getCalories_expended();
+                //walking_calories_expended = 1500;
                 if (walking_calories_expended != -1) {
                     walking_calories_percentage = (int) Math.round((walking_calories_expended / mTotalCaloriesExpended) * 100);
                     mWalkingActivityContainer.setVisibility(View.VISIBLE);
                     mWalkingActivityValueText.setText(String.valueOf(Math.round(walking_calories_expended)));
-                    mWalkingActivityDimesionText.setText(getString(R.string.calories));
+                    mWalkingActivityDimesionText.setText(getString(R.string.calories_unit));
                 } else {
                     mWalkingActivityContainer.setVisibility(View.GONE);
                 }
                 // To calculate running calories percentage in total calories
                 double running_calories_expended = mFitnessActivityList.get(1).getCalories_expended();
-                if (mFitnessActivityList.get(1).getCalories_expended() != -1) {
+                //running_calories_expended = 2000;
+                if (running_calories_expended != -1) {
                     running_calories_percentage = (int) Math.round((running_calories_expended / mTotalCaloriesExpended) * 100);
                     mRunningActivityContainer.setVisibility(View.VISIBLE);
                     mRunningActivityValueText.setText(String.valueOf(Math.round(running_calories_expended)));
-                    mRunningActivityDimensionText.setText(getString(R.string.calories));
+                    mRunningActivityDimensionText.setText(getString(R.string.calories_unit));
                 } else {
                     mRunningActivityContainer.setVisibility(View.GONE);
                 }
                 // To calculate biking calories percentage in total calories
                 double biking_calories_expended = mFitnessActivityList.get(2).getCalories_expended();
-                if (mFitnessActivityList.get(2).getCalories_expended() != -1) {
+                //biking_calories_expended = 200;
+                if (biking_calories_expended != -1) {
                     biking_calories_percentage = (int) Math.round((biking_calories_expended / mTotalCaloriesExpended) * 100);
                     mBikingActivityContainer.setVisibility(View.VISIBLE);
                     mCyclingActivityValueText.setText(String.valueOf(Math.round(biking_calories_expended)));
-                    mCyclingActivityDimensionText.setText(getString(R.string.calories));
+                    mCyclingActivityDimensionText.setText(getString(R.string.calories_unit));
                 } else {
                     mBikingActivityContainer.setVisibility(View.GONE);
                 }
@@ -372,6 +383,7 @@ public class DashboardFragment extends Fragment {
                 // To calculate walking distance percentage in total distance travelled
                 int walking_distance_percentage = 0, running_distance_percentage = 0, biking_distance_percentage = 0;
                 double walking_distance = mFitnessActivityList.get(0).getDistance();
+                //walking_distance = 5.0;
                 if (walking_distance != -1) {
                     walking_distance_percentage = (int) Math.round((walking_distance / mTotalDistanceTravelled) * 100);
                     mWalkingActivityContainer.setVisibility(View.VISIBLE);
@@ -382,7 +394,8 @@ public class DashboardFragment extends Fragment {
                 }
                 // To calculate running distance percentage in total distance travelled
                 double running_distance = mFitnessActivityList.get(1).getDistance();
-                if (mFitnessActivityList.get(1).getDistance() != -1) {
+                //running_distance = 5.0;
+                if (running_distance != -1) {
                     running_distance_percentage = (int) Math.round((running_distance / mTotalDistanceTravelled) * 100);
                     mRunningActivityContainer.setVisibility(View.VISIBLE);
                     mRunningActivityValueText.setText(String.format("%.2f", running_distance));
@@ -392,7 +405,8 @@ public class DashboardFragment extends Fragment {
                 }
                 // To calculate biking distance percentage in total distance travelled
                 double biking_distance = mFitnessActivityList.get(2).getDistance();
-                if (mFitnessActivityList.get(2).getDistance() != -1) {
+               // biking_distance = 6.0;
+                if (biking_distance != -1) {
                     biking_distance_percentage = (int) Math.round((biking_distance / mTotalDistanceTravelled) * 100);
                     mBikingActivityContainer.setVisibility(View.VISIBLE);
                     mCyclingActivityValueText.setText((String.format("%.2f", biking_distance)));
@@ -407,31 +421,34 @@ public class DashboardFragment extends Fragment {
                 // To calculate walking steps percentage in total steps taken
                 int walking_step_percentage = 0, running_step_percentage = 0, biking_step_percentage = 0;
                 double walking_step = mFitnessActivityList.get(0).getStep_count();
-                if (mFitnessActivityList.get(0).getStep_count() != -1) {
+                //walking_step = 1000;
+                if (walking_step != -1) {
                     walking_step_percentage = (int) Math.round((walking_step / mTotalStepCount) * 100);
                     mWalkingActivityContainer.setVisibility(View.VISIBLE);
                     mWalkingActivityValueText.setText(String.valueOf(Math.round(walking_step)));
-                    mWalkingActivityDimesionText.setText(getString(R.string.steps));
+                    mWalkingActivityDimesionText.setText(getString(R.string.steps_text));
                 } else {
                     mWalkingActivityContainer.setVisibility(View.GONE);
                 }
                 // To calculate running steps percentage in total steps taken
                 double running_step = mFitnessActivityList.get(1).getStep_count();
-                if (mFitnessActivityList.get(1).getStep_count() != -1) {
+                //running_step = 20000;
+                if (running_step != -1) {
                     running_step_percentage = (int) Math.round((running_step / mTotalStepCount) * 100);
                     mRunningActivityContainer.setVisibility(View.VISIBLE);
                     mRunningActivityValueText.setText(String.valueOf(running_step));
-                    mRunningActivityDimensionText.setText(getString(R.string.steps));
+                    mRunningActivityDimensionText.setText(getString(R.string.steps_text));
                 } else {
                     mRunningActivityContainer.setVisibility(View.GONE);
                 }
                 // To calculate biking steps percentage in total steps taken
                 double biking_step = mFitnessActivityList.get(2).getStep_count();
-                if (mFitnessActivityList.get(2).getStep_count() != -1) {
+                //biking_step = 4000;
+                if (biking_step != -1) {
                     biking_step_percentage = (int) Math.round((biking_step / mTotalStepCount) * 100);
                     mBikingActivityContainer.setVisibility(View.VISIBLE);
                     mCyclingActivityValueText.setText(String.valueOf(Math.round(biking_step)));
-                    mCyclingActivityDimensionText.setText(getString(R.string.steps));
+                    mCyclingActivityDimensionText.setText(getString(R.string.steps_text));
                 } else {
                     mBikingActivityContainer.setVisibility(View.GONE);
                 }
@@ -470,10 +487,10 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(mGoogleAPIClient == null){
-            if(checkLocationPermissions() && checkGetAccountsPermissions()){
+        if (mGoogleAPIClient == null) {
+            if (checkLocationPermissions() && checkGetAccountsPermissions()) {
                 buildGoogleFitnessClient();
-            }else if(mIsPermissionRequestRaised) {
+            } else if (mIsPermissionRequestRaised) {
                 Snackbar.make(
                         mView,
                         R.string.permission_denied_explanation,
@@ -570,8 +587,8 @@ public class DashboardFragment extends Fragment {
                         day_start_time.set(Calendar.MILLISECOND, 0);
                         long start_time = day_start_time.getTimeInMillis();
                         if (mDateFilterSpinner.getSelectedItemPosition() == 0) {
-                            Log.i("Fitness Async","called from onconnected callback");
-                            if(!mIsGetFitnessDataAsyncRunning)
+                            Log.i("Fitness Async", "called from onconnected callback");
+                            if (!mIsGetFitnessDataAsyncRunning)
                                 new FitnessDataAsync().execute(start_time, end_time);
                         } else {
                             mDateFilterSpinner.setSelection(0, true);
@@ -635,15 +652,20 @@ public class DashboardFragment extends Fragment {
             mRunningActivityDimensionText.setVisibility(View.GONE);
             mCyclingActivityValueText.setVisibility(View.GONE);
             mCyclingActivityDimensionText.setVisibility(View.GONE);
+            mWalkingActivityBorder.setVisibility(View.GONE);
+            mRunningActivityBorder.setVisibility(View.GONE);
+            mCyclingActivityBorder.setVisibility(View.GONE);
+            mOfferListProgressBarContainer.setVisibility(View.VISIBLE);
+            mBusinessOfferListPagerContainer.setVisibility(View.INVISIBLE);
         }
 
         @Override
         protected String doInBackground(Long... params) {
-            if(mGoogleAPIClient != null) {
+            if (mGoogleAPIClient != null) {
                 getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
                 return "success";
-            }else
-              return null;
+            } else
+                return null;
         }
 
         @Override
@@ -661,7 +683,15 @@ public class DashboardFragment extends Fragment {
             mRunningActivityDimensionText.setVisibility(View.VISIBLE);
             mCyclingActivityValueText.setVisibility(View.VISIBLE);
             mCyclingActivityDimensionText.setVisibility(View.VISIBLE);
+            mWalkingActivityBorder.setVisibility(View.VISIBLE);
+            mRunningActivityBorder.setVisibility(View.VISIBLE);
+            mCyclingActivityBorder.setVisibility(View.VISIBLE);
+            mOfferListProgressBarContainer.setVisibility(View.GONE);
+            mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
             mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
+            mBusinessOfferListViewPager.setAdapter(new CustomBusinessOfferListAdapter());
+            mBusinessOfferListViewPager.setInterval(5000);
+            mBusinessOfferListViewPager.startAutoScroll(5000);
             Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
             if (mActivitiesViewPager.getCurrentItem() == 0)
                 resetActivitiesViewPager();
@@ -760,7 +790,7 @@ public class DashboardFragment extends Fragment {
         } else if (dataReadResult.getDataSets().size() > 0) {
             Log.i("FITNESS RESULT", "Number of returned DataSets is: "
                     + dataReadResult.getDataSets().size());
-                   }
+        }
         // [END parse_read_data_result]
     }
 
@@ -1027,7 +1057,7 @@ public class DashboardFragment extends Fragment {
                 return;
             }
             buildGoogleFitnessClient();
-        }else{
+        } else {
             buildGoogleFitnessClient();
         }
 
@@ -1041,6 +1071,47 @@ public class DashboardFragment extends Fragment {
                 return false;
         }
         return true;
+    }
+
+    class CustomBusinessOfferListAdapter extends PagerAdapter{
+
+        private LayoutInflater mLayoutInflater;
+
+        CustomBusinessOfferListAdapter(){
+            mLayoutInflater = LayoutInflater.from(getContext());
+        }
+
+        @Override
+        public int getCount() {
+            return 10;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View view = mLayoutInflater.inflate(R.layout.pager_business_offer_list,container,false);
+            Button mGrabNowButton = (Button) view.findViewById(R.id.btn_grab_now);
+            mGrabNowButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    /*Bundle bundle = new Bundle();
+                    bundle.putString(getString(R.string.page_flag), DashboardFragment.this.getClass().getSimpleName());
+                    mListener.changeFragment(bundle);*/
+                    startActivity(new Intent(getActivity(), OfferDetailActivity.class));
+                }
+            });
+            container.addView(view);
+            return view;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
     }
 
 

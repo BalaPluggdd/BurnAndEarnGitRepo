@@ -51,6 +51,7 @@
     <string name="settings">Settings</string>
     <string name="distance_dimension">km</string>
     <string name="steps">steps</string>
+    <string name="steps_text">Steps</string>
     <string name="app_tour1_text_header">Burn and Earn works \n with Google Fit</string>
     <string name="app_tour1_content_text">Connect the app with Google fit and switch it on!</string>
     <string name="app_tour2_text_header">Burn Calories</string>
@@ -58,4 +59,11 @@
     <string name="app_tour3_text_header">Unlock and Redeem</string>
     <string name="app_tour3_content_text">Redeem your points for offers from our partners</string>
     <string name="is_how_its_works_learned">how_it_works_learned</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="your_total_points">Your total earned points are now</string>
+    <string name="grap_now">GRAB NOW</string>
+    <string name="calories_burnt">You have burnt</string>
+    <string name="calories_unit">Calories</string>
+    <string name="distance_travelled">You have covered</string>
+    <string name="steps_taken">You have taken</string>
 </resources>

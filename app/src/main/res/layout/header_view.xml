@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.pluggdd.burnandearn.utils.HeaderView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <!-- Title -->
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/header_view_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:typeface="robotoBoldCondensed"
+        />
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/header_view_sub_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        />
+
+
+</com.pluggdd.burnandearn.utils.HeaderView>

@@ -90,17 +90,80 @@
         android:layout_height="140dp"
         android:layout_alignParentBottom="true"
         android:elevation="5dp"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:cardCornerRadius="1dp"
         app:cardElevation="3dp"
         app:contentPadding="5dp">
 
-         <cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_business_logo"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_running" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_toLeftOf="@id/img_business_logo"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_offer_promo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Pamper yourself with a complementary foot message at "
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    app:typeface="robotoBoldCondensed" />
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_business_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center"
+                    android:text="Thai Massage"
+                    android:textColor="@color/orange"
+                    android:textSize="24sp"
+                    app:typeface="robotoCondensed" />
+
+                <Button
+                    android:id="@+id/btn_grab_now"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/orange"
+                    android:minHeight="30dp"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="3dp"
+                    android:paddingRight="3dp"
+                    android:paddingTop="5dp"
+                    android:text="@string/grap_now"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+
+        <!--<cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager
             android:id="@+id/business_offer_list_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        </cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager>
+        </cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager>-->
 
     </android.support.v7.widget.CardView>
 
@@ -138,6 +201,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
+                    android:visibility="gone"
                     android:layout_toRightOf="@id/img_walking" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -148,6 +212,7 @@
                     android:layout_toRightOf="@id/img_walking"
                     android:gravity="center"
                     android:minWidth="60dp"
+                    android:text="10000"
                     android:textColor="@color/orange"
                     android:textSize="20sp"
                     android:visibility="visible"
@@ -161,7 +226,7 @@
                     android:layout_below="@id/txt_walking_activity_value"
                     android:layout_toRightOf="@id/img_walking"
                     android:background="@android:color/black"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -176,7 +241,8 @@
                     android:gravity="center"
                     android:textColor="@color/torqoise"
                     android:textSize="16sp"
-                    android:visibility="gone"
+                    android:text="@string/calories_unit"
+                    android:visibility="visible"
                     app:typeface="robotoCondensed" />
 
 
@@ -203,6 +269,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
+                    android:visibility="gone"
                     android:layout_toRightOf="@id/img_running" />
 
 
@@ -213,9 +280,10 @@
                     android:layout_toRightOf="@id/img_running"
                     android:gravity="center"
                     android:minWidth="60dp"
+                    android:text="50.50"
                     android:textColor="@color/orange"
                     android:textSize="20sp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:typeface="robotoCondensed" />
 
                 <View
@@ -226,7 +294,7 @@
                     android:layout_below="@id/txt_running_activity_value"
                     android:layout_toRightOf="@id/img_running"
                     android:background="@android:color/black"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_running_activity_dimension"
@@ -239,7 +307,8 @@
                     android:gravity="center"
                     android:textColor="@color/torqoise"
                     android:textSize="16sp"
-                    android:visibility="gone"
+                    android:text="@string/distance_dimension"
+                    android:visibility="visible"
                     app:typeface="robotoCondensed" />
 
 
@@ -265,6 +334,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
+                    android:visibility="gone"
                     android:layout_toRightOf="@id/img_cycling" />
 
 
@@ -277,7 +347,8 @@
                     android:minWidth="60dp"
                     android:textColor="@color/orange"
                     android:textSize="20sp"
-                    android:visibility="gone"
+                    android:text="15000"
+                    android:visibility="visible"
                     app:typeface="robotoCondensed" />
 
                 <View
@@ -288,7 +359,7 @@
                     android:layout_below="@id/txt_cycling_activity_value"
                     android:layout_toRightOf="@id/img_cycling"
                     android:background="@android:color/black"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -300,6 +371,7 @@
                     android:layout_below="@id/txt_cycling_activity_value"
                     android:layout_toRightOf="@id/img_cycling"
                     android:gravity="center"
+                    android:text="@string/steps"
                     android:textColor="@color/torqoise"
                     android:textSize="16sp"
                     android:visibility="visible"
@@ -317,7 +389,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_below="@id/activities_fitness_container"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ProgressBar
             style="@style/Widget.AppCompat.ProgressBar"
@@ -354,12 +426,50 @@
                 android:layout_centerInParent="true"
                 android:visibility="gone" />
 
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/activities_view_pager"
-                android:layout_width="130dp"
+            <LinearLayout
+                android:layout_width="@dimen/activities_view_pager_width"
                 android:layout_height="wrap_content"
-                android:visibility="gone"></android.support.v4.view.ViewPager>
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:context="com.pluggdd.burnandearn.view.fragment.TotalCaloriesBurnedFragment">
+
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_activities_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/activities_text_header_footer"
+                    android:gravity="center"
+                    android:text="you have earned"
+                    android:textColor="@color/torqoise"
+                    app:typeface="robotoCondensed"
+                    />
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_activities_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/activities_text_size"
+                    android:gravity="center"
+                    android:text="10000"
+                    android:textColor="@color/orange"
+                    app:typeface="robotoCondensed"
+                    />
+
+                <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_activities_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/activities_text_header_footer"
+                    android:gravity="center"
+                    android:text="@string/calories_unit"
+                    android:textColor="@color/torqoise"
+                    app:typeface="robotoCondensed"
+                    />
+
+            </LinearLayout>
+
 
             <RelativeLayout
                 android:id="@+id/viewpager_indicator_container"
