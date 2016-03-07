@@ -73,7 +73,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="1700!"
                     android:textColor="@color/orange"
                     android:textSize="28sp"
                     app:typeface="robotoBoldCondensed" />
@@ -89,8 +88,8 @@
         android:layout_width="match_parent"
         android:layout_height="140dp"
         android:layout_alignParentBottom="true"
-        android:elevation="5dp"
-        android:visibility="invisible"
+        android:elevation="8dp"
+        android:visibility="gone"
         app:cardCornerRadius="1dp"
         app:cardElevation="3dp"
         app:contentPadding="5dp">
@@ -112,7 +111,8 @@
         android:layout_above="@id/business_offer_list_pager_container"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -131,14 +131,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="2dp"
                     android:src="@drawable/ic_walking" />
-
-                <ProgressBar
-                    android:id="@+id/walking_progress_bar"
-                    style="?android:attr/android:progressBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_toRightOf="@id/img_walking" />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_walking_activity_value"
@@ -161,7 +153,7 @@
                     android:layout_below="@id/txt_walking_activity_value"
                     android:layout_toRightOf="@id/img_walking"
                     android:background="@android:color/black"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -170,13 +162,12 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@id/txt_walking_activity_border"
                     android:layout_alignRight="@id/txt_walking_activity_border"
-                    android:layout_below="@id/txt_walking_activity_value"
+                    android:layout_below="@id/txt_walking_activity_border"
                     android:layout_centerHorizontal="true"
                     android:layout_toRightOf="@id/img_walking"
                     android:gravity="center"
                     android:textColor="@color/torqoise"
                     android:textSize="16sp"
-                    android:visibility="gone"
                     app:typeface="robotoCondensed" />
 
 
@@ -197,14 +188,6 @@
                     android:layout_marginRight="5dp"
                     android:src="@drawable/ic_running" />
 
-                <ProgressBar
-                    android:id="@+id/running_progress_bar"
-                    style="?android:attr/android:progressBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_toRightOf="@id/img_running" />
-
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_running_activity_value"
@@ -215,7 +198,6 @@
                     android:minWidth="60dp"
                     android:textColor="@color/orange"
                     android:textSize="20sp"
-                    android:visibility="gone"
                     app:typeface="robotoCondensed" />
 
                 <View
@@ -226,7 +208,7 @@
                     android:layout_below="@id/txt_running_activity_value"
                     android:layout_toRightOf="@id/img_running"
                     android:background="@android:color/black"
-                    android:visibility="gone" />
+                     />
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_running_activity_dimension"
@@ -234,12 +216,11 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@id/txt_running_activity_border"
                     android:layout_alignRight="@id/txt_running_activity_border"
-                    android:layout_below="@id/txt_running_activity_value"
+                    android:layout_below="@id/txt_running_activity_border"
                     android:layout_toRightOf="@id/img_running"
                     android:gravity="center"
                     android:textColor="@color/torqoise"
                     android:textSize="16sp"
-                    android:visibility="gone"
                     app:typeface="robotoCondensed" />
 
 
@@ -259,15 +240,6 @@
                     android:layout_marginRight="5dp"
                     android:src="@drawable/ic_cycling" />
 
-                <ProgressBar
-                    android:id="@+id/cycling_progress_bar"
-                    style="?android:attr/android:progressBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_toRightOf="@id/img_cycling" />
-
-
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_cycling_activity_value"
                     android:layout_width="wrap_content"
@@ -277,7 +249,6 @@
                     android:minWidth="60dp"
                     android:textColor="@color/orange"
                     android:textSize="20sp"
-                    android:visibility="gone"
                     app:typeface="robotoCondensed" />
 
                 <View
@@ -288,7 +259,7 @@
                     android:layout_below="@id/txt_cycling_activity_value"
                     android:layout_toRightOf="@id/img_cycling"
                     android:background="@android:color/black"
-                    android:visibility="gone" />
+                     />
 
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -297,12 +268,11 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@id/txt_cycling_activity_border"
                     android:layout_alignRight="@id/txt_cycling_activity_border"
-                    android:layout_below="@id/txt_cycling_activity_value"
+                    android:layout_below="@id/txt_cycling_activity_border"
                     android:layout_toRightOf="@id/img_cycling"
                     android:gravity="center"
                     android:textColor="@color/torqoise"
                     android:textSize="16sp"
-                    android:visibility="visible"
                     app:typeface="robotoCondensed" />
 
 
@@ -316,7 +286,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/activities_fitness_container"
+        android:layout_below="@id/points_earned_container"
         android:visibility="visible">
 
         <ProgressBar
@@ -329,12 +299,14 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/fitness_progress_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/activities_fitness_container"
         android:layout_below="@id/points_earned_container"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:visibility="gone">
 
         <com.hookedonplay.decoviewlib.DecoView
             android:id="@+id/deco_view"
@@ -346,20 +318,11 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true">
 
-            <ProgressBar
-                android:id="@+id/activities_progress_bar"
-                style="@style/Widget.AppCompat.ProgressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:visibility="gone" />
-
-
             <android.support.v4.view.ViewPager
                 android:id="@+id/activities_view_pager"
                 android:layout_width="130dp"
                 android:layout_height="wrap_content"
-                android:visibility="gone"></android.support.v4.view.ViewPager>
+                ></android.support.v4.view.ViewPager>
 
             <RelativeLayout
                 android:id="@+id/viewpager_indicator_container"
@@ -368,7 +331,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:paddingBottom="25dp"
-                android:visibility="visible">
+                >
 
                 <ImageView
                     android:id="@+id/viewpager_indicator1_image"

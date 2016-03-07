@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -30,12 +31,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -57,10 +65,18 @@ import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.activity.OfferDetailActivity;
+import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
+import com.pluggdd.burnandearn.utils.VolleySingleton;
+import com.pluggdd.burnandearn.utils.WebserviceAPI;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,12 +100,11 @@ public class DashboardFragment extends Fragment {
     private ViewPager mActivitiesViewPager;
     private AutoScrollViewPager mBusinessOfferListViewPager;
     private CardView mBusinessOfferListPagerContainer;
-    private RelativeLayout mViewPagerIndicatorContainer, mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer,mOfferListProgressBarContainer;
+    private RelativeLayout mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer,mOfferListProgressBarContainer,mFitnessActivityDecoViewContainer;
+    private LinearLayout mActivitiesTextContainer;
     private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image;
-    private Button mRedeemButton;
-    private ProgressBar mActivitiesProgressBar, mCyclingActivityProgressBar, mWalkingActivityProgressBar, mRunningActivityProgressBar,mProfileImageProgressBar;
-    private TextView mWalkingActivityValueText, mRunningActivityValueText, mCyclingActivityValueText, mWalkingActivityDimesionText, mRunningActivityDimensionText, mCyclingActivityDimensionText;
-    private View mWalkingActivityBorder,mRunningActivityBorder,mCyclingActivityBorder;
+    private ProgressBar mProfileImageProgressBar;
+    private TextView mWalkingActivityValueText, mRunningActivityValueText, mCyclingActivityValueText, mWalkingActivityDimesionText, mRunningActivityDimensionText, mCyclingActivityDimensionText,mPointsEarnedText;
     private ImageView mProfileImage;
     private GoogleApiClient mGoogleAPIClient;
     private ArrayList<FitnessActivity> mFitnessActivityList = new ArrayList<>(3);
@@ -100,6 +115,8 @@ public class DashboardFragment extends Fragment {
     private Spinner mDateFilterSpinner;
     private boolean mIsPermissionRequestRaised, mIsGetFitnessDataAsyncRunning;
     private PicassoImageLoaderHelper mImageLoaderHelper;
+    private PreferencesManager mPreferenceManager;
+    private String mFitnessEmail ="";
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -109,23 +126,18 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        mPointsEarnedText = (TextView) mView.findViewById(R.id.txt_total_points_earned);
         mCircularProgressDecoView = (DecoView) mView.findViewById(R.id.deco_view);
+        mFitnessActivityDecoViewContainer = (RelativeLayout) mView.findViewById(R.id.fitness_progress_container);
         mActivitiesViewPager = (ViewPager) mView.findViewById(R.id.activities_view_pager);
         mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
         mProfileImageProgressBar = (ProgressBar) mView.findViewById(R.id.profile_progress_bar);
-        mActivitiesProgressBar = (ProgressBar) mView.findViewById(R.id.activities_progress_bar);
-        mCyclingActivityProgressBar = (ProgressBar) mView.findViewById(R.id.cycling_progress_bar);
-        mWalkingActivityProgressBar = (ProgressBar) mView.findViewById(R.id.walking_progress_bar);
-        mRunningActivityProgressBar = (ProgressBar) mView.findViewById(R.id.running_progress_bar);
-        mViewPagerIndicatorContainer = (RelativeLayout) mView.findViewById(R.id.viewpager_indicator_container);
         mViewPagerIndicator1Image = (ImageView) mView.findViewById(R.id.viewpager_indicator1_image);
         mViewPagerIndicator2Image = (ImageView) mView.findViewById(R.id.viewpager_indicator2_image);
         mViewPagerIndicator3Image = (ImageView) mView.findViewById(R.id.viewpager_indicator3_image);
         mWalkingActivityContainer = (RelativeLayout) mView.findViewById(R.id.walking_activity_container);
+        mActivitiesTextContainer = (LinearLayout) mView.findViewById(R.id.activities_fitness_container);
         mWalkingActivityValueText = (TextView) mView.findViewById(R.id.txt_walking_activity_value);
-        mWalkingActivityBorder = mView.findViewById(R.id.txt_walking_activity_border);
-        mRunningActivityBorder = mView.findViewById(R.id.txt_running_activity_border);
-        mCyclingActivityBorder = mView.findViewById(R.id.txt_cycling_activity_border);
         mWalkingActivityDimesionText = (TextView) mView.findViewById(R.id.txt_walking_activity_dimension);
         mRunningActivityContainer = (RelativeLayout) mView.findViewById(R.id.running_activity_container);
         mRunningActivityValueText = (TextView) mView.findViewById(R.id.txt_running_activity_value);
@@ -138,11 +150,11 @@ public class DashboardFragment extends Fragment {
         mOfferListProgressBarContainer = (RelativeLayout) mView.findViewById(R.id.offer_list_progress_bar_container);
         mDateFilterSpinner = (Spinner) getActivity().findViewById(R.id.toolbar).findViewById(R.id.activities_time_spinner);
         mImageLoaderHelper = new PicassoImageLoaderHelper(getContext(),mProfileImage,mProfileImageProgressBar);
-        mImageLoaderHelper.loadImage(new PreferencesManager(getContext()).getStringValue(getString(R.string.profile_image_url)));
+        mPreferenceManager = new PreferencesManager(getContext());
+        mImageLoaderHelper.loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
         initializeActivitiesList();
         checkAndBuildGoogleApiClient();
-
-       /* // Check and request for location and get accounts permission
+        /* // Check and request for location and get accounts permission
         if (!checkLocationPermissions() && !checkGetAccountsPermissions()) {
             requestBothPermissions();
         } else if (!checkGetAccountsPermissions()) {
@@ -153,7 +165,7 @@ public class DashboardFragment extends Fragment {
             buildGoogleFitnessClient();
         }*/
         // Initial set up for circular decoview
-         createBackgroundSeries();
+        createBackgroundSeries();
         createBikingActivitySeries();
         createRunningActivitySeries();
         createWalkingActivitySeries();
@@ -265,13 +277,12 @@ public class DashboardFragment extends Fragment {
 
             }
         });
-
-
         return mView;
     }
 
     // To reset viewpager to initial position
     private void resetActivitiesViewPager() {
+
         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_selected);
         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
@@ -512,6 +523,7 @@ public class DashboardFragment extends Fragment {
         }
         if (mGoogleAPIClient != null && !mGoogleAPIClient.isConnected())
             mGoogleAPIClient.connect();
+
     }
 
     @Override
@@ -577,8 +589,7 @@ public class DashboardFragment extends Fragment {
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
-                        String email = Plus.AccountApi.getAccountName(mGoogleAPIClient);
-                        //Toast.makeText(getContext(), email,Toast.LENGTH_SHORT).show();
+                        mFitnessEmail = Plus.AccountApi.getAccountName(mGoogleAPIClient);
                         long end_time = Calendar.getInstance().getTimeInMillis();
                         Calendar day_start_time = Calendar.getInstance();
                         day_start_time.set(Calendar.HOUR_OF_DAY, 0);
@@ -639,24 +650,10 @@ public class DashboardFragment extends Fragment {
             mTotalStepCount = 0;
             mFitnessActivityList.clear();
             initializeActivitiesList();
-            mActivitiesProgressBar.setVisibility(View.VISIBLE);
-            mCyclingActivityProgressBar.setVisibility(View.VISIBLE);
-            mWalkingActivityProgressBar.setVisibility(View.VISIBLE);
-            mRunningActivityProgressBar.setVisibility(View.VISIBLE);
-            mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
-            mActivitiesViewPager.setVisibility(View.GONE);
-            mViewPagerIndicatorContainer.setVisibility(View.GONE);
-            mWalkingActivityValueText.setVisibility(View.GONE);
-            mWalkingActivityDimesionText.setVisibility(View.GONE);
-            mRunningActivityValueText.setVisibility(View.GONE);
-            mRunningActivityDimensionText.setVisibility(View.GONE);
-            mCyclingActivityValueText.setVisibility(View.GONE);
-            mCyclingActivityDimensionText.setVisibility(View.GONE);
-            mWalkingActivityBorder.setVisibility(View.GONE);
-            mRunningActivityBorder.setVisibility(View.GONE);
-            mCyclingActivityBorder.setVisibility(View.GONE);
             mOfferListProgressBarContainer.setVisibility(View.VISIBLE);
-            mBusinessOfferListPagerContainer.setVisibility(View.INVISIBLE);
+            mBusinessOfferListPagerContainer.setVisibility(View.GONE);
+            mActivitiesTextContainer.setVisibility(View.GONE);
+            mFitnessActivityDecoViewContainer.setVisibility(View.GONE);
         }
 
         @Override
@@ -671,40 +668,10 @@ public class DashboardFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mActivitiesProgressBar.setVisibility(View.GONE);
-            mCyclingActivityProgressBar.setVisibility(View.GONE);
-            mWalkingActivityProgressBar.setVisibility(View.GONE);
-            mRunningActivityProgressBar.setVisibility(View.GONE);
-            mActivitiesViewPager.setVisibility(View.VISIBLE);
-            mViewPagerIndicatorContainer.setVisibility(View.VISIBLE);
-            mWalkingActivityValueText.setVisibility(View.VISIBLE);
-            mWalkingActivityDimesionText.setVisibility(View.VISIBLE);
-            mRunningActivityValueText.setVisibility(View.VISIBLE);
-            mRunningActivityDimensionText.setVisibility(View.VISIBLE);
-            mCyclingActivityValueText.setVisibility(View.VISIBLE);
-            mCyclingActivityDimensionText.setVisibility(View.VISIBLE);
-            mWalkingActivityBorder.setVisibility(View.VISIBLE);
-            mRunningActivityBorder.setVisibility(View.VISIBLE);
-            mCyclingActivityBorder.setVisibility(View.VISIBLE);
-            mOfferListProgressBarContainer.setVisibility(View.GONE);
-            mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
-            mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
-            mBusinessOfferListViewPager.setAdapter(new CustomBusinessOfferListAdapter());
-            mBusinessOfferListViewPager.setInterval(5000);
-            mBusinessOfferListViewPager.startAutoScroll(5000);
-            Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
-            if (mActivitiesViewPager.getCurrentItem() == 0)
-                resetActivitiesViewPager();
-            else {
-                mActivitiesViewPager.setCurrentItem(0, true);
-                mCircularProgressDecoView.executeReset();
-                createBackgroundSeries();
-                createBikingActivitySeries();
-                createRunningActivitySeries();
-                createWalkingActivitySeries();
-                resetActivitiesViewPager();
-            }
-            mIsGetFitnessDataAsyncRunning = false;
+            if(mDateFilterSpinner.getSelectedItemPosition() == 0)
+               getBusinessList();
+            else
+                updateUI(null);
             /*Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
             for (FitnessActivity activity : mFitnessActivityList) {
                 Log.e("Nmae", activity.getName());
@@ -718,6 +685,37 @@ public class DashboardFragment extends Fragment {
         }
     }
 
+    private void updateUI(ArrayList<BusinessDetails> businessList){
+        mOfferListProgressBarContainer.setVisibility(View.GONE);
+        if(businessList != null){
+            if(businessList.size() > 0){
+                mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
+                mBusinessOfferListViewPager.setAdapter(new CustomBusinessOfferListAdapter(businessList));
+                mBusinessOfferListViewPager.setInterval(5000);
+                mBusinessOfferListViewPager.startAutoScroll(5000);
+            }else{
+                mBusinessOfferListPagerContainer.setVisibility(View.INVISIBLE);
+            }
+        }else{
+            mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
+        }
+        mActivitiesTextContainer.setVisibility(View.VISIBLE);
+        mFitnessActivityDecoViewContainer.setVisibility(View.VISIBLE);
+        mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
+        Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
+        if (mActivitiesViewPager.getCurrentItem() == 0)
+            resetActivitiesViewPager();
+        else {
+            mActivitiesViewPager.setCurrentItem(0, true);
+            mCircularProgressDecoView.executeReset();
+            createBackgroundSeries();
+            createBikingActivitySeries();
+            createRunningActivitySeries();
+            createWalkingActivitySeries();
+            resetActivitiesViewPager();
+        }
+        mIsGetFitnessDataAsyncRunning = false;
+    }
 
     private DataReadRequest getFitnessData(long start_time, long end_time) {
         DataReadRequest mFitnessDataRequest = new DataReadRequest.Builder()
@@ -934,91 +932,6 @@ public class DashboardFragment extends Fragment {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        /*if (requestCode == REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-                Toast.makeText(getContext(),"Please grant location permission for better usage of app",Toast.LENGTH_SHORT).show();
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted.
-                buildGoogleFitnessClient();
-                mGoogleAPIClient.connect();
-            } else {
-                Snackbar.make(
-                        mView,
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
-            }
-        }else if (requestCode == REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-                Toast.makeText(getContext(),"Please grant account permission for better usage of app",Toast.LENGTH_SHORT).show();
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted.
-                buildGoogleFitnessClient();
-                mGoogleAPIClient.connect();
-            } else {
-                Snackbar.make(
-                        mView,
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
-            }
-        }else if (requestCode == REQUEST_BOTH_PERMISSION_CODE) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-                Toast.makeText(getContext(),"Please grant all permission for better usage of app",Toast.LENGTH_SHORT).show();
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted.
-                buildGoogleFitnessClient();
-                mGoogleAPIClient.connect();
-            } else {
-                Snackbar.make(
-                        mView,
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
-            }
-        }*/
 
     }
 
@@ -1032,26 +945,6 @@ public class DashboardFragment extends Fragment {
             if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION))
                 permissionsNeeded.add("Location");
             if (permissionsList.size() > 0) {
-                /*if (permissionsNeeded.size() > 0) {
-                    // Need Rationale
-                    String message = "You need to grant access to " + permissionsNeeded.get(0);
-                    for (int i = 1; i < permissionsNeeded.size(); i++)
-                        message = message + ", " + permissionsNeeded.get(i);
-                    Snackbar.make(
-                            getView(),
-                            message,
-                            Snackbar.LENGTH_INDEFINITE)
-                            .setAction(R.string.ok, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    // Request permission
-                                    requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), REQUEST_BOTH_PERMISSION_CODE);
-                                }
-                            })
-                            .show();
-
-                    return;
-                }*/
                 requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
                         REQUEST_BOTH_PERMISSION_CODE);
                 return;
@@ -1073,34 +966,145 @@ public class DashboardFragment extends Fragment {
         return true;
     }
 
+    private void getBusinessList(){
+        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
+        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.BUSINESS_LIST, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("response", response);
+                if (response != null) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response);
+                        if (!responseJson.optString("msg").trim().equalsIgnoreCase("No Offer Found")) {
+                            ArrayList mBusinessOfferList = new ArrayList<BusinessDetails>();
+                            mPointsEarnedText.setText(responseJson.optInt("yourpoint")+"!");
+                            JSONArray business_list = responseJson.optJSONArray("businesslist");
+                            if (business_list != null && business_list.length() > 0) {
+                                for (int i = 0; i < business_list.length(); i++) {
+                                    JSONObject business_object = business_list.optJSONObject(i);
+                                    BusinessDetails businessDetails = new BusinessDetails();
+                                    businessDetails.setName(business_object.optString("Business Name"));
+                                    businessDetails.setOffer_name(business_object.optString("offerName"));
+                                    businessDetails.setLogo(business_object.optString("Business Image"));
+                                    businessDetails.setPromo(business_object.optString("offerText"));
+                                    businessDetails.setPoints_needed(business_object.optInt("requiredPoints"));
+                                    businessDetails.setCoupon_expiry_date(business_object.optString("endingDate"));
+                                    businessDetails.setHow_to_reedem(business_object.optString("How to Redeem"));
+                                    businessDetails.setUrl(business_object.optString("site"));
+                                    businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
+                                    businessDetails.setCoupon(business_object.optString("couponCode"));
+                                    mBusinessOfferList.add(businessDetails);
+                                }
+                            } else {
+                                if(!isDetached())
+                                    Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                            }
+                           updateUI(mBusinessOfferList);
+                        } else {
+                            updateUI(null);
+                            if(!isDetached())
+                                Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (JSONException e) {
+                        updateUI(null);
+                        e.printStackTrace();
+                        if(!isDetached())
+                            Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    updateUI(null);
+                    if(isVisible())
+                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                String json_request = "";
+                try{
+                    JSONObject root = new JSONObject();
+                    root.put("user_id",mPreferenceManager.getStringValue(getString(R.string.user_id)));
+                    root.put("date_time","");
+                    root.put("flag","android");
+                    root.put("fitness_email_id",mFitnessEmail);
+                    JSONArray activities_array = new JSONArray();
+                    for(int i=0; i< 3; i++){
+                        JSONObject activity = new JSONObject();
+                        activity.put("name",mFitnessActivityList.get(i).getName());
+                        activity.put("calories_burnt",mFitnessActivityList.get(i).getCalories_expended() == -1 ? 0 : mFitnessActivityList.get(i).getCalories_expended());
+                        activity.put("step_count",mFitnessActivityList.get(i).getStep_count() == -1 ? 0 : mFitnessActivityList.get(i).getStep_count());
+                        activity.put("distance",mFitnessActivityList.get(i).getDistance() == -1 ? 0 : mFitnessActivityList.get(i).getDistance());
+                        activities_array.put(activity);
+                    }
+                    root.put("activities",activities_array);
+                    json_request = root.toString();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                Log.i("json request", json_request);
+                params.put("jsonrequest", json_request);
+                return params;
+            }
+        }));
+    }
+
     class CustomBusinessOfferListAdapter extends PagerAdapter{
 
         private LayoutInflater mLayoutInflater;
+        private ArrayList<BusinessDetails> mBusinessList;
 
-        CustomBusinessOfferListAdapter(){
+        CustomBusinessOfferListAdapter(ArrayList<BusinessDetails> businessList){
             mLayoutInflater = LayoutInflater.from(getContext());
+            mBusinessList = businessList;
         }
 
         @Override
         public int getCount() {
-            return 10;
+            return mBusinessList.size();
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = mLayoutInflater.inflate(R.layout.pager_business_offer_list,container,false);
-            Button mGrabNowButton = (Button) view.findViewById(R.id.btn_grab_now);
+            final BusinessDetails businessDetail = mBusinessList.get(position);
+            View itemView = mLayoutInflater.inflate(R.layout.pager_business_offer_list,container,false);
+            TextView offerRewardsText = (TextView) itemView.findViewById(R.id.txt_offer_promo);
+            TextView nameText = (TextView) itemView.findViewById(R.id.txt_business_title);
+            ImageView businessImage = (ImageView) itemView.findViewById(R.id.img_business_logo);
+            ProgressBar logoProgressBar = (ProgressBar) itemView.findViewById(R.id.logo_progress_bar);
+            nameText.setText(businessDetail.getName());
+            new PicassoImageLoaderHelper(getContext(),businessImage,logoProgressBar).loadImage(businessDetail.getLogo());
+            offerRewardsText.setText(businessDetail.getPromo());
+            Button mGrabNowButton = (Button) itemView.findViewById(R.id.btn_grab_now);
             mGrabNowButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     /*Bundle bundle = new Bundle();
                     bundle.putString(getString(R.string.page_flag), DashboardFragment.this.getClass().getSimpleName());
                     mListener.changeFragment(bundle);*/
-                    startActivity(new Intent(getActivity(), OfferDetailActivity.class));
+                    Intent intent = new Intent(getActivity(), OfferDetailActivity.class);
+                    intent.putExtra(getString(R.string.logo_url),businessDetail.getLogo());
+                    intent.putExtra(getString(R.string.business_name),businessDetail.getName());
+                    intent.putExtra(getString(R.string.offer_name),businessDetail.getOffer_name());
+                    intent.putExtra(getString(R.string.offer_promo),businessDetail.getPromo());
+                    intent.putExtra(getString(R.string.how_to_redeem),businessDetail.getHow_to_reedem());
+                    intent.putExtra(getString(R.string.coupon_expiry_date),businessDetail.getCoupon_expiry_date());
+                    intent.putExtra(getString(R.string.coupon),businessDetail.getCoupon());
+                    intent.putExtra(getString(R.string.redirect_url),businessDetail.getUrl() /*"https://play.google.com/store/apps/details?id=com.tingtongapp.android&hl=en"*/);
+                    startActivity(intent);
                 }
             });
-            container.addView(view);
-            return view;
+            container.addView(itemView);
+            return itemView;
         }
 
         @Override
@@ -1113,6 +1117,4 @@ public class DashboardFragment extends Fragment {
             return view == object;
         }
     }
-
-
 }

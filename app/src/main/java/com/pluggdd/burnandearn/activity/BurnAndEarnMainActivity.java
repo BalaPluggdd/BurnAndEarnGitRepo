@@ -17,7 +17,9 @@ import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
+import com.pluggdd.burnandearn.view.fragment.AboutUsFragment;
 import com.pluggdd.burnandearn.view.fragment.AppIntroductionFragment;
+import com.pluggdd.burnandearn.view.fragment.ContactUsFragment;
 import com.pluggdd.burnandearn.view.fragment.DashboardFragment;
 import com.pluggdd.burnandearn.view.fragment.LoginFragment;
 import com.pluggdd.burnandearn.view.fragment.OfferDetailFragment;
@@ -84,7 +86,7 @@ public class BurnAndEarnMainActivity extends AppCompatActivity implements Fragme
         // If received from Dashboard fragment , bypasss the callback to Dashboard Fragment's onActivityResult
         Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if(mCurrentFragment instanceof DashboardFragment){
-            mCurrentFragment.onActivityResult(requestCode,resultCode,data);
+            mCurrentFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -153,23 +155,57 @@ public class BurnAndEarnMainActivity extends AppCompatActivity implements Fragme
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         switch (item.getItemId()) {
             case R.id.action_offers_and_rewards:
-                Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
                 if (mCurrentFragment instanceof OffersAndRewardsFragment == false) {
                     mActivitiesTimeSpinner.setVisibility(View.GONE);
                     mBackImage.setVisibility(View.VISIBLE);
                     mToolBarTitle.setVisibility(View.VISIBLE);
                     getSupportActionBar().setIcon(0);
                     mToolBarTitle.setText(getString(R.string.action_offers_and_rewards));
+                    if(mCurrentFragment instanceof DashboardFragment == false)
+                        mFragmentHelper.removeFromBackStack();
                     mFragmentHelper.replaceFragment(R.id.fragment_container, new OffersAndRewardsFragment(), true);
+                    /*if(mCurrentFragment instanceof DashboardFragment)
+                        mFragmentHelper.replaceFragment(R.id.fragment_container, new OffersAndRewardsFragment(), true);
+                    else
+                        mFragmentHelper.replaceFragment(R.id.fragment_container, new OffersAndRewardsFragment(), false);*/
                 }
                 break;
             case R.id.action_how_it_works:
                 break;
             case R.id.action_about_us:
+                if (mCurrentFragment instanceof AboutUsFragment == false) {
+                    mActivitiesTimeSpinner.setVisibility(View.GONE);
+                    mBackImage.setVisibility(View.VISIBLE);
+                    mToolBarTitle.setVisibility(View.VISIBLE);
+                    getSupportActionBar().setIcon(0);
+                    mToolBarTitle.setText(getString(R.string.action_about_us));
+                    if(mCurrentFragment instanceof DashboardFragment == false)
+                        mFragmentHelper.removeFromBackStack();
+                    mFragmentHelper.replaceFragment(R.id.fragment_container, new AboutUsFragment(), true);
+                    /*if(mCurrentFragment instanceof DashboardFragment)
+                       mFragmentHelper.replaceFragment(R.id.fragment_container, new AboutUsFragment(), true);
+                    else
+                        mFragmentHelper.replaceFragment(R.id.fragment_container, new AboutUsFragment(), false);*/
+                }
                 break;
             case R.id.action_contact_us:
+                if (mCurrentFragment instanceof ContactUsFragment == false) {
+                    mActivitiesTimeSpinner.setVisibility(View.GONE);
+                    mBackImage.setVisibility(View.VISIBLE);
+                    mToolBarTitle.setVisibility(View.VISIBLE);
+                    getSupportActionBar().setIcon(0);
+                    mToolBarTitle.setText(getString(R.string.action_contact_us));
+                    if(mCurrentFragment instanceof DashboardFragment == false)
+                        mFragmentHelper.removeFromBackStack();
+                    mFragmentHelper.replaceFragment(R.id.fragment_container, new ContactUsFragment(), true);
+                    /*if(mCurrentFragment instanceof DashboardFragment)
+                        mFragmentHelper.replaceFragment(R.id.fragment_container, new ContactUsFragment(), true);
+                    else
+                        mFragmentHelper.replaceFragment(R.id.fragment_container, new ContactUsFragment(), false);*/
+                }
                 break;
 
         }

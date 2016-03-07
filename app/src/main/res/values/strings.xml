@@ -66,4 +66,28 @@
     <string name="calories_unit">Calories</string>
     <string name="distance_travelled">You have covered</string>
     <string name="steps_taken">You have taken</string>
+    <string name="terms_and_conditions">Terms And Conditions*</string>
+    <string name="no_offer">Currently No Offers Exits. \n Try after somtime</string>
+    <string name="philosopy_behind">Philosophy behind</string>
+    <string name="philosopy_behind_data">While each one of us understands the necessity for physical activity in ensuring a healthy life, majority of us do not find just health as a motivating factor for excersing.  We are Burn&amp;Earn want to give you one more reason to excersize. As you burn your calories and get healthier, we reward you with points that you can use to get custom and tailor made offers, deals, complimentary things for yourself.</string>
+    <string name="why_how_it_helps">Why and how it helps?</string>
+    <string name="why_how_it_helps_data">We believe that physical activities, apart from keeping you healthy, ensure the general well being of the planet as well. How? Here are a few ways how:</string>
+    <string name="why_how_it_helps_entries">-Save Fuel when you walk or cycle to you. workplace \n- Lesser pollution as you walk or cycle \n- Lesser traffic \n- Saving money \n- Lesser expenditure on hospitals \n- Governments can focus on infra like schools hospitals etc, if we reduce congestion on roads</string>
+    <string name="about_us_footer">So go, burn your calories, while we run around and gather things that you love!</string>
+    <string name="we_are_there_for_you">We are there for you!</string>
+    <string name="let_us_know_how_we_can_help">Let us know how we can help...</string>
+    <string name="hint_subject">Subject</string>
+    <string name="hint_feedback_request">Feedback / Request</string>
+    <string name="send">SEND</string>
+    <string name="logo_url">logo_url</string>
+    <string name="business_name">business_name</string>
+    <string name="offer_name">offer_name</string>
+    <string name="offer_promo">offer_rpomo</string>
+    <string name="how_to_redeem">how to redeem</string>
+    <string name="coupon">Coupon</string>
+    <string name="redirect">REDIRECT</string>
+    <string name="cancel">CANCEL</string>
+    <string name="coupon_expiry_date">Coupon expiry date</string>
+    <string name="redirect_url">redirect url</string>
+
 </resources>

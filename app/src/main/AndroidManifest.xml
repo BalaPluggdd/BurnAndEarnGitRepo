@@ -47,6 +47,13 @@
             android:parentActivityName="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" >
 
         </activity>
+
+       <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="d0ba1e1db49d7532d308f492b8d08f3dd051fb8f" />
+         <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="d0ba1e1db49d7532d308f492b8d08f3dd051fb8f" />
     </application>
 
 </manifest>

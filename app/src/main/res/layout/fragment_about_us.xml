@@ -1,0 +1,135 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_app_background"
+    android:fillViewport="true"
+    android:padding="5dp"
+    tools:context="com.pluggdd.burnandearn.view.fragment.AboutUsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/philosopy_behind"
+            android:textSize="20sp"
+            android:textColor="@color/torqoise"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/black"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/philosopy_behind_data"
+            android:textSize="18sp"
+            android:layout_marginTop="5dp"
+            android:textColor="@android:color/black"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/why_how_it_helps"
+            android:textSize="20sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/torqoise"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/black"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/why_how_it_helps_data"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/why_how_it_helps_entries"
+            android:textSize="18sp"
+            android:paddingLeft="40dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/orange"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about_us_footer"
+            android:textSize="20sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/torqoise"/>
+
+
+
+        <!--<view
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/black">
+        </view>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/philosopy_behind_data"
+            android:textSize="22sp"
+            android:textColor="@android:color/black"/>
+
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/why_how_it_helps"
+            android:textSize="22sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/torqoise"/>
+
+        <view
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/black">
+        </view>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/why_how_it_helps_data"
+            android:textSize="22sp"
+            android:textColor="@android:color/black"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/why_how_it_helps_entries"
+            android:textSize="22sp"
+            android:paddingLeft="30dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/orange"/>
+
+        <com.pluggdd.burnandearn.font.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about_us_footer"
+            android:textSize="22sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/torqoise"/>
+
+-->
+
+    </LinearLayout>
+
+
+</ScrollView>

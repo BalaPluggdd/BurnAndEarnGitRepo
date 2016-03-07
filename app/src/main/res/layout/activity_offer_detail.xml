@@ -24,11 +24,19 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <ProgressBar
+                android:id="@+id/logo_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center" />
+
+
             <ImageView
-                android:id="@+id/imgToolbar"
+                android:id="@+id/img_business_logo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_amazon_logo"
                 app:layout_collapseMode="parallax" />
 
             <android.support.v7.widget.Toolbar
@@ -75,11 +83,11 @@
                 app:contentPadding="5dp">
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
+                    android:id="@+id/txt_offer_promo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginTop="10dp"
-                    android:text="Get flat 5% cashback on recharges and bill payments, including utilities and DTH, of Rs. 20 or more. Use the coupon code to avail this offer. Maximum cashback of Rs. 200. Code can be used upto 5 times per user. A number can be recharged only 5 times using this campaign. Cashback will be credited within 24 hours of the transaction into the user's Paytm wallet. Valid for all users. Code is not valid for Airtel prepaid, postpaid, DTH, electricity and landline bill payments. Valid on web and app"
                     android:textColor="@android:color/black"
                     android:textSize="20sp"
                     app:typeface="robotoCondensed" />
@@ -113,14 +121,13 @@
                         android:textColor="@android:color/black"
                         android:textSize="20sp"
                         android:textStyle="bold"
-
                         app:typeface="robotoBoldCondensed" />
 
                     <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_how_to_redeem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Open the app and add product to cart and enter coupon code.Open the app and add product to cart and enter coupon code."
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         app:typeface="robotoCondensed" />
@@ -137,11 +144,12 @@
             </android.support.v7.widget.CardView>
 
             <Button
+                android:id="@+id/btn_redeem_now"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/button_background_unselected"
+                android:background="@drawable/selector_button"
                 android:paddingLeft="30dp"
                 android:paddingRight="30dp"
                 android:text="@string/redeem_now"

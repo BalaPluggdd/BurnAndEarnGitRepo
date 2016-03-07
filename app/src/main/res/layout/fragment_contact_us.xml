@@ -1,0 +1,75 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:context="com.pluggdd.burnandearn.view.fragment.ContactUsFragment">
+
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/we_are_there_for_you"
+        android:textSize="20sp"
+        android:textColor="@color/torqoise"/>
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/let_us_know_how_we_can_help"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:textColor="@android:color/black"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@android:color/darker_gray">
+
+        <EditText
+            android:id="@+id/edt_subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_subject"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@color/colorAccent"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@android:color/darker_gray">
+
+        <EditText
+            android:id="@+id/edt_feedback_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@color/colorAccent"
+            android:hint="@string/hint_feedback_request" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@color/orange"
+        android:minHeight="30dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingTop="5dp"
+        android:text="@string/send"
+        android:textSize="18sp" />
+
+
+
+
+</LinearLayout>

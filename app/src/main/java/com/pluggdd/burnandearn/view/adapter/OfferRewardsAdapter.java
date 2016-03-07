@@ -1,7 +1,9 @@
 package com.pluggdd.burnandearn.view.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,11 +13,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.Response;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.activity.OfferDetailActivity;
+import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
+import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.view.fragment.OffersAndRewardsFragment;
+
+import java.util.ArrayList;
 
 /**
  * Created by User on 12-Feb-16.
@@ -26,11 +35,15 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
     private int mLastPosition = -1;
     private FragmentInteraction mListener;
     private OffersAndRewardsFragment mFragment;
+    private ArrayList<BusinessDetails> mBusinessOfferList;
 
-    public OfferRewardsAdapter(Context context,FragmentInteraction listener,OffersAndRewardsFragment fragment) {
+
+    public OfferRewardsAdapter(Context context,ArrayList<BusinessDetails> mBusinessList,FragmentInteraction listener,OffersAndRewardsFragment fragment) {
         mContext = context;
         mListener = listener;
         mFragment = fragment;
+        mBusinessOfferList = mBusinessList;
+
     }
 
     @Override
@@ -42,21 +55,33 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
 
     @Override
     public void onBindViewHolder(final RestaurentLiveDealViewHolder holder, int position) {
-        //setAnimation(holder.sContainer, position);
-        /*holder.sContainer.setOnClickListener(new View.OnClickListener() {
+        setAnimation(holder.sContainer, position);
+        final BusinessDetails businessDetail = mBusinessOfferList.get(position);
+        holder.sNameText.setText(businessDetail.getName());
+        new PicassoImageLoaderHelper(mContext,holder.sBusinessImage,holder.sLogoProgressBar).loadImage(businessDetail.getLogo());
+        holder.sOfferRewardsText.setText(businessDetail.getPromo());
+        holder.sPointsNeeded.setText("Points needed : " + businessDetail.getPoints_needed());
+
+        holder.sRedeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ExtrasManager extras = new ExtrasManager();
-                extras.setStringValue(mContext.getString(R.string.page_flag),"NearMyRestaurentListFragment");
-                extras.setParceableValue(mContext.getString(R.string.image),((BitmapDrawable)holder.sRestaurentImage.getDrawable()).getBitmap());
-                mListener.changeFragmentWithSharedElements(mFragment,extras.getBundle(), holder.sRestaurentImage);
+                Intent intent = new Intent(mContext, OfferDetailActivity.class);
+                intent.putExtra(mContext.getString(R.string.logo_url),businessDetail.getLogo());
+                intent.putExtra(mContext.getString(R.string.business_name),businessDetail.getName());
+                intent.putExtra(mContext.getString(R.string.offer_name),businessDetail.getOffer_name());
+                intent.putExtra(mContext.getString(R.string.offer_promo),businessDetail.getPromo());
+                intent.putExtra(mContext.getString(R.string.how_to_redeem),businessDetail.getHow_to_reedem());
+                intent.putExtra(mContext.getString(R.string.coupon_expiry_date),businessDetail.getCoupon_expiry_date());
+                intent.putExtra(mContext.getString(R.string.coupon),businessDetail.getCoupon());
+                intent.putExtra(mContext.getString(R.string.redirect_url),businessDetail.getUrl());
+                mContext.startActivity(intent);
             }
-        });*/
+        });
     }
 
     @Override
     public int getItemCount() {
-        return 5;
+        return mBusinessOfferList.size();
     }
 
     public static class RestaurentLiveDealViewHolder extends RecyclerView.ViewHolder {
@@ -65,16 +90,17 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
         private ImageView sBusinessImage;
         private TextView sOfferRewardsText, sNameText, sPointsNeeded;
         private Button sRedeemButton;
-
+        private ProgressBar sLogoProgressBar;
 
         public RestaurentLiveDealViewHolder(View itemView) {
             super(itemView);
             sContainer = (CardView) itemView.findViewById(R.id.offers_rewards_container);
-            sOfferRewardsText = (TextView) itemView.findViewById(R.id.txt_offer_rewards);
-            sNameText = (TextView) itemView.findViewById(R.id.name);
+            sOfferRewardsText = (TextView) itemView.findViewById(R.id.txt_offer_promo);
+            sNameText = (TextView) itemView.findViewById(R.id.txt_business_title);
             sPointsNeeded = (TextView) itemView.findViewById(R.id.txt_points_needed);
-            sRedeemButton = (Button) itemView.findViewById(R.id.btn_redeem);
-            sBusinessImage = (ImageView) itemView.findViewById(R.id.business_image);
+            sRedeemButton = (Button) itemView.findViewById(R.id.btn_grab_now);
+            sBusinessImage = (ImageView) itemView.findViewById(R.id.img_business_logo);
+            sLogoProgressBar = (ProgressBar) itemView.findViewById(R.id.logo_progress_bar);
         }
     }
 
