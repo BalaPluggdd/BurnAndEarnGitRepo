@@ -75,8 +75,19 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_centerInParent="true"
+                    android:layout_marginRight="8dp"
                     android:layout_toRightOf="@id/viewpager_indicator2_image"
                     android:src="@drawable/viewpager_indicator_unselected" />
+
+                <ImageView
+                    android:id="@+id/viewpager_indicator4_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/viewpager_indicator3_image"
+                    android:src="@drawable/viewpager_indicator_unselected" />
+
 
                 <ImageView
                     android:id="@+id/viewpager_forward_close_image"

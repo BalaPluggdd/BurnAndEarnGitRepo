@@ -26,20 +26,25 @@ public class PicassoImageLoaderHelper {
 
 
     public void loadImage(String url){
-        mPicasso
-                .load(url)
-                .noFade()
-                .into(mImageView, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        mLoadingProgressBar.setVisibility(View.GONE);
-                    }
+        if(!url.equalsIgnoreCase("")){
+            mPicasso
+                    .load(url)
+                    .noFade()
+                    .into(mImageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            mLoadingProgressBar.setVisibility(View.GONE);
+                        }
 
-                    @Override
-                    public void onError() {
+                        @Override
+                        public void onError() {
 
-                    }
-                });
+                        }
+                    });
+
+        }else{
+            mLoadingProgressBar.setVisibility(View.GONE);
+        }
 
     }
 

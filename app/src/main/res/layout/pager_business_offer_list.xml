@@ -68,7 +68,8 @@
             android:paddingRight="3dp"
             android:paddingTop="5dp"
             android:text="@string/grap_now"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:foreground="?android:attr/selectableItemBackground"/>
 
     </LinearLayout>
 

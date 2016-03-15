@@ -24,10 +24,11 @@ import com.pluggdd.burnandearn.utils.PreferencesManager;
 public class AppIntroductionFragment extends Fragment {
 
     // Iniitialization of views and variables
+
     private FragmentInteraction mFragmentInteraction;
     private ViewPager mAppIntroViewPager;
     private TextView mSkipText,mDoneText;
-    private ImageView mViewPagerIndicator1Image,mViewPagerIndicator2Image,mViewPagerIndicator3Image,mViewPagerForwardCloseImage;
+    private ImageView mViewPagerIndicator1Image,mViewPagerIndicator2Image,mViewPagerIndicator3Image,mViewPagerIndicator4Image,mViewPagerForwardCloseImage;
     private PreferencesManager mPreferenceManager;
 
     public AppIntroductionFragment() {
@@ -48,6 +49,7 @@ public class AppIntroductionFragment extends Fragment {
         mViewPagerIndicator1Image = (ImageView) view.findViewById(R.id.viewpager_indicator1_image);
         mViewPagerIndicator2Image = (ImageView) view.findViewById(R.id.viewpager_indicator2_image);
         mViewPagerIndicator3Image = (ImageView) view.findViewById(R.id.viewpager_indicator3_image);
+        mViewPagerIndicator4Image = (ImageView) view.findViewById(R.id.viewpager_indicator4_image);
         mViewPagerForwardCloseImage = (ImageView) view.findViewById(R.id.viewpager_forward_close_image);
         mSkipText = (TextView) view.findViewById(R.id.txt_skip);
         mDoneText = (TextView) view.findViewById(R.id.txt_done);
@@ -68,11 +70,13 @@ public class AppIntroductionFragment extends Fragment {
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         break;
                     case 1:
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mSkipText.setVisibility(View.VISIBLE);
                         mViewPagerForwardCloseImage.setVisibility(View.VISIBLE);
                         mDoneText.setVisibility(View.GONE);
@@ -81,6 +85,16 @@ public class AppIntroductionFragment extends Fragment {
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_selected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mSkipText.setVisibility(View.VISIBLE);
+                        mDoneText.setVisibility(View.GONE);
+                        mViewPagerForwardCloseImage.setVisibility(View.VISIBLE);
+                        break;
+                    case 3:
+                        mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         mSkipText.setVisibility(View.GONE);
                         mDoneText.setVisibility(View.VISIBLE);
                         mViewPagerForwardCloseImage.setVisibility(View.GONE);
@@ -156,6 +170,8 @@ public class AppIntroductionFragment extends Fragment {
                     return new AppIntroduction2Fragment();
                 case 2:
                     return new AppIntroduction3Fragment();
+                case 3:
+                    return new AppIntroduction4Fragment();
 
             }
             return null;
@@ -163,7 +179,7 @@ public class AppIntroductionFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     }
 

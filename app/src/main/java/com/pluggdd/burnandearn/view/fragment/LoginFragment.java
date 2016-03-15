@@ -77,7 +77,7 @@ import java.util.Map;
 /**
  * Fragment to display and manage login details
  */
-public class LoginFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class LoginFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final int GOOGLE_PLUS_SIGN_REQUEST_CODE = 1;
     public static final int REQUEST_GET_ACCOUNTS_PERMISSION_CODE = 2;
@@ -106,7 +106,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_login, container, false);
         // Referencing views
@@ -122,19 +122,22 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 .requestEmail()
                 .requestScopes(new Scope(Scopes.PLUS_LOGIN))
                 .build();
+
         if (mGooglePlayAvailability.isGooglePlayServicesAvailable(getContext()) == ConnectionResult.SUCCESS) {
-            mGoogleAPIClient = new GoogleApiClient.Builder(getActivity())
-                    .enableAutoManage(getActivity(), this)
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                    .addApi(Plus.API)
-                    .build();
+            try {
+                setupGoogleApiClient(gso);
+            } catch (IllegalStateException e) {
+                if (mGoogleAPIClient != null)
+                    mGoogleAPIClient.stopAutoManage(getActivity());
+                setupGoogleApiClient(gso);
+            }
         }
         mGooglePlusSignInButton.setSize(SignInButton.SIZE_WIDE);
         mGooglePlusSignInButton.setScopes(gso.getScopeArray());
-        setGooglePlusButtonText(mGooglePlusSignInButton,getString(R.string.google_plus_login));
+        setGooglePlusButtonText(mGooglePlusSignInButton, getString(R.string.google_plus_login));
         // Facebook sign in set up
         mFBLoginButton.setFragment(this);
-        mFBLoginButton.setReadPermissions(Arrays.asList("public_profile,email"));
+        mFBLoginButton.setReadPermissions(Arrays.asList("public_profile,email,user_birthday"));
         mFBLoginButton.registerCallback(mFBCallBackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -153,13 +156,16 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                                     String last_name = object.optString("last_name");
                                     String email_id = object.optString("email");
                                     String facebook_id = object.optString("id");
+                                    String gender = object.optString("gender");
+                                    String birthday = object.optString("birthday");
+                                    Log.i("gender:birthday", " " + gender + " " + birthday);
                                     mPreferenceManager.setStringValue(getString(R.string.first_name), first_name);
                                     mPreferenceManager.setStringValue(getString(R.string.last_name), last_name);
                                     mPreferenceManager.setStringValue(getString(R.string.email), email_id);
                                     //836913896406276
                                     mPreferenceManager.setStringValue(getString(R.string.profile_image_url), "https://graph.facebook.com/" + facebook_id + "/picture?type=large&width=400&height=400");
                                     if (new NetworkCheck().ConnectivityCheck(getContext())) {
-                                         signUp(mProgressDialog,"facebook",first_name,last_name,email_id,facebook_id);
+                                        signUp(mProgressDialog, "facebook", first_name, last_name, email_id, facebook_id);
                                     } else {
                                         Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                                     }
@@ -189,7 +195,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
         mGooglePlusSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                  googlePlusSignIn();
+                googlePlusSignIn();
             }
         });
 
@@ -199,7 +205,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(mGoogleAPIClient != null)
+        if (mGoogleAPIClient != null)
             mGoogleAPIClient.connect();
         if (context instanceof FragmentInteraction) {
             mListener = (FragmentInteraction) context;
@@ -215,7 +221,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
         super.onResume();
         if (isPackageInstalled("com.google.android.apps.fitness")) {
 
-        }else{
+        } else {
             AlertDialog.Builder mConfirmDialog = new AlertDialog.Builder(getActivity());
             mConfirmDialog.setTitle("Confirm");
             mConfirmDialog.setMessage("Thank you for installing BurnAndEarn.To start using, Please connect to Google FIT");
@@ -251,7 +257,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        if (mGoogleAPIClient !=null && mGoogleAPIClient.isConnected())
+        if (mGoogleAPIClient != null && mGoogleAPIClient.isConnected())
             mGoogleAPIClient.disconnect();
     }
 
@@ -275,6 +281,19 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
         }
     }
 
+    private void setupGoogleApiClient(GoogleSignInOptions gso) {
+        try {
+            mGoogleAPIClient = new GoogleApiClient.Builder(getActivity())
+                    .enableAutoManage(getActivity(), this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .addApi(Plus.API)
+                    .build();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     private void getSignInResult(GoogleSignInResult result) {
 
         if (result.isSuccess()) {
@@ -284,8 +303,12 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
             mPreferenceManager.setStringValue(getString(R.string.last_name), "");
             mPreferenceManager.setStringValue(getString(R.string.email), acct.getEmail());
             mPreferenceManager.setStringValue(getString(R.string.profile_image_url), acct.getPhotoUrl() != null ? acct.getPhotoUrl().toString() : "");
+
+            Person person = Plus.PeopleApi.getCurrentPerson(mGoogleAPIClient);
+            Log.i("Gender : birthday", person.getGender() + " " + person.getBirthday());
+
             if (new NetworkCheck().ConnectivityCheck(getContext())) {
-                signUp(mProgressDialog,"google",acct.getDisplayName(),"",acct.getEmail(),"");
+                signUp(mProgressDialog, "google", acct.getDisplayName(), "", acct.getEmail(), "");
             } else {
                 Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
             }
@@ -310,7 +333,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 mPreferenceManager.setStringValue(getString(R.string.email), Plus.AccountApi.getAccountName(mGoogleAPIClient));
                 mPreferenceManager.setStringValue(getString(R.string.profile_image_url), currentPerson.getImage().getUrl());
                 navigateToDashboard();
-               // Snackbar.make(mView, "success", Snackbar.LENGTH_SHORT).show();
+                // Snackbar.make(mView, "success", Snackbar.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(mView, "Personal information not found", Snackbar.LENGTH_SHORT).show();
             }
@@ -322,10 +345,10 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     }
 
     private void navigateToDashboard() {
-        mPreferenceManager.setBooleanValue(getString(R.string.is_user_logged_in),true);
+        mPreferenceManager.setBooleanValue(getString(R.string.is_user_logged_in), true);
         Bundle extras = new Bundle();
         extras.putString(getString(R.string.page_flag), LoginFragment.class.getSimpleName());
-        extras.putString(getString(R.string.button_pressed),getString(R.string.social_login));
+        extras.putString(getString(R.string.button_pressed), getString(R.string.social_login));
         mListener.changeFragment(extras);
     }
 
@@ -370,18 +393,18 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
             if (v instanceof TextView) {
                 TextView tv = (TextView) v;
                 //tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
-                tv.setPadding(0, getResources().getDimensionPixelOffset(R.dimen.google_plus_button_padding),0,getResources().getDimensionPixelOffset(R.dimen.google_plus_button_padding));
+                tv.setPadding(0, getResources().getDimensionPixelOffset(R.dimen.google_plus_button_padding), 0, getResources().getDimensionPixelOffset(R.dimen.google_plus_button_padding));
                 tv.setTypeface(null, Typeface.BOLD);
                 //tv.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
                 tv.setText(buttonText);
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-               // tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_google_plus,0,0,0);
+                // tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_google_plus,0,0,0);
                 return;
             }
         }
     }
 
-    private void signUp(final ProgressDialog mLoadingProgress,final String social_login,final String firstName, final String lastName, final String email, final String facebook_id/*, final String image_data*/){
+    private void signUp(final ProgressDialog mLoadingProgress, final String social_login, final String firstName, final String lastName, final String email, final String facebook_id/*, final String image_data*/) {
         mLoadingProgress.show();
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
         mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.USER_CREATE, new Response.Listener<String>() {
@@ -393,7 +416,9 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optString("msg").equalsIgnoreCase("Registration Successfull") || responseJson.optString("msg").trim().equalsIgnoreCase("Alredy Exist") || responseJson.optString("msg").trim().equalsIgnoreCase("Alredy Exist And Updated")) {
-                            new PreferencesManager(getActivity()).setStringValue(getString(R.string.user_id), responseJson.optString("userid"));
+                            PreferencesManager mPreferenceManager = new PreferencesManager(getActivity());
+                            mPreferenceManager.setStringValue(getString(R.string.user_id), responseJson.optString("userid"));
+                            mPreferenceManager.setStringValue(getString(R.string.facebook_share), responseJson.optString("facebook_share"));
                             navigateToDashboard();
                         } else {
                             Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
@@ -417,7 +442,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 params.put("firstName", firstName);
                 params.put("lastName", lastName);
                 params.put("emailId", email);
-                if(social_login.equalsIgnoreCase("facebook"))
+                if (social_login.equalsIgnoreCase("facebook"))
                     params.put("facebookId", facebook_id);
                 //params.put("image", image_data);
                 return params;

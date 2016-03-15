@@ -8,7 +8,6 @@
     android:layout_margin="5dp"
     android:elevation="10dp"
     android:orientation="vertical"
-    android:visibility="visible"
     app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="1dp"
     app:cardElevation="3dp"
@@ -68,15 +67,17 @@
                 android:layout_marginTop="5dp">
 
                 <ImageView
+                    android:id="@+id/img_call"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_call" />
+                    android:src="@drawable/ic_call_selector" />
 
                 <ImageView
+                    android:id="@+id/img_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_location" />
+                    android:src="@drawable/ic_location_selector" />
 
             </RelativeLayout>
 
@@ -132,6 +133,7 @@
                 android:paddingRight="3dp"
                 android:paddingTop="5dp"
                 android:text="@string/grap_now"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:textSize="18sp" />
 
             <com.pluggdd.burnandearn.font.RobotoTextView

@@ -5,7 +5,7 @@
     <string name="connect_with_facebook">Login With Facebook</string>
     <string name="client_id">XJ80L8iWntcmoPYjNn8bRGaCJKWvF8ZG</string>
     <string name="secret_id">7jb_1APE0Q1PzZQ4KiFxiK8a85VC9W512e0uMKA969hUg82HvTTwd16ubcWAWZxB</string>
-    <string name="facebook_app_id">222601311415831</string>
+    <string name="facebook_app_id">994703893899145</string>
     <string name="auth_scope">activity</string>
     <string name="redirect_uri">http://pluggdd.com/</string>
     <string name="is_user_logged_in">is_user_logged_in</string>
@@ -89,5 +89,17 @@
     <string name="cancel">CANCEL</string>
     <string name="coupon_expiry_date">Coupon expiry date</string>
     <string name="redirect_url">redirect url</string>
+    <string name="share">Share</string>
+    <string name="share_and_earn">Share with your friends and earn we shall add 500 points to your total</string>
+    <string name="facebook_share">Share with Facebook</string>
+    <string name="goal_set_up_header">HANG ON !!! We need some additional information</string>
+    <string name="choose_your_age_group">Choose your age group</string>
+    <string name="choose_your_goal">Choose your goal</string>
+    <string name="submit">SUBMIT</string>
+    <string name="is_goal_set">is goal set finished</string>
+    <string name="sex">Sex</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="other">Other</string>
 
 </resources>

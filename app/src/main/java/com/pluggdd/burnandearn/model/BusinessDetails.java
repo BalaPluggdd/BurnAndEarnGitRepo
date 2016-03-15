@@ -5,8 +5,8 @@ package com.pluggdd.burnandearn.model;
  */
 public class BusinessDetails {
 
-    private String name,offer_name,logo,promo,how_to_reedem,terms_and_conditions,url,coupon,coupon_expiry_date;
-    private int points_needed;
+    private String name,offer_name,logo,promo,how_to_reedem,terms_and_conditions,url,coupon,coupon_expiry_date,address;
+    private int points_needed,phone_number;
 
     public String getName() {
         return name;
@@ -86,5 +86,21 @@ public class BusinessDetails {
 
     public void setCoupon_expiry_date(String coupon_expiry_date) {
         this.coupon_expiry_date = coupon_expiry_date;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getPhone_number() {
+        return phone_number;
+    }
+
+    public void setPhone_number(int phone_number) {
+        this.phone_number = phone_number;
     }
 }

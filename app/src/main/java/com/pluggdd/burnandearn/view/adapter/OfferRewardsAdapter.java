@@ -1,8 +1,12 @@
 package com.pluggdd.burnandearn.view.adapter;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.pluggdd.burnandearn.R;
@@ -38,7 +43,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
     private ArrayList<BusinessDetails> mBusinessOfferList;
 
 
-    public OfferRewardsAdapter(Context context,ArrayList<BusinessDetails> mBusinessList,FragmentInteraction listener,OffersAndRewardsFragment fragment) {
+    public OfferRewardsAdapter(Context context, ArrayList<BusinessDetails> mBusinessList, FragmentInteraction listener, OffersAndRewardsFragment fragment) {
         mContext = context;
         mListener = listener;
         mFragment = fragment;
@@ -58,9 +63,40 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
         setAnimation(holder.sContainer, position);
         final BusinessDetails businessDetail = mBusinessOfferList.get(position);
         holder.sNameText.setText(businessDetail.getName());
-        new PicassoImageLoaderHelper(mContext,holder.sBusinessImage,holder.sLogoProgressBar).loadImage(businessDetail.getLogo());
+        new PicassoImageLoaderHelper(mContext, holder.sBusinessImage, holder.sLogoProgressBar).loadImage(businessDetail.getLogo());
         holder.sOfferRewardsText.setText(businessDetail.getPromo());
         holder.sPointsNeeded.setText("Points needed : " + businessDetail.getPoints_needed());
+
+        holder.sPhoneImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String uri = "tel:" + businessDetail.getPhone_number();
+                    Intent mCallIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(uri));
+                    mContext.startActivity(mCallIntent);
+                }catch(Exception e) {
+                    Toast.makeText(mContext, "Your call has failed...", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+
+                }
+
+            }
+        });
+
+        holder.sLocationImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               try {
+                   Uri locationUri = Uri.parse("geo:0,0?q="+businessDetail.getAddress());
+                   Intent mMapIntent = new Intent(Intent.ACTION_VIEW, locationUri);
+                   mMapIntent.setPackage("com.google.android.apps.maps");
+                   mContext.startActivity(mMapIntent);
+               }catch (Exception e){
+                   e.printStackTrace();
+                   Toast.makeText(mContext, "Maps not available...", Toast.LENGTH_LONG).show();
+               }
+            }
+        });
 
         holder.sRedeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +123,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
     public static class RestaurentLiveDealViewHolder extends RecyclerView.ViewHolder {
 
         private CardView sContainer;
-        private ImageView sBusinessImage;
+        private ImageView sBusinessImage,sPhoneImage,sLocationImage;
         private TextView sOfferRewardsText, sNameText, sPointsNeeded;
         private Button sRedeemButton;
         private ProgressBar sLogoProgressBar;
@@ -101,6 +137,8 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
             sRedeemButton = (Button) itemView.findViewById(R.id.btn_grab_now);
             sBusinessImage = (ImageView) itemView.findViewById(R.id.img_business_logo);
             sLogoProgressBar = (ProgressBar) itemView.findViewById(R.id.logo_progress_bar);
+            sPhoneImage = (ImageView) itemView.findViewById(R.id.img_call);
+            sLocationImage = (ImageView) itemView.findViewById(R.id.img_location);
         }
     }
 

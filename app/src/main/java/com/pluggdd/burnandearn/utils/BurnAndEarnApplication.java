@@ -2,6 +2,7 @@ package com.pluggdd.burnandearn.utils;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -17,6 +18,7 @@ public class BurnAndEarnApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        MultiDex.install(getBaseContext());
         Fabric.with(this, new Crashlytics());
         // Set up volley request queue
         sApplicationInstatance = this;

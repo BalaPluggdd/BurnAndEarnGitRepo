@@ -6,4 +6,17 @@
         <item>Last Week</item>
         <item>Last Month</item>
     </string-array>
+    <string-array name="age_group">
+        <item> 10 - 20 </item>
+        <item> 20 - 40 </item>
+        <item> 40 - 60 </item>
+        <item> Above 60 </item>
+    </string-array>
+    <string-array name="goal_setup">
+        <item> Burn 1000 Calories</item>
+        <item> Burn 2000 Calories</item>
+        <item> Burn 3000 Calories</item>
+        <item> Burn 4000 Calories</item>
+        <item> Burn 5000 Calories</item>
+    </string-array>
 </resources>

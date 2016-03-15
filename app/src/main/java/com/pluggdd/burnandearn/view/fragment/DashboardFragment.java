@@ -78,11 +78,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
@@ -99,11 +103,10 @@ public class DashboardFragment extends Fragment {
     private DecoView mCircularProgressDecoView;
     private ViewPager mActivitiesViewPager;
     private AutoScrollViewPager mBusinessOfferListViewPager;
-    private CardView mBusinessOfferListPagerContainer;
-    private RelativeLayout mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer,mOfferListProgressBarContainer,mFitnessActivityDecoViewContainer;
+    private RelativeLayout mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer,mFitnessActivityViewPagerContainer;
     private LinearLayout mActivitiesTextContainer;
     private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image;
-    private ProgressBar mProfileImageProgressBar;
+    private ProgressBar mProfileImageProgressBar,mActivitiesProgressBar,mOfferListProgressBar;
     private TextView mWalkingActivityValueText, mRunningActivityValueText, mCyclingActivityValueText, mWalkingActivityDimesionText, mRunningActivityDimensionText, mCyclingActivityDimensionText,mPointsEarnedText;
     private ImageView mProfileImage;
     private GoogleApiClient mGoogleAPIClient;
@@ -117,6 +120,7 @@ public class DashboardFragment extends Fragment {
     private PicassoImageLoaderHelper mImageLoaderHelper;
     private PreferencesManager mPreferenceManager;
     private String mFitnessEmail ="";
+    private CustomPagerAdapter mActivitiesPagerAdapter;
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -128,7 +132,7 @@ public class DashboardFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_dashboard, container, false);
         mPointsEarnedText = (TextView) mView.findViewById(R.id.txt_total_points_earned);
         mCircularProgressDecoView = (DecoView) mView.findViewById(R.id.deco_view);
-        mFitnessActivityDecoViewContainer = (RelativeLayout) mView.findViewById(R.id.fitness_progress_container);
+        mFitnessActivityViewPagerContainer = (RelativeLayout) mView.findViewById(R.id.activities_view_pager_container);
         mActivitiesViewPager = (ViewPager) mView.findViewById(R.id.activities_view_pager);
         mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
         mProfileImageProgressBar = (ProgressBar) mView.findViewById(R.id.profile_progress_bar);
@@ -145,13 +149,14 @@ public class DashboardFragment extends Fragment {
         mBikingActivityContainer = (RelativeLayout) mView.findViewById(R.id.biking_activity_container);
         mCyclingActivityValueText = (TextView) mView.findViewById(R.id.txt_cycling_activity_value);
         mCyclingActivityDimensionText = (TextView) mView.findViewById(R.id.txt_cycling_activity_dimension);
-        mBusinessOfferListPagerContainer = (CardView) mView.findViewById(R.id.business_offer_list_pager_container);
         mBusinessOfferListViewPager = (AutoScrollViewPager) mView.findViewById(R.id.business_offer_list_pager);
-        mOfferListProgressBarContainer = (RelativeLayout) mView.findViewById(R.id.offer_list_progress_bar_container);
+        mOfferListProgressBar = (ProgressBar) mView.findViewById(R.id.offer_list_progress_bar);
+        mActivitiesProgressBar = (ProgressBar) mView.findViewById(R.id.activities_progress_bar);
         mDateFilterSpinner = (Spinner) getActivity().findViewById(R.id.toolbar).findViewById(R.id.activities_time_spinner);
         mImageLoaderHelper = new PicassoImageLoaderHelper(getContext(),mProfileImage,mProfileImageProgressBar);
         mPreferenceManager = new PreferencesManager(getContext());
         mImageLoaderHelper.loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
+        mActivitiesViewPager.setOffscreenPageLimit(0);
         initializeActivitiesList();
         checkAndBuildGoogleApiClient();
         /* // Check and request for location and get accounts permission
@@ -282,7 +287,6 @@ public class DashboardFragment extends Fragment {
 
     // To reset viewpager to initial position
     private void resetActivitiesViewPager() {
-
         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_selected);
         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
@@ -650,10 +654,15 @@ public class DashboardFragment extends Fragment {
             mTotalStepCount = 0;
             mFitnessActivityList.clear();
             initializeActivitiesList();
-            mOfferListProgressBarContainer.setVisibility(View.VISIBLE);
-            mBusinessOfferListPagerContainer.setVisibility(View.GONE);
+            mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
+            mActivitiesViewPager.setVisibility(View.GONE);
+            mOfferListProgressBar.setVisibility(View.VISIBLE);
+            mActivitiesProgressBar.setVisibility(View.VISIBLE);
+            mCircularProgressDecoView.setVisibility(View.GONE);
+            mFitnessActivityViewPagerContainer.setVisibility(View.GONE);
+            mBusinessOfferListViewPager.setVisibility(View.GONE);
             mActivitiesTextContainer.setVisibility(View.GONE);
-            mFitnessActivityDecoViewContainer.setVisibility(View.GONE);
+
         }
 
         @Override
@@ -668,10 +677,55 @@ public class DashboardFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(mDateFilterSpinner.getSelectedItemPosition() == 0)
-               getBusinessList();
-            else
-                updateUI(null);
+            if(!isDetached()){
+                if(mDateFilterSpinner.getSelectedItemPosition() == 0)
+                    getBusinessList();
+                else
+                    updateUI(null);
+            }
+
+            /*Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
+            for (FitnessActivity activity : mFitnessActivityList) {
+                Log.e("Nmae", activity.getName());
+                Log.e("calories", activity.getCalories_expended() + "");
+                Log.e("distaance", activity.getDistance() + "");
+                Log.e("stepcount", activity.getStep_count() + "");
+            }
+            Log.e("Total calories", mTotalCaloriesExpended + "");
+            Log.e("Total distaance", mTotalDistanceTravelled + "");
+            Log.e("Total stepcount", mTotalStepCount + "");*/
+        }
+    }
+
+    public class BusinessListAsync extends AsyncTask<Long, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
+
+
+        }
+
+        @Override
+        protected String doInBackground(Long... params) {
+            if (mGoogleAPIClient != null) {
+                getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
+                return "success";
+            } else
+                return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            /*if(!isDetached()){
+                if(mDateFilterSpinner.getSelectedItemPosition() == 0)
+                    getBusinessList();
+                else
+                    updateUI(null);
+            }*/
+
             /*Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
             for (FitnessActivity activity : mFitnessActivityList) {
                 Log.e("Nmae", activity.getName());
@@ -686,35 +740,51 @@ public class DashboardFragment extends Fragment {
     }
 
     private void updateUI(ArrayList<BusinessDetails> businessList){
-        mOfferListProgressBarContainer.setVisibility(View.GONE);
-        if(businessList != null){
-            if(businessList.size() > 0){
-                mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
-                mBusinessOfferListViewPager.setAdapter(new CustomBusinessOfferListAdapter(businessList));
-                mBusinessOfferListViewPager.setInterval(5000);
-                mBusinessOfferListViewPager.startAutoScroll(5000);
+        if(!isDetached()){
+            mActivitiesProgressBar.setVisibility(View.GONE);
+            mActivitiesTextContainer.setVisibility(View.VISIBLE);
+            mCircularProgressDecoView.setVisibility(View.VISIBLE);
+            mFitnessActivityViewPagerContainer.setVisibility(View.VISIBLE);
+            mActivitiesViewPager.setVisibility(View.VISIBLE);
+            mBusinessOfferListViewPager.setVisibility(View.VISIBLE);
+            if(businessList != null){
+                if(businessList.size() > 0){
+                    mBusinessOfferListViewPager.setAdapter(new CustomBusinessOfferListAdapter(businessList));
+                    mBusinessOfferListViewPager.setInterval(5000);
+                    mBusinessOfferListViewPager.startAutoScroll(5000);
+                }else{
+                    //mBusinessOfferListPagerContainer.setVisibility(View.INVISIBLE);
+                }
             }else{
-                mBusinessOfferListPagerContainer.setVisibility(View.INVISIBLE);
+                //mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
             }
-        }else{
-            mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
+
+        /*if(mActivitiesPagerAdapter == null){
+            mActivitiesPagerAdapter = new CustomPagerAdapter(getChildFragmentManager());
+            mActivitiesViewPager.setAdapter(mActivitiesPagerAdapter);
+        }else {
+            //mActivitiesViewPager.destroyDrawingCache();
+            mActivitiesPagerAdapter.notifyDataSetChanged();
+        }*/
+            mOfferListProgressBar.setVisibility(View.GONE);
+            mActivitiesPagerAdapter = new CustomPagerAdapter(getChildFragmentManager());
+            mActivitiesViewPager.setAdapter(mActivitiesPagerAdapter);
+
+            Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
+            if (mActivitiesViewPager.getCurrentItem() == 0) {
+                resetActivitiesViewPager();
+            }else {
+                mActivitiesViewPager.setCurrentItem(0, true);
+                mCircularProgressDecoView.executeReset();
+                createBackgroundSeries();
+                createBikingActivitySeries();
+                createRunningActivitySeries();
+                createWalkingActivitySeries();
+                resetActivitiesViewPager();
+            }
+            mIsGetFitnessDataAsyncRunning = false;
         }
-        mActivitiesTextContainer.setVisibility(View.VISIBLE);
-        mFitnessActivityDecoViewContainer.setVisibility(View.VISIBLE);
-        mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
-        Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
-        if (mActivitiesViewPager.getCurrentItem() == 0)
-            resetActivitiesViewPager();
-        else {
-            mActivitiesViewPager.setCurrentItem(0, true);
-            mCircularProgressDecoView.executeReset();
-            createBackgroundSeries();
-            createBikingActivitySeries();
-            createRunningActivitySeries();
-            createWalkingActivitySeries();
-            resetActivitiesViewPager();
-        }
-        mIsGetFitnessDataAsyncRunning = false;
+
     }
 
     private DataReadRequest getFitnessData(long start_time, long end_time) {
@@ -723,6 +793,7 @@ public class DashboardFragment extends Fragment {
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
                 .bucketByActivityType(1, TimeUnit.MILLISECONDS)
+                //.bucketByTime(1,TimeUnit.DAYS)
                 .setTimeRange(start_time, end_time, TimeUnit.MILLISECONDS)
                 .build();
 
@@ -742,12 +813,15 @@ public class DashboardFragment extends Fragment {
             /*Log.i("FITNESS RESULT", "Number of returned buckets of DataSets is: "
                     + dataReadResult.getBuckets().size());*/
             for (Bucket bucket : dataReadResult.getBuckets()) {
+                /*DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+               Log.i("Days : ", bucket.getStartTime(TimeUnit.DAYS) + " " + bucket.getEndTime(TimeUnit.DAYS) + " " );
+                Log.i("DAY ", "\tStart: " + dateFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)));
+                Log.i("DAY ", "\tEnd: " + dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));*/
                 //Log.e("Activity : ", bucket.getActivity());
                 if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                     List<DataSet> dataSets = bucket.getDataSets();
                     int step_count = 0;
                     double calories_expended = 0, distance = 0;
-
                     for (DataSet dataSet : dataSets) {
                         //dumpDataSet(dataSet);
                         for (DataPoint dp : dataSet.getDataPoints()) {
@@ -768,7 +842,6 @@ public class DashboardFragment extends Fragment {
                             }
                         }
                     }
-
                     FitnessActivity activity = new FitnessActivity();
                     activity.setName(bucket.getActivity());
                     activity.setCalories_expended(calories_expended);
@@ -781,8 +854,6 @@ public class DashboardFragment extends Fragment {
                     } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                         mFitnessActivityList.set(2, activity);
                     }
-
-
                 }
             }
         } else if (dataReadResult.getDataSets().size() > 0) {
@@ -991,6 +1062,9 @@ public class DashboardFragment extends Fragment {
                                     businessDetails.setCoupon_expiry_date(business_object.optString("endingDate"));
                                     businessDetails.setHow_to_reedem(business_object.optString("How to Redeem"));
                                     businessDetails.setUrl(business_object.optString("site"));
+                                    businessDetails.setPhone_number(business_object.optInt("Phone No"));
+                                    businessDetails.setAddress(business_object.optString("Address"));
+                                    businessDetails.setPoints_needed(business_object.optInt(""));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
                                     mBusinessOfferList.add(businessDetails);

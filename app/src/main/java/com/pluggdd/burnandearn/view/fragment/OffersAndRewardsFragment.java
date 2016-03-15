@@ -85,7 +85,6 @@ public class OffersAndRewardsFragment extends Fragment {
 
     private void getBusinessOfferList(){
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        final ArrayList<BusinessDetails> mBusinessList = new ArrayList<>();
         mRequestQueue.add((new StringRequest(Request.Method.GET, WebserviceAPI.ALL_BUSINESS_OFFER_LIST, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -108,6 +107,8 @@ public class OffersAndRewardsFragment extends Fragment {
                                     businessDetails.setCoupon_expiry_date(business_object.optString("endingDate"));
                                     businessDetails.setHow_to_reedem(business_object.optString("How to Redeem"));
                                     businessDetails.setUrl(business_object.optString("site"));
+                                    businessDetails.setPhone_number(business_object.optInt("Phone No"));
+                                    businessDetails.setAddress(business_object.optString("Address"));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
                                     mBusinessOfferList.add(businessDetails);
@@ -115,9 +116,8 @@ public class OffersAndRewardsFragment extends Fragment {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.VISIBLE);
-                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessList,mListener,OffersAndRewardsFragment.this));
-                                /*mRecylerviewContainer.setVisibility(View.VISIBLE);
-                                mHaappiiPlaceListView.setAdapter(new HaappiiAdapter(getActivity(), HaappiiPlaceFragment.this.getClass().getSimpleName(), mBusinessList));*/
+                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,mListener,OffersAndRewardsFragment.this));
+
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.VISIBLE);
@@ -137,10 +137,10 @@ public class OffersAndRewardsFragment extends Fragment {
                         }
 
                     } catch (JSONException e) {
+                        e.printStackTrace();
                         mLoadingProgressBar.setVisibility(View.GONE);
                         mNoOfferText.setVisibility(View.VISIBLE);
                         mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
-                        e.printStackTrace();
                         if(!isDetached())
                             Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
 

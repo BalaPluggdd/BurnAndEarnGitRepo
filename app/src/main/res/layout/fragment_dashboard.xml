@@ -13,14 +13,14 @@
         android:layout_height="wrap_content"
         android:elevation="5dp"
         app:cardCornerRadius="1dp"
-        app:cardElevation="3dp"
-        app:contentPadding="5dp">
+        app:cardElevation="3dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
 
             <FrameLayout
                 android:layout_width="96dp"
@@ -30,7 +30,7 @@
                     android:id="@+id/img_profile"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center" />
 
                 <ProgressBar
                     android:id="@+id/profile_progress_bar"
@@ -60,7 +60,7 @@
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="3dp"
                     android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:text="@string/your_total_points"
@@ -75,13 +75,14 @@
                     android:gravity="center"
                     android:textColor="@color/orange"
                     android:textSize="28sp"
-                    app:typeface="robotoBoldCondensed" />
+                    app:typeface="robotoCondensed"
+
+                    />
 
             </LinearLayout>
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
-
 
     <android.support.v7.widget.CardView
         android:id="@+id/business_offer_list_pager_container"
@@ -89,271 +90,281 @@
         android:layout_height="140dp"
         android:layout_alignParentBottom="true"
         android:elevation="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:cardCornerRadius="1dp"
         app:cardElevation="3dp"
         app:contentPadding="5dp">
 
-         <cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager
+        <ProgressBar
+            android:id="@+id/offer_list_progress_bar"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            />
+
+        <cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager
             android:id="@+id/business_offer_list_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="visible">
 
         </cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager>
 
     </android.support.v7.widget.CardView>
 
 
-    <LinearLayout
-        android:id="@+id/activities_fitness_container"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/business_offer_list_pager_container"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:layout_below="@id/points_earned_container"
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/activities_fitness_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <RelativeLayout
-                android:id="@+id/walking_activity_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/img_walking"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:id="@+id/walking_activity_container"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="2dp"
-                    android:src="@drawable/ic_walking" />
+                    android:layout_weight="1"
+                    android:gravity="center">
 
-                <com.pluggdd.burnandearn.font.RobotoTextView
-                    android:id="@+id/txt_walking_activity_value"
-                    android:layout_width="wrap_content"
+                    <ImageView
+                        android:id="@+id/img_walking"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="2dp"
+                        android:src="@drawable/ic_walking" />
+
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_walking_activity_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_toRightOf="@id/img_walking"
+                        android:gravity="center"
+                        android:minWidth="60dp"
+                        android:textColor="@color/orange"
+                        android:textSize="20sp"
+                        android:visibility="visible"
+                        app:typeface="robotoCondensed" />
+
+                    <View
+                        android:id="@+id/txt_walking_activity_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="1dp"
+                        android:layout_alignRight="@id/txt_walking_activity_value"
+                        android:layout_below="@id/txt_walking_activity_value"
+                        android:layout_toRightOf="@id/img_walking"
+                        android:background="@android:color/black"
+                        android:visibility="visible" />
+
+
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_walking_activity_dimension"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@id/txt_walking_activity_border"
+                        android:layout_alignRight="@id/txt_walking_activity_border"
+                        android:layout_below="@id/txt_walking_activity_border"
+                        android:layout_centerHorizontal="true"
+                        android:layout_toRightOf="@id/img_walking"
+                        android:gravity="center"
+                        android:textColor="@color/torqoise"
+                        android:textSize="16sp"
+                        app:typeface="robotoCondensed" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/running_activity_container"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_toRightOf="@id/img_walking"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:minWidth="60dp"
-                    android:textColor="@color/orange"
-                    android:textSize="20sp"
-                    android:visibility="visible"
-                    app:typeface="robotoCondensed" />
+                    android:visibility="visible">
 
-                <View
-                    android:id="@+id/txt_walking_activity_border"
-                    android:layout_width="wrap_content"
-                    android:layout_height="1dp"
-                    android:layout_alignRight="@id/txt_walking_activity_value"
-                    android:layout_below="@id/txt_walking_activity_value"
-                    android:layout_toRightOf="@id/img_walking"
-                    android:background="@android:color/black"
-                    android:visibility="visible" />
+                    <ImageView
+                        android:id="@+id/img_running"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:src="@drawable/ic_running" />
 
 
-                <com.pluggdd.burnandearn.font.RobotoTextView
-                    android:id="@+id/txt_walking_activity_dimension"
-                    android:layout_width="wrap_content"
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_running_activity_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/img_running"
+                        android:gravity="center"
+                        android:minWidth="60dp"
+                        android:textColor="@color/orange"
+                        android:textSize="20sp"
+                        app:typeface="robotoCondensed" />
+
+                    <View
+                        android:id="@+id/txt_running_activity_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="1dp"
+                        android:layout_alignRight="@id/txt_running_activity_value"
+                        android:layout_below="@id/txt_running_activity_value"
+                        android:layout_toRightOf="@id/img_running"
+                        android:background="@android:color/black" />
+
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_running_activity_dimension"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@id/txt_running_activity_border"
+                        android:layout_alignRight="@id/txt_running_activity_border"
+                        android:layout_below="@id/txt_running_activity_border"
+                        android:layout_toRightOf="@id/img_running"
+                        android:gravity="center"
+                        android:textColor="@color/torqoise"
+                        android:textSize="16sp"
+                        app:typeface="robotoCondensed" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/biking_activity_container"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignLeft="@id/txt_walking_activity_border"
-                    android:layout_alignRight="@id/txt_walking_activity_border"
-                    android:layout_below="@id/txt_walking_activity_border"
-                    android:layout_centerHorizontal="true"
-                    android:layout_toRightOf="@id/img_walking"
-                    android:gravity="center"
-                    android:textColor="@color/torqoise"
-                    android:textSize="16sp"
-                    app:typeface="robotoCondensed" />
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/img_cycling"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:src="@drawable/ic_cycling" />
+
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_cycling_activity_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/img_cycling"
+                        android:gravity="center"
+                        android:minWidth="60dp"
+                        android:textColor="@color/orange"
+                        android:textSize="20sp"
+                        app:typeface="robotoCondensed" />
+
+                    <View
+                        android:id="@+id/txt_cycling_activity_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="1dp"
+                        android:layout_alignRight="@id/txt_cycling_activity_value"
+                        android:layout_below="@id/txt_cycling_activity_value"
+                        android:layout_toRightOf="@id/img_cycling"
+                        android:background="@android:color/black" />
 
 
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/running_activity_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/img_running"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_running" />
+                    <com.pluggdd.burnandearn.font.RobotoTextView
+                        android:id="@+id/txt_cycling_activity_dimension"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@id/txt_cycling_activity_border"
+                        android:layout_alignRight="@id/txt_cycling_activity_border"
+                        android:layout_below="@id/txt_cycling_activity_border"
+                        android:layout_toRightOf="@id/img_cycling"
+                        android:gravity="center"
+                        android:textColor="@color/torqoise"
+                        android:textSize="16sp"
+                        app:typeface="robotoCondensed" />
 
 
-                <com.pluggdd.burnandearn.font.RobotoTextView
-                    android:id="@+id/txt_running_activity_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/img_running"
-                    android:gravity="center"
-                    android:minWidth="60dp"
-                    android:textColor="@color/orange"
-                    android:textSize="20sp"
-                    app:typeface="robotoCondensed" />
+                </RelativeLayout>
+            </LinearLayout>
 
-                <View
-                    android:id="@+id/txt_running_activity_border"
-                    android:layout_width="wrap_content"
-                    android:layout_height="1dp"
-                    android:layout_alignRight="@id/txt_running_activity_value"
-                    android:layout_below="@id/txt_running_activity_value"
-                    android:layout_toRightOf="@id/img_running"
-                    android:background="@android:color/black"
-                     />
-
-                <com.pluggdd.burnandearn.font.RobotoTextView
-                    android:id="@+id/txt_running_activity_dimension"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignLeft="@id/txt_running_activity_border"
-                    android:layout_alignRight="@id/txt_running_activity_border"
-                    android:layout_below="@id/txt_running_activity_border"
-                    android:layout_toRightOf="@id/img_running"
-                    android:gravity="center"
-                    android:textColor="@color/torqoise"
-                    android:textSize="16sp"
-                    app:typeface="robotoCondensed" />
-
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/biking_activity_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/img_cycling"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_cycling" />
-
-                <com.pluggdd.burnandearn.font.RobotoTextView
-                    android:id="@+id/txt_cycling_activity_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/img_cycling"
-                    android:gravity="center"
-                    android:minWidth="60dp"
-                    android:textColor="@color/orange"
-                    android:textSize="20sp"
-                    app:typeface="robotoCondensed" />
-
-                <View
-                    android:id="@+id/txt_cycling_activity_border"
-                    android:layout_width="wrap_content"
-                    android:layout_height="1dp"
-                    android:layout_alignRight="@id/txt_cycling_activity_value"
-                    android:layout_below="@id/txt_cycling_activity_value"
-                    android:layout_toRightOf="@id/img_cycling"
-                    android:background="@android:color/black"
-                     />
-
-
-                <com.pluggdd.burnandearn.font.RobotoTextView
-                    android:id="@+id/txt_cycling_activity_dimension"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignLeft="@id/txt_cycling_activity_border"
-                    android:layout_alignRight="@id/txt_cycling_activity_border"
-                    android:layout_below="@id/txt_cycling_activity_border"
-                    android:layout_toRightOf="@id/img_cycling"
-                    android:gravity="center"
-                    android:textColor="@color/torqoise"
-                    android:textSize="16sp"
-                    app:typeface="robotoCondensed" />
-
-
-            </RelativeLayout>
         </LinearLayout>
 
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/offer_list_progress_bar_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/points_earned_container"
-        android:visibility="visible">
-
-        <ProgressBar
-            style="@style/Widget.AppCompat.ProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/fitness_progress_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/activities_fitness_container"
-        android:layout_below="@id/points_earned_container"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:visibility="gone">
-
-        <com.hookedonplay.decoviewlib.DecoView
-            android:id="@+id/deco_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:id="@+id/fitness_progress_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/activities_fitness_container"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp">
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/activities_view_pager"
-                android:layout_width="130dp"
-                android:layout_height="wrap_content"
-                ></android.support.v4.view.ViewPager>
-
-            <RelativeLayout
-                android:id="@+id/viewpager_indicator_container"
+            <ProgressBar
+                android:id="@+id/activities_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:paddingBottom="25dp"
-                >
+                android:layout_centerInParent="true"
+                android:layout_gravity="center" />
 
-                <ImageView
-                    android:id="@+id/viewpager_indicator1_image"
+
+            <com.hookedonplay.decoviewlib.DecoView
+                android:id="@+id/deco_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <RelativeLayout
+                android:id="@+id/activities_view_pager_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/activities_view_pager"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"></android.support.v4.view.ViewPager>
+
+                <RelativeLayout
+                    android:id="@+id/viewpager_indicator_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/viewpager_indicator_selected" />
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:paddingBottom="25dp">
 
-                <ImageView
-                    android:id="@+id/viewpager_indicator2_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_toRightOf="@id/viewpager_indicator1_image"
-                    android:src="@drawable/viewpager_indicator_unselected" />
+                    <ImageView
+                        android:id="@+id/viewpager_indicator1_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/viewpager_indicator_selected" />
 
-                <ImageView
-                    android:id="@+id/viewpager_indicator3_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/viewpager_indicator2_image"
-                    android:src="@drawable/viewpager_indicator_unselected" />
+                    <ImageView
+                        android:id="@+id/viewpager_indicator2_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_toRightOf="@id/viewpager_indicator1_image"
+                        android:src="@drawable/viewpager_indicator_unselected" />
+
+                    <ImageView
+                        android:id="@+id/viewpager_indicator3_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/viewpager_indicator2_image"
+                        android:src="@drawable/viewpager_indicator_unselected" />
+
+
+                </RelativeLayout>
 
 
             </RelativeLayout>
@@ -361,8 +372,6 @@
 
         </RelativeLayout>
 
-
     </RelativeLayout>
-
 
 </RelativeLayout>
