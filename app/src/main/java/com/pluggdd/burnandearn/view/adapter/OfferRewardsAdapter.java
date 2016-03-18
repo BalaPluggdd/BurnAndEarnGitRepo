@@ -38,14 +38,12 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
 
     private Context mContext;
     private int mLastPosition = -1;
-    private FragmentInteraction mListener;
     private OffersAndRewardsFragment mFragment;
     private ArrayList<BusinessDetails> mBusinessOfferList;
 
 
-    public OfferRewardsAdapter(Context context, ArrayList<BusinessDetails> mBusinessList, FragmentInteraction listener, OffersAndRewardsFragment fragment) {
+    public OfferRewardsAdapter(Context context, ArrayList<BusinessDetails> mBusinessList,OffersAndRewardsFragment fragment) {
         mContext = context;
-        mListener = listener;
         mFragment = fragment;
         mBusinessOfferList = mBusinessList;
 

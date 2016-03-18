@@ -1,5 +1,7 @@
 package com.pluggdd.burnandearn.model;
 
+import org.joda.time.LocalDateTime;
+
 import java.util.ArrayList;
 
 /**
@@ -7,23 +9,25 @@ import java.util.ArrayList;
  */
 public class FitnessHistory {
 
-    private String startDateTime,endDateTime;
+    private LocalDateTime startDateTime,endDateTime;
 
     private ArrayList<FitnessActivity> fitnessActivitiesList;
 
-    public String getStartDateTime() {
+    private double totalCaloriesBurnt;
+
+    public LocalDateTime getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(String startDateTime) {
+    public void setStartDateTime(LocalDateTime startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public String getEndDateTime() {
+    public LocalDateTime getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(String endDateTime) {
+    public void setEndDateTime(LocalDateTime endDateTime) {
         this.endDateTime = endDateTime;
     }
 
@@ -33,5 +37,13 @@ public class FitnessHistory {
 
     public void setFitnessActivitiesList(ArrayList<FitnessActivity> fitnessActivitiesList) {
         this.fitnessActivitiesList = fitnessActivitiesList;
+    }
+
+    public double getTotalCaloriesBurnt() {
+        return totalCaloriesBurnt;
+    }
+
+    public void setTotalCaloriesBurnt(double totalCaloriesBurnt) {
+        this.totalCaloriesBurnt = totalCaloriesBurnt;
     }
 }

@@ -164,11 +164,14 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                                     mPreferenceManager.setStringValue(getString(R.string.email), email_id);
                                     //836913896406276
                                     mPreferenceManager.setStringValue(getString(R.string.profile_image_url), "https://graph.facebook.com/" + facebook_id + "/picture?type=large&width=400&height=400");
-                                    if (new NetworkCheck().ConnectivityCheck(getContext())) {
+                                    mPreferenceManager.setStringValue(getString(R.string.gender),gender);
+                                    mPreferenceManager.setStringValue(getString(R.string.dob),birthday);
+                                    navigateToDashboard();
+                                    /*if (new NetworkCheck().ConnectivityCheck(getContext())) {
                                         signUp(mProgressDialog, "facebook", first_name, last_name, email_id, facebook_id);
                                     } else {
                                         Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
-                                    }
+                                    }*/
 
                                 }
 
@@ -306,12 +309,22 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
 
             Person person = Plus.PeopleApi.getCurrentPerson(mGoogleAPIClient);
             Log.i("Gender : birthday", person.getGender() + " " + person.getBirthday());
-
-            if (new NetworkCheck().ConnectivityCheck(getContext())) {
+            String gender;
+            if(person.getGender() == 0){
+               gender = "Male";
+            }else if(person.getGender() == 1){
+                gender = "Female";
+            }else{
+                gender = "Other";
+            }
+            mPreferenceManager.setStringValue(getString(R.string.gender),gender);
+            mPreferenceManager.setStringValue(getString(R.string.dob), person.getBirthday());
+            navigateToDashboard();
+            /*if (new NetworkCheck().ConnectivityCheck(getContext())) {
                 signUp(mProgressDialog, "google", acct.getDisplayName(), "", acct.getEmail(), "");
             } else {
                 Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
-            }
+            }*/
         } else {
             // Signed out, show unauthenticated UI.
             Snackbar.make(mView, "Google sign in error please try after sometime", Snackbar.LENGTH_SHORT).show();
@@ -332,7 +345,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 String email = Plus.AccountApi.getAccountName(mGoogleAPIClient);
                 mPreferenceManager.setStringValue(getString(R.string.email), Plus.AccountApi.getAccountName(mGoogleAPIClient));
                 mPreferenceManager.setStringValue(getString(R.string.profile_image_url), currentPerson.getImage().getUrl());
-                navigateToDashboard();
+                //navigateToDashboard();
                 // Snackbar.make(mView, "success", Snackbar.LENGTH_SHORT).show();
             } else {
                 Snackbar.make(mView, "Personal information not found", Snackbar.LENGTH_SHORT).show();

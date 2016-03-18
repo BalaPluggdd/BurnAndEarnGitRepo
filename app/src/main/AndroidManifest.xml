@@ -25,12 +25,13 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <provider android:authorities="com.facebook.app.FacebookContentProvider994703893899145"
+        <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"/>
+            android:authorities="com.facebook.app.FacebookContentProvider994703893899145"
+            android:exported="true" />
 
         <activity
-            android:name=".activity.BurnAndEarnMainActivity"
+            android:name=".activity.InitialSetUpActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -40,6 +41,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.BurnAndEarnMainActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:screenOrientation="portrait" />
+        <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
@@ -47,17 +52,64 @@
         <activity
             android:name=".activity.OfferDetailActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/CustomMaterialThemeBase"
-            android:parentActivityName="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" >
+            android:theme="@style/CustomMaterialThemeBase" />
 
-        </activity>
-
-       <meta-data
+        <meta-data
             android:name="io.fabric.ApiKey"
             android:value="d0ba1e1db49d7532d308f492b8d08f3dd051fb8f" />
 
-
+        <activity
+            android:name=".activity.OfferAndRewardsActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/title_activity_offer_and_rewards"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ShareActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/share"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.AboutUsActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/action_about_us"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ContactUsActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/action_contact_us"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
+        <activity android:name=".activity.BaseActivity" />
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:label="@string/action_profile"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
     </application>
 
 </manifest>

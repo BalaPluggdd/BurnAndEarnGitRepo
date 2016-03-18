@@ -40,7 +40,6 @@ import java.util.ArrayList;
  */
 public class OffersAndRewardsFragment extends Fragment {
 
-    private FragmentInteraction mListener;
     private RecyclerView mOfferAndRewardsRecyclerView;
     private ProgressBar mLoadingProgressBar;
     private TextView mNoOfferText;
@@ -66,22 +65,7 @@ public class OffersAndRewardsFragment extends Fragment {
     }
 
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentInteraction) {
-            mListener = (FragmentInteraction) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 
     private void getBusinessOfferList(){
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
@@ -116,7 +100,7 @@ public class OffersAndRewardsFragment extends Fragment {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.VISIBLE);
-                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,mListener,OffersAndRewardsFragment.this));
+                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,OffersAndRewardsFragment.this));
 
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);

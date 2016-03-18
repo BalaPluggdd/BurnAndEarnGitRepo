@@ -26,7 +26,7 @@ public class PicassoImageLoaderHelper {
 
 
     public void loadImage(String url){
-        if(!url.equalsIgnoreCase("")){
+        if(url != null && !url.equalsIgnoreCase("")){
             mPicasso
                     .load(url)
                     .noFade()

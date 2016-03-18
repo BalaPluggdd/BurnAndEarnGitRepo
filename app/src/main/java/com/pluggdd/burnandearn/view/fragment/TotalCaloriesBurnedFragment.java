@@ -27,8 +27,6 @@ public class TotalCaloriesBurnedFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private double mCaloriesBurned;
-    private String mDateFilter;
-    private FragmentInteraction mListener;
     private TextView mTotalCaloriedBurnedText,mCaloriesBurntText,mCaloriesUnitText;
 
     public TotalCaloriesBurnedFragment() {
@@ -40,15 +38,14 @@ public class TotalCaloriesBurnedFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param calories_burned Parameter 1.
-     * @param dateFilter
+
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalCaloriesBurnedFragment newInstance(double calories_burned, String dateFilter) {
+    public static TotalCaloriesBurnedFragment newInstance(double calories_burned) {
         TotalCaloriesBurnedFragment fragment = new TotalCaloriesBurnedFragment();
         Bundle args = new Bundle();
         args.putDouble(ARG_CALORIES_BURNED, calories_burned);
-        args.putString(ARG_DATE_FILTER, dateFilter);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,7 +55,7 @@ public class TotalCaloriesBurnedFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mCaloriesBurned = getArguments().getDouble(ARG_CALORIES_BURNED);
-            mDateFilter = getArguments().getString(ARG_DATE_FILTER);
+
         }
     }
 
@@ -75,20 +72,5 @@ public class TotalCaloriesBurnedFragment extends Fragment {
         return view;
     }
 
-     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentInteraction) {
-            mListener = (FragmentInteraction) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 }

@@ -12,7 +12,7 @@
     <string name="tag">tag</string>
     <string name="first_name">first_name</string>
     <string name="last_name">last_name</string>
-    <string name="email">email</string>
+    <string name="email">Email</string>
     <string name="profile_image_url">profile_image_url</string>
     <string name="no_network">No Internet Connection</string>
     <string name="user_id">user_id</string>
@@ -101,5 +101,19 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="other">Other</string>
+    <string name="title_activity_initial_set_up">InitialSetUpActivity</string>
+    <string name="title_activity_offer_and_rewards">OfferandRewards</string>
+    <string name="title_activity_share">ShareActivity</string>
+    <string name="title_activity_about_us">AboutUsActivity</string>
+    <string name="title_activity_contact_us">ContactUsActivity</string>
+    <string name="action_home">Home</string>
+    <string name="hint_first_name">First Name</string>
+    <string name="hint_last_name">Last Name</string>
+    <string name="hint_dob">yyyy-mm-dd</string>
+    <string name="dob">Date of Birth</string>
+    <string name="gender">gender</string>
+    <string name="hint_email">email</string>
+    <string name="action_profile">Profile</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 
 </resources>

@@ -1,33 +1,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/ic_app_background"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     android:padding="5dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.pluggdd.burnandearn.view.fragment.ShareFragment">
 
     <com.pluggdd.burnandearn.font.RobotoTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/share_and_earn"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 
-     <com.facebook.share.widget.ShareButton
-         android:id="@+id/btn_fbshare"
-         android:layout_marginTop="20dp"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:paddingBottom="13dp"
-         android:paddingTop="13dp"
-         android:drawableLeft="@drawable/ic_facebook_edited"
-         android:layout_marginLeft="10dp"
-         android:layout_marginRight="10dp"
-         android:textSize="20sp"
-         android:text="@string/facebook_share"
-         android:background="@drawable/selector_facebook_share"/>
+    <com.facebook.share.widget.ShareButton
+        android:id="@+id/btn_fbshare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/selector_facebook_share"
+        android:drawableLeft="@drawable/ic_facebook_edited"
+        android:paddingBottom="13dp"
+        android:paddingTop="13dp"
+        android:text="@string/facebook_share"
+        android:textSize="20sp" />
 
 </LinearLayout>

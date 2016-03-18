@@ -27,12 +27,7 @@ public class TotalStepsCountFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private int mStepsTaken;
-    private String mDateFilter;
-
     private TextView mTotalStepsCountText,mStepCountText,mStepUnitText;
-
-    private FragmentInteraction mListener;
-
     public TotalStepsCountFragment() {
         // Required empty public constructor
     }
@@ -42,15 +37,13 @@ public class TotalStepsCountFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param steps_taken Parameter 1.
-     * @param dateFilter
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalStepsCountFragment newInstance(int steps_taken, String dateFilter) {
+    public static TotalStepsCountFragment newInstance(int steps_taken) {
         TotalStepsCountFragment fragment = new TotalStepsCountFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_STEPS_TAKEN,steps_taken);
-        args.putString(ARG_DATE_FILTER, dateFilter);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,7 +53,7 @@ public class TotalStepsCountFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mStepsTaken = getArguments().getInt(ARG_STEPS_TAKEN);
-            mDateFilter = getArguments().getString(ARG_DATE_FILTER);
+
         }
     }
 
@@ -79,20 +72,5 @@ public class TotalStepsCountFragment extends Fragment {
         return view;
     }
 
-     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentInteraction) {
-            mListener = (FragmentInteraction) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 }

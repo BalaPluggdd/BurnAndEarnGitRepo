@@ -4,6 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="gm.activities.ViewAllActivity">
     <item
+        android:id="@+id/action_home"
+        android:orderInCategory="100"
+        android:title="@string/action_home"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_offers_and_rewards"
         android:orderInCategory="100"
         android:title="@string/action_offers_and_rewards"
@@ -19,6 +24,13 @@
         android:orderInCategory="100"
         android:title="@string/share"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_profile"
+        android:orderInCategory="100"
+        android:title="@string/action_profile"
+        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/action_how_it_works"
