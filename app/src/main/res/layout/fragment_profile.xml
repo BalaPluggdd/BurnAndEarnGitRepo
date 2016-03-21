@@ -144,6 +144,8 @@
                 android:backgroundTint="@color/colorAccent"
                 android:hint="@string/hint_dob"
                 android:singleLine="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
                 android:textColor="@android:color/white" />
 
 

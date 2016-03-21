@@ -35,7 +35,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
         } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_goal_set))) { // If goal does n't set
             // To set translucent status bar
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            mFragmentHelper.addFragment(R.id.fragment_container, new ProfileFragment());
+            mFragmentHelper.addFragment(R.id.fragment_container, ProfileFragment.getInstance("login"));
         } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_how_its_works_learned)) || getIntent().hasExtra(getString(R.string.page_flag))) { // If user logged in and does n't learned how it will work
             // To set translucent status bar
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -74,7 +74,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
         switch (extras.getString(getString(R.string.page_flag))) {
             case "LoginFragment":
                 if (extras.getString(getString(R.string.button_pressed)).equalsIgnoreCase(getString(R.string.social_login))) {
-                    mFragmentHelper.replaceFragment(R.id.fragment_container,new ProfileFragment(), false);
+                    mFragmentHelper.replaceFragment(R.id.fragment_container,ProfileFragment.getInstance("login"), false);
                 } else {
                     finish();
                 }

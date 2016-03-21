@@ -28,7 +28,7 @@ public class ProfileActivity extends BaseActivity implements FragmentInteraction
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
-        mFragmentHelper.addFragment(R.id.fragment_container,new ProfileFragment());
+        mFragmentHelper.addFragment(R.id.fragment_container,ProfileFragment.getInstance("ProfileMenu"));
 
     }
 

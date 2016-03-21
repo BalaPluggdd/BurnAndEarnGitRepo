@@ -64,6 +64,8 @@ import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -159,13 +161,22 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                                     String gender = object.optString("gender");
                                     String birthday = object.optString("birthday");
                                     Log.i("gender:birthday", " " + gender + " " + birthday);
+                                    mPreferenceManager.setStringValue(getString(R.string.facebookId),facebook_id);
                                     mPreferenceManager.setStringValue(getString(R.string.first_name), first_name);
                                     mPreferenceManager.setStringValue(getString(R.string.last_name), last_name);
                                     mPreferenceManager.setStringValue(getString(R.string.email), email_id);
                                     //836913896406276
                                     mPreferenceManager.setStringValue(getString(R.string.profile_image_url), "https://graph.facebook.com/" + facebook_id + "/picture?type=large&width=400&height=400");
-                                    mPreferenceManager.setStringValue(getString(R.string.gender),gender);
-                                    mPreferenceManager.setStringValue(getString(R.string.dob),birthday);
+                                    if(gender != null){
+                                        if(gender.equalsIgnoreCase("male"))
+                                            mPreferenceManager.setIntValue(getString(R.string.gender), 0);
+                                        else if(gender.equalsIgnoreCase("female"))
+                                            mPreferenceManager.setIntValue(getString(R.string.gender),1);
+                                        else if(gender.equalsIgnoreCase("other"))
+                                            mPreferenceManager.setIntValue(getString(R.string.gender),2);
+                                    }
+                                    if(birthday != null && !birthday.equalsIgnoreCase(""))
+                                        mPreferenceManager.setStringValue(getString(R.string.dob),birthday.split("/")[1]+"-"+birthday.split("/")[0]+"-"+birthday.split("/")[2]);
                                     navigateToDashboard();
                                     /*if (new NetworkCheck().ConnectivityCheck(getContext())) {
                                         signUp(mProgressDialog, "facebook", first_name, last_name, email_id, facebook_id);

@@ -26,6 +26,7 @@ public class PicassoImageLoaderHelper {
 
 
     public void loadImage(String url){
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
         if(url != null && !url.equalsIgnoreCase("")){
             mPicasso
                     .load(url)
@@ -45,7 +46,6 @@ public class PicassoImageLoaderHelper {
         }else{
             mLoadingProgressBar.setVisibility(View.GONE);
         }
-
     }
 
 

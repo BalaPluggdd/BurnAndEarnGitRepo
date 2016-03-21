@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.View;
 
@@ -20,6 +21,7 @@ import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.view.fragment.PointsFragment;
+import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
 import com.pluggdd.burnandearn.view.fragment.TrendsFragment;
 
 import java.util.ArrayList;
@@ -116,11 +118,29 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // If received from Dashboard fragment , bypasss the callback to Dashboard Fragment's onActivityResult
-        /*Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (mCurrentFragment instanceof LoginFragment || mCurrentFragment instanceof PointsFragment || mCurrentFragment instanceof ShareFragment) {
+        Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (mCurrentFragment instanceof ProfileFragment) {
             mCurrentFragment.onActivityResult(requestCode, resultCode, data);
-        }*/
+        }
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if(mCurrentFragment instanceof ProfileFragment){
+            mCurrentFragment.onCreateContextMenu(menu,v,menuInfo);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if(mCurrentFragment instanceof ProfileFragment){
+            mCurrentFragment.onRequestPermissionsResult(requestCode,permissions,grantResults);
+        }
     }
 
     /*@Override

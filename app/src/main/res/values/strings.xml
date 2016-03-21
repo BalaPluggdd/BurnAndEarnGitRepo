@@ -115,5 +115,12 @@
     <string name="hint_email">email</string>
     <string name="action_profile">Profile</string>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="facebookId">FacebookID</string>
+    <string name="gcm_SenderId">322102541933</string>
+    <string name="gcm_reg_id">GCM Registration Id</string>
+    <string name="is_gcm_token_updated">is GCM token sent to server</string>
+    <string name="user_goal">User goal</string>
+    <string name="start_time">StartTime</string>
+    <string name="last_updated_calories_time">last updated calores time</string>
 
 </resources>

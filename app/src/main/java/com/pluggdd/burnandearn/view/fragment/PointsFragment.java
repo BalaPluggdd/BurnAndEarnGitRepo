@@ -78,6 +78,7 @@ import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -161,7 +162,6 @@ public class PointsFragment extends Fragment {
         //mDateFilterSpinner = (Spinner) getActivity().findViewById(R.id.toolbar).findViewById(R.id.activities_time_spinner);
         mImageLoaderHelper = new PicassoImageLoaderHelper(getContext(), mProfileImage, mProfileImageProgressBar);
         mPreferenceManager = new PreferencesManager(getContext());
-        mImageLoaderHelper.loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
         mActivitiesViewPager.setOffscreenPageLimit(0);
         initializeActivitiesList();
         checkAndBuildGoogleApiClient();
@@ -507,6 +507,7 @@ public class PointsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        mImageLoaderHelper.loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
         if (mGoogleAPIClient == null) {
             if (checkLocationPermissions() && checkGetAccountsPermissions()) {
                 buildGoogleFitnessClient();
@@ -673,14 +674,9 @@ public class PointsFragment extends Fragment {
                 else
                     updateUI(null);
             }*/
-            getBusinessList();
+            //getBusinessList();
 
-            long end_time = Calendar.getInstance().getTimeInMillis();
-            Calendar day_start_time = Calendar.getInstance();
-            day_start_time.add(Calendar.WEEK_OF_MONTH, -2);
-            long start_time = day_start_time.getTimeInMillis();
-
-            //new BusinessListAsync().execute(start_time, end_time);
+            new BusinessListAsync().execute();
 
             /*Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
             for (FitnessActivity activity : mFitnessActivityList) {
@@ -706,24 +702,35 @@ public class PointsFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Long... params) {
-            List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
-            LocalDateTime StartDate = new LocalDateTime(params[0]);
-            int days = Days.daysBetween(StartDate, new LocalDateTime(params[1])).getDays();
-            for (int i = 0; i < days; i++) {
-                LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
-                dates.add(d);
-            }
-            fitnessHistoryList = new ArrayList<>();
-            for (LocalDateTime date : dates) {
-                LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
-                getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
-            }
-            /*if (mGoogleAPIClient != null) {
-                return getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
 
-            } else
-                return null;*/
+            long last_calories_updated_time = mPreferenceManager.getLongValue(getString(R.string.last_updated_calories_time));
+            //last_calories_updated_time = new LocalDateTime().minusHours(10).toDateTime().getMillis();
+            if(last_calories_updated_time == -1){ // App installed today only,so send today fitnessDetails only
+                fitnessHistoryList = new ArrayList<>();
+                getTodayFitnessDetails();
+            }else{ // Send fitness data from last synced date to current time
+                List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
+                LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
+                LocalDateTime currentDateTime = new LocalDateTime();
+                int days = Days.daysBetween(startDate, currentDateTime).getDays();
+                if(days == 0){  // Calories already sent  for current date
+                    Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
+                    fitnessHistoryList = new ArrayList<>();
+                    getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                }else{
+                    for (int i = 0; i < days; i++) {
+                        LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
+                        dates.add(d);
+                    }
+                    fitnessHistoryList = new ArrayList<>();
+                    for (LocalDateTime date : dates) {
+                        LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                        Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
+                        getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+                    }
+                    getTodayFitnessDetails(); // To add today fitness details as last one
+                }
+            }
             return null;
         }
 
@@ -741,6 +748,7 @@ public class PointsFragment extends Fragment {
             }
             mBusinessOfferListViewPager.setVisibility(View.VISIBLE);
             mOfferListProgressBar.setVisibility(View.GONE);
+            getBusinessList();
             /*if(!isDetached()){
                 if(mDateFilterSpinner.getSelectedItemPosition() == 0)
                     getBusinessList();
@@ -759,6 +767,15 @@ public class PointsFragment extends Fragment {
             Log.e("Total distaance", mTotalDistanceTravelled + "");
             Log.e("Total stepcount", mTotalStepCount + "");*/
         }
+    }
+
+    private void getTodayFitnessDetails() {
+        LocalDateTime currentDateTime = new LocalDateTime();
+        long endTime = currentDateTime.toDateTime().getMillis();
+        LocalDateTime startdateTime = currentDateTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        long startTime = startdateTime.toDateTime().getMillis();
+        Log.i("Time :", startdateTime.toString() + " " + currentDateTime.toDateTime().toString());
+        getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startTime, endTime)).await(1, TimeUnit.MINUTES), startdateTime, currentDateTime);
     }
 
     private void updateUI(ArrayList<BusinessDetails> businessList) {
@@ -1127,7 +1144,6 @@ public class PointsFragment extends Fragment {
         }
     }
 
-
     /**
      * Callback received when a permissions request has been completed.
      */
@@ -1207,6 +1223,121 @@ public class PointsFragment extends Fragment {
     }
 
     private void getBusinessList() {
+        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
+        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.BUSINESS_OFFER_LIST, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("response", response);
+                if (response != null) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response);
+                        if (!responseJson.optString("msg").trim().equalsIgnoreCase("No Offer Found")) {
+                            ArrayList mBusinessOfferList = new ArrayList<BusinessDetails>();
+                            mPointsEarnedText.setText(responseJson.optInt("yourpoint") + "!");
+                            if(!responseJson.optString("lastcaloriesupdate").startsWith("0000")){
+                                LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
+                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
+                            }else
+                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), -1);
+                            JSONArray business_list = responseJson.optJSONArray("businesslist");
+                            if (business_list != null && business_list.length() > 0) {
+                                for (int i = 0; i < business_list.length(); i++) {
+                                    JSONObject business_object = business_list.optJSONObject(i);
+                                    BusinessDetails businessDetails = new BusinessDetails();
+                                    businessDetails.setName(business_object.optString("Business Name"));
+                                    businessDetails.setOffer_name(business_object.optString("offerName"));
+                                    businessDetails.setLogo(business_object.optString("Business Image"));
+                                    businessDetails.setPromo(business_object.optString("offerText"));
+                                    businessDetails.setPoints_needed(business_object.optInt("requiredPoints"));
+                                    businessDetails.setCoupon_expiry_date(business_object.optString("endingDate"));
+                                    businessDetails.setHow_to_reedem(business_object.optString("How to Redeem"));
+                                    businessDetails.setUrl(business_object.optString("site"));
+                                    businessDetails.setPhone_number(business_object.optInt("Phone No"));
+                                    businessDetails.setAddress(business_object.optString("Address"));
+                                    businessDetails.setPoints_needed(business_object.optInt(""));
+                                    businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
+                                    businessDetails.setCoupon(business_object.optString("couponCode"));
+                                    mBusinessOfferList.add(businessDetails);
+                                }
+                            } else {
+                                if (!isDetached())
+                                    Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                            }
+                            if (!isDetached())
+                                updateUI(mBusinessOfferList);
+                        } else {
+                            if (!isDetached()){
+                                updateUI(null);
+                                Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+                    } catch (JSONException e) {
+                        if(!isDetached()){
+                            updateUI(null);
+                            e.printStackTrace();
+                            Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    if(!isDetached()){
+                        updateUI(null);
+                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                String json_request = "";
+                try {
+                    JSONObject root = new JSONObject();
+                    root.put("user_id", mPreferenceManager.getStringValue(getString(R.string.user_id)));
+                    root.put("flag", "android");
+                    root.put("fitness_email_id", mFitnessEmail);
+                    JSONArray dates_array = new JSONArray();
+                    for(FitnessHistory history : fitnessHistoryList){
+                        JSONObject fitnessSummaryObj = new JSONObject();
+                        fitnessSummaryObj.put("start_datetime",history.getStartDateTime());
+                        fitnessSummaryObj.put("end_datetime",history.getEndDateTime());
+                        JSONArray activities_array = new JSONArray();
+                        for (FitnessActivity activity : history.getFitnessActivitiesList()) {
+                            JSONObject activityObj = new JSONObject();
+                            activityObj.put("name", activity.getName());
+                            activityObj.put("calories_burnt", activity.getCalories_expended() == -1 ? 0 : activity.getCalories_expended());
+                            activityObj.put("step_count", activity.getStep_count() == -1 ? 0 : activity.getStep_count());
+                            activityObj.put("distance", activity.getDistance() == -1 ? 0 : activity.getDistance());
+                            activities_array.put(activityObj);
+                        }
+                        fitnessSummaryObj.put("activities",activities_array);
+                        dates_array.put(fitnessSummaryObj);
+                    }
+                    root.put("date",dates_array);
+                    json_request = root.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.i("json request", json_request);
+                params.put("jsonrequest", json_request);
+                return params;
+            }
+        }));
+    }
+
+
+    /*private void getBusinessList() {
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
         mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.BUSINESS_LIST, new Response.Listener<String>() {
             @Override
@@ -1306,7 +1437,7 @@ public class PointsFragment extends Fragment {
                 return params;
             }
         }));
-    }
+    }*/
 
     class CustomBusinessOfferListAdapter extends PagerAdapter {
 
@@ -1314,8 +1445,10 @@ public class PointsFragment extends Fragment {
         private ArrayList<BusinessDetails> mBusinessList;
 
         CustomBusinessOfferListAdapter(ArrayList<BusinessDetails> businessList) {
-            mLayoutInflater = LayoutInflater.from(getContext());
-            mBusinessList = businessList;
+            if(!isDetached()){
+                mLayoutInflater = LayoutInflater.from(getContext());
+                mBusinessList = businessList;
+            }
         }
 
         @Override
@@ -1332,7 +1465,9 @@ public class PointsFragment extends Fragment {
             ImageView businessImage = (ImageView) itemView.findViewById(R.id.img_business_logo);
             ProgressBar logoProgressBar = (ProgressBar) itemView.findViewById(R.id.logo_progress_bar);
             nameText.setText(businessDetail.getName());
-            new PicassoImageLoaderHelper(getContext(), businessImage, logoProgressBar).loadImage(businessDetail.getLogo());
+            nameText.setSelected(true);
+            if(!isDetached())
+                new PicassoImageLoaderHelper(getContext(), businessImage, logoProgressBar).loadImage(businessDetail.getLogo());
             offerRewardsText.setText(businessDetail.getPromo());
             Button mGrabNowButton = (Button) itemView.findViewById(R.id.btn_grab_now);
             mGrabNowButton.setOnClickListener(new View.OnClickListener() {
