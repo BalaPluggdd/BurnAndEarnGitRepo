@@ -74,8 +74,10 @@ import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
+import org.joda.time.Hours;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -702,10 +704,9 @@ public class PointsFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Long... params) {
-
             long last_calories_updated_time = mPreferenceManager.getLongValue(getString(R.string.last_updated_calories_time));
-            //last_calories_updated_time = new LocalDateTime().minusHours(10).toDateTime().getMillis();
-            if(last_calories_updated_time == -1){ // App installed today only,so send today fitnessDetails only
+            //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
+            if(last_calories_updated_time == 0){ // App installed today only,so send today fitnessDetails only
                 fitnessHistoryList = new ArrayList<>();
                 getTodayFitnessDetails();
             }else{ // Send fitness data from last synced date to current time
@@ -713,10 +714,16 @@ public class PointsFragment extends Fragment {
                 LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
                 LocalDateTime currentDateTime = new LocalDateTime();
                 int days = Days.daysBetween(startDate, currentDateTime).getDays();
-                if(days == 0){  // Calories already sent  for current date
+                if(days == 0){
                     Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
                     fitnessHistoryList = new ArrayList<>();
-                    getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                    if(startDate.get(DateTimeFieldType.dayOfMonth())  == currentDateTime.get(DateTimeFieldType.dayOfMonth())){ //// Calories already sent  for current date
+                        getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                    }else{ // Calories already sent yesterday but date difference is not 1...
+                        LocalDateTime startDateMidnight = startDate.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                        getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), startDateMidnight.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, startDateMidnight);
+                        getTodayFitnessDetails();
+                    }
                 }else{
                     for (int i = 0; i < days; i++) {
                         LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);

@@ -456,7 +456,7 @@ public class ProfileFragment extends Fragment {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
                             }else
-                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), -1);
+                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), 0);
 
                             if(mSourcePageFlag.equalsIgnoreCase("login")){ // From login fragment
                                 mPreferenceManager.setBooleanValue(getString(R.string.is_goal_set), true);
