@@ -16,9 +16,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
+import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.view.fragment.PointsFragment;
 import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
@@ -41,6 +45,9 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
     //private Spinner mActivitiesTimeSpinner;
     //private ImageView mBackImage;
     //private TextView mToolBarTitle;
+    private ImageView mProfileImage;
+    private ProgressBar mProfileImageProgressBar;
+    private TextView mUserNameText;
     private PreferencesManager mPreferenceManager;
     private final int REQUEST_CODE_RESOLUTION = 100, REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE = 101, REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE = 102, REQUEST_BOTH_PERMISSION_CODE = 103;
     private boolean mIsPermissionRequestRaised;
@@ -55,11 +62,17 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
        // mBackImage = (ImageView) findViewById(R.id.img_back);
        // mToolBarTitle = (TextView) findViewById(R.id.txt_title);
         setSupportActionBar(mToolBar);
+        getSupportActionBar().setIcon(0);
+        getSupportActionBar().setTitle("");
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabViewPager = (ViewPager) findViewById(R.id.tab_viewpager);
-        mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
-        getSupportActionBar().setTitle(getString(R.string.app_name));
-        getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+        mProfileImage = (ImageView) findViewById(R.id.img_profile);
+        mProfileImageProgressBar = (ProgressBar) findViewById(R.id.profile_progress_bar);
+        mPreferenceManager = new PreferencesManager(this);
+        new PicassoImageLoaderHelper(this,mProfileImage,mProfileImageProgressBar).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
+        mUserNameText = (TextView) findViewById(R.id.txt_user_name);
+        //mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
+        mUserNameText.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)) + " " + mPreferenceManager.getStringValue(getString(R.string.last_name)));
         setUpHomePageTabs();
         /*mPreferenceManager = new PreferencesManager(this);
         // To add Login fragment as first fragment in transaction
@@ -96,8 +109,8 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
     private void setUpHomePageTabs() {
         // To add Tabs
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PointsFragment(), "Points");
-        adapter.addFragment(new TrendsFragment(), "Trends");
+        adapter.addFragment(new PointsFragment(), "BURNT");
+        adapter.addFragment(new TrendsFragment(), "EARNED");
         mTabViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mTabViewPager);
     }

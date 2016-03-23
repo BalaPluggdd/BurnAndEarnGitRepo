@@ -21,4 +21,7 @@
     <color name="darker_grey">#666666</color>
     <color name="torqoise">#00796B</color>
     <color name="orange">#FFC107</color>
+    <color name="walking_color">#53B6CD</color>
+    <color name="running_color">#F8C900</color>
+    <color name="biking_color">#B0C53C</color>
 </resources>
