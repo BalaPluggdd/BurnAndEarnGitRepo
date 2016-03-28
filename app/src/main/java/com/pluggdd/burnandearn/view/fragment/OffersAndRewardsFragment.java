@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -21,6 +22,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.model.BusinessDetails;
+import com.pluggdd.burnandearn.model.FitnessActivity;
+import com.pluggdd.burnandearn.model.FitnessHistory;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
@@ -31,6 +34,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,19 +45,35 @@ import java.util.ArrayList;
  */
 public class OffersAndRewardsFragment extends Fragment {
 
+    public static final String ARG_FLAG = "Flag";
     private RecyclerView mOfferAndRewardsRecyclerView;
     private ProgressBar mLoadingProgressBar;
     private TextView mNoOfferText;
+    private int mFlag;
     private ArrayList<BusinessDetails> mBusinessOfferList = new ArrayList<>();
 
     public OffersAndRewardsFragment() {
         // Required empty public constructor
     }
 
+    public static OffersAndRewardsFragment newInstance(int flag){
+        OffersAndRewardsFragment mOfferAndRewardFragment = new OffersAndRewardsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(ARG_FLAG, flag);
+        mOfferAndRewardFragment.setArguments(bundle);
+        return mOfferAndRewardFragment;
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            mFlag = getArguments().getInt(ARG_FLAG);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_offers_and_rewards, container, false);
         mLoadingProgressBar = (ProgressBar) view.findViewById(R.id.loading_progress_bar);
@@ -69,7 +90,7 @@ public class OffersAndRewardsFragment extends Fragment {
 
     private void getBusinessOfferList(){
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.GET, WebserviceAPI.ALL_BUSINESS_OFFER_LIST, new Response.Listener<String>() {
+        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.ALL_BUSINESS_OFFER_LIST, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
@@ -144,7 +165,14 @@ public class OffersAndRewardsFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-        })));
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("flag", String.valueOf(mFlag));
+                return params;
+            }
+        }));
     }
 
 }

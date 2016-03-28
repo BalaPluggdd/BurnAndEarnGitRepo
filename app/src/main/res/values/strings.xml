@@ -122,5 +122,9 @@
     <string name="user_goal">User goal</string>
     <string name="start_time">StartTime</string>
     <string name="last_updated_calories_time">last updated calores time</string>
+    <string name="calories_goal">calories goal</string>
+    <string name="points_earned">You have earned</string>
+    <string name="points">points</string>
+    <string name="no_business_offer">Burn more calories to avail offers</string>
 
 </resources>

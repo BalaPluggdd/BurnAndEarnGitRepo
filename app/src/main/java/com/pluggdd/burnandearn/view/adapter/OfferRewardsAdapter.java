@@ -34,7 +34,7 @@ import java.util.ArrayList;
 /**
  * Created by User on 12-Feb-16.
  */
-public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapter.RestaurentLiveDealViewHolder> {
+public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapter.BusinessOfferViewHolder> {
 
     private Context mContext;
     private int mLastPosition = -1;
@@ -50,14 +50,14 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
     }
 
     @Override
-    public RestaurentLiveDealViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BusinessOfferViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflater_view = LayoutInflater.from(mContext).inflate(R.layout.list_row_offer_rewards, parent, false);
-        RestaurentLiveDealViewHolder viewHolder = new RestaurentLiveDealViewHolder(inflater_view);
+        BusinessOfferViewHolder viewHolder = new BusinessOfferViewHolder(inflater_view);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(final RestaurentLiveDealViewHolder holder, int position) {
+    public void onBindViewHolder(final BusinessOfferViewHolder holder, int position) {
         setAnimation(holder.sContainer, position);
         final BusinessDetails businessDetail = mBusinessOfferList.get(position);
         holder.sNameText.setText(businessDetail.getName());
@@ -118,7 +118,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
         return mBusinessOfferList.size();
     }
 
-    public static class RestaurentLiveDealViewHolder extends RecyclerView.ViewHolder {
+    public static class BusinessOfferViewHolder extends RecyclerView.ViewHolder {
 
         private CardView sContainer;
         private ImageView sBusinessImage,sPhoneImage,sLocationImage;
@@ -126,7 +126,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
         private Button sRedeemButton;
         private ProgressBar sLogoProgressBar;
 
-        public RestaurentLiveDealViewHolder(View itemView) {
+        public BusinessOfferViewHolder(View itemView) {
             super(itemView);
             sContainer = (CardView) itemView.findViewById(R.id.offers_rewards_container);
             sOfferRewardsText = (TextView) itemView.findViewById(R.id.txt_offer_promo);

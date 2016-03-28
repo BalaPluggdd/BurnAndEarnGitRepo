@@ -1,19 +1,14 @@
 package com.pluggdd.burnandearn.view.fragment;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountsException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.print.PageRange;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -24,18 +19,15 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,13 +49,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
-import com.google.android.gms.fitness.data.Bucket;
-import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.request.DataReadRequest;
-import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.plus.Plus;
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
@@ -74,70 +59,50 @@ import com.pluggdd.burnandearn.activity.OfferDetailActivity;
 import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
-import com.pluggdd.burnandearn.utils.FragmentInteraction;
+import com.pluggdd.burnandearn.utils.GoogleFitHelper;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.Days;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Hours;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.lang.reflect.Array;
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
 
 /**
- * Fragment to show acitivity details and offers
+ * Fragment to show activity details and offers
  */
-public class PointsFragment extends Fragment {
+public class PointsFragment extends Fragment implements View.OnClickListener {
     // Initialization of views and variables
     private final int REQUEST_CODE_RESOLUTION = 100, REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE = 101, REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE = 102, REQUEST_BOTH_PERMISSION_CODE = 103;
     private View mView;
     private DecoView mCircularProgressDecoView;
     private ViewPager mActivitiesViewPager;
-    private AutoScrollViewPager mBusinessOfferListViewPager;
-    private RelativeLayout mWalkingActivityContainer, mRunningActivityContainer, mBikingActivityContainer, mFitnessActivityViewPagerContainer;
-    private LinearLayout mActivitiesTextContainer;
-    private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image;
-    private ProgressBar mProfileImageProgressBar, mActivitiesProgressBar, mOfferListProgressBar;
-    private TextView mWalkingActivityValueText, mRunningActivityValueText, mCyclingActivityValueText, mWalkingActivityDimesionText, mRunningActivityDimensionText, mCyclingActivityDimensionText, mPointsEarnedText;
-    private ImageView mProfileImage;
+    private RelativeLayout mFitnessActivityViewPagerContainer, mAllActivitiesImageContainer, mWalkingImageContainer, mRunningImageContainer, mBikingImageContainer;
+    private LinearLayout mFitnessActivityImageContainer;
+    private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image, mViewPagerIndicator4Image;
+    private ProgressBar mActivitiesProgressBar;
     private BarChart mBarChart;
     private GoogleApiClient mGoogleAPIClient;
-    private ArrayList<FitnessActivity> mFitnessActivityList = new ArrayList<>(3);
-    private int mTotalStepCount = 0;
-    private double mTotalCaloriesExpended = 0, mTotalDistanceTravelled = 0;
-    private int mBackIndex;
-    private int mWalkingActivityIndex, mRunningActivityIndex, mBikingActivityIndex;
+    private int mTotalStepCount = 0, mStepsAverage = 0, mPointsAverage = 0;
+    private double mTotalCaloriesExpended = 0, mCaloriesAverage = 0, mTotalDistanceTravelled = 0, mDistanceAverage = 0;
+    private int mBackIndex, mWalkingActivityIndex, mRunningActivityIndex, mBikingActivityIndex, mTotalPointEarned;
     //private Spinner mDateFilterSpinner;
     private boolean mIsPermissionRequestRaised, mIsGetFitnessDataAsyncRunning;
-    private PicassoImageLoaderHelper mImageLoaderHelper;
     private PreferencesManager mPreferenceManager;
-    private String mFitnessEmail = "";
+    private String mFitnessEmail = "", mCurrentFitnessActivity;
     private CustomPagerAdapter mActivitiesPagerAdapter;
-    private ArrayList<FitnessHistory> fitnessHistoryList = new ArrayList<>();
-    private ArrayList<FitnessHistory> chartfitnessHistoryList = new ArrayList<>();
+    private GoogleFitHelper mGoogleFitHelper;
+    private ArrayList<FitnessHistory> mFitnessHistoryList = new ArrayList<>();
+    private ArrayList<FitnessHistory> mWeekFitnessHistoryList = new ArrayList<>();
+    private ArrayList<Integer> mWeeklyPointsList = new ArrayList<>();
 
     public PointsFragment() {
         // Required empty public constructor
@@ -146,71 +111,35 @@ public class PointsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        mPointsEarnedText = (TextView) mView.findViewById(R.id.txt_total_points_earned);
+        mView = inflater.inflate(R.layout.fragment_burnt, container, false);
         mCircularProgressDecoView = (DecoView) mView.findViewById(R.id.deco_view);
         mFitnessActivityViewPagerContainer = (RelativeLayout) mView.findViewById(R.id.activities_view_pager_container);
         mActivitiesViewPager = (ViewPager) mView.findViewById(R.id.activities_view_pager);
-        mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
-        mProfileImageProgressBar = (ProgressBar) mView.findViewById(R.id.profile_progress_bar);
         mViewPagerIndicator1Image = (ImageView) mView.findViewById(R.id.viewpager_indicator1_image);
         mViewPagerIndicator2Image = (ImageView) mView.findViewById(R.id.viewpager_indicator2_image);
         mViewPagerIndicator3Image = (ImageView) mView.findViewById(R.id.viewpager_indicator3_image);
-        mWalkingActivityContainer = (RelativeLayout) mView.findViewById(R.id.walking_activity_container);
-        mActivitiesTextContainer = (LinearLayout) mView.findViewById(R.id.activities_fitness_container);
-        mWalkingActivityValueText = (TextView) mView.findViewById(R.id.txt_walking_activity_value);
-        mWalkingActivityDimesionText = (TextView) mView.findViewById(R.id.txt_walking_activity_dimension);
-        mRunningActivityContainer = (RelativeLayout) mView.findViewById(R.id.running_activity_container);
-        mRunningActivityValueText = (TextView) mView.findViewById(R.id.txt_running_activity_value);
-        mRunningActivityDimensionText = (TextView) mView.findViewById(R.id.txt_running_activity_dimension);
-        mBikingActivityContainer = (RelativeLayout) mView.findViewById(R.id.biking_activity_container);
-        mCyclingActivityValueText = (TextView) mView.findViewById(R.id.txt_cycling_activity_value);
-        mCyclingActivityDimensionText = (TextView) mView.findViewById(R.id.txt_cycling_activity_dimension);
-        mBusinessOfferListViewPager = (AutoScrollViewPager) mView.findViewById(R.id.business_offer_list_pager);
-        mOfferListProgressBar = (ProgressBar) mView.findViewById(R.id.offer_list_progress_bar);
+        mViewPagerIndicator4Image = (ImageView) mView.findViewById(R.id.viewpager_indicator4_image);
         mActivitiesProgressBar = (ProgressBar) mView.findViewById(R.id.activities_progress_bar);
+        mFitnessActivityImageContainer = (LinearLayout) mView.findViewById(R.id.activities_fitness_container);
+        mAllActivitiesImageContainer = (RelativeLayout) mView.findViewById(R.id.all_activities_image_container);
+        mWalkingImageContainer = (RelativeLayout) mView.findViewById(R.id.walking_image_container);
+        mRunningImageContainer = (RelativeLayout) mView.findViewById(R.id.running_image_container);
+        mBikingImageContainer = (RelativeLayout) mView.findViewById(R.id.cycling_image_container);
         mBarChart = (BarChart) mView.findViewById(R.id.bar_chart);
-        //mDateFilterSpinner = (Spinner) getActivity().findViewById(R.id.toolbar).findViewById(R.id.activities_time_spinner);
-        mImageLoaderHelper = new PicassoImageLoaderHelper(getContext(), mProfileImage, mProfileImageProgressBar);
         mPreferenceManager = new PreferencesManager(getContext());
         mActivitiesViewPager.setOffscreenPageLimit(0);
-        initializeActivitiesList();
         checkAndBuildGoogleApiClient();
-        mBarChart.setDescription("");    // Hide the description
-        mBarChart.getAxisLeft().setDrawLabels(false);
-        mBarChart.getAxisRight().setDrawLabels(false);
-        mBarChart.getXAxis().setDrawLabels(false);
-        mBarChart.getLegend().setEnabled(false);
-        mBarChart.setDrawGridBackground(false);
-        mBarChart.getXAxis().setEnabled(false);
-        mBarChart.getAxisLeft().setEnabled(false);
-        mBarChart.getAxisRight().setEnabled(false);
-
-
-        /* // Check and request for location and get accounts permission
-        if (!checkLocationPermissions() && !checkGetAccountsPermissions()) {
-            requestBothPermissions();
-        } else if (!checkGetAccountsPermissions()) {
-            requestLocationPermissions();
-        } else if (!checkLocationPermissions()) {
-            requestLocationPermissions();
-        } else {
-            buildGoogleFitnessClient();
-        }*/
+        initializeActivitiesBarChart();
         // Initial set up for circular decoview
         createBackgroundSeries();
         createBikingActivitySeries();
         createRunningActivitySeries();
         createWalkingActivitySeries();
-
-       /* mRedeemButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString(getString(R.string.page_flag), PointsFragment.this.getClass().getSimpleName());
-                mListener.changeFragment(bundle);
-            }
-        });*/
+        // Adding click listener to activity image container
+        mAllActivitiesImageContainer.setOnClickListener(this);
+        mWalkingImageContainer.setOnClickListener(this);
+        mRunningImageContainer.setOnClickListener(this);
+        mBikingImageContainer.setOnClickListener(this);
 
         mActivitiesViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -225,15 +154,27 @@ public class PointsFragment extends Fragment {
                         resetActivitiesViewPager();
                         break;
                     case 1:
+                        plotActivityChart(mCurrentFitnessActivity, "distance");
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         updateFitnessActivities(position);
                         break;
                     case 2:
+                        plotActivityChart(mCurrentFitnessActivity, "steps");
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_selected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        updateFitnessActivities(position);
+                        break;
+                    case 3:
+                        plotActivityChart(mCurrentFitnessActivity, "points");
+                        mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+                        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         updateFitnessActivities(position);
                         break;
                 }
@@ -244,76 +185,24 @@ public class PointsFragment extends Fragment {
 
             }
         });
-
-        /*mDateFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Calendar day_start_time = Calendar.getInstance();
-                Calendar end_time_calc = Calendar.getInstance();
-                end_time_calc.set(Calendar.HOUR_OF_DAY, 0);
-                end_time_calc.set(Calendar.MINUTE, 0);
-                end_time_calc.set(Calendar.SECOND, 0);
-                end_time_calc.set(Calendar.MILLISECOND, 0);
-                long start_time;
-                long end_time;
-                switch (position) {
-                    case 0: // Today
-                        day_start_time.set(Calendar.HOUR_OF_DAY, 0);
-                        day_start_time.set(Calendar.MINUTE, 0);
-                        day_start_time.set(Calendar.SECOND, 0);
-                        day_start_time.set(Calendar.MILLISECOND, 0);
-                        start_time = day_start_time.getTimeInMillis();
-                        end_time = Calendar.getInstance().getTimeInMillis();
-                        Log.i("Fitness Async", "called from today spinner");
-                        if (!mIsGetFitnessDataAsyncRunning)
-                            new FitnessDataAsync().execute(start_time, end_time);
-                        break;
-                    case 1: // Yesterday
-                        day_start_time.add(Calendar.DAY_OF_MONTH, -1);
-                        day_start_time.set(Calendar.HOUR_OF_DAY, 0);
-                        day_start_time.set(Calendar.MINUTE, 0);
-                        day_start_time.set(Calendar.SECOND, 0);
-                        day_start_time.set(Calendar.MILLISECOND, 0);
-                        start_time = day_start_time.getTimeInMillis();
-                        end_time = end_time_calc.getTimeInMillis();
-                        Log.i("Data Check", day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
-                        new FitnessDataAsync().execute(start_time, end_time);
-                        break;
-                    case 2: // Last Week
-                        day_start_time.add(Calendar.WEEK_OF_MONTH, -1);
-                        day_start_time.set(Calendar.HOUR_OF_DAY, 0);
-                        day_start_time.set(Calendar.MINUTE, 0);
-                        day_start_time.set(Calendar.SECOND, 0);
-                        day_start_time.set(Calendar.MILLISECOND, 0);
-                        start_time = day_start_time.getTimeInMillis();
-                        end_time = end_time_calc.getTimeInMillis();
-                        Log.i("Data Check", day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
-                        new FitnessDataAsync().execute(start_time, end_time);
-                        break;
-                    case 3: // Last Month
-                        day_start_time.add(Calendar.MONTH, -1);
-                        day_start_time.set(Calendar.HOUR_OF_DAY, 0);
-                        day_start_time.set(Calendar.MINUTE, 0);
-                        day_start_time.set(Calendar.SECOND, 0);
-                        day_start_time.set(Calendar.MILLISECOND, 0);
-                        start_time = day_start_time.getTimeInMillis();
-                        end_time = end_time_calc.getTimeInMillis();
-                        Log.i("Data Check", day_start_time.getTime().toString() + " " + end_time_calc.getTime().toString());
-                        new FitnessDataAsync().execute(start_time, end_time);
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });*/
         return mView;
+    }
+
+    private void initializeActivitiesBarChart() {
+        mBarChart.setDescription("");    // Hide the description
+        mBarChart.getAxisLeft().setDrawLabels(false);
+        mBarChart.getAxisRight().setDrawLabels(false);
+        mBarChart.getXAxis().setDrawLabels(false);
+        mBarChart.getLegend().setEnabled(false);
+        mBarChart.setDrawGridBackground(false);
+        mBarChart.getXAxis().setEnabled(false);
+        mBarChart.getAxisLeft().setEnabled(false);
+        mBarChart.getAxisRight().setEnabled(false);
     }
 
     // To reset viewpager to initial position
     private void resetActivitiesViewPager() {
+        plotActivityChart(mCurrentFitnessActivity, "calories");
         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_selected);
         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
@@ -360,32 +249,164 @@ public class PointsFragment extends Fragment {
         mBikingActivityIndex = mCircularProgressDecoView.addSeries(biking_activity_series);
     }
 
-    // Set up activity detail collection list
-    private void initializeActivitiesList() {
-        for (int i = 0; i < 3; i++) {
-            FitnessActivity mFitnessAtivity = new FitnessActivity();
-            if (i == 0)
-                mFitnessAtivity.setName(FitnessActivities.WALKING);
-            else if (i == 1)
-                mFitnessAtivity.setName(FitnessActivities.RUNNING);
-            else
-                mFitnessAtivity.setName(FitnessActivities.BIKING);
-            // Default set to -1 for validation purpose
-            mFitnessAtivity.setStep_count(-1);
-            mFitnessAtivity.setDistance(-1);
-            mFitnessAtivity.setCalories_expended(-1);
-            mFitnessActivityList.add(i, mFitnessAtivity);
+    private void updateFitnessActivities(int position) {
+        ArrayList<FitnessActivity> mTodayFitnessActivityList = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1).getFitnessActivitiesList();
+        switch (position) {
+            case 0: // Calories
+                Log.i("calories average", mCaloriesAverage + "");
+                double walking_calories_percentage = 0, running_calories_percentage = 0, biking_calories_percentage = 0;
+                double walking_calories_expended = 0;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                        walking_calories_expended = fitnessActivity.getCalories_expended();
+                        break;
+                    }
+                }
+                //walking_calories_expended = 100;
+                Log.i("walking calories", walking_calories_expended + "");
+                walking_calories_percentage = Math.round((walking_calories_expended / mCaloriesAverage) * 100);
+                // To calculate running calories percentage in total calories
+                double running_calories_expended = 0;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                        running_calories_expended = fitnessActivity.getCalories_expended();
+                        break;
+                    }
+                }
+                //running_calories_expended = 60;
+                Log.i("running calories", running_calories_expended + "");
+                running_calories_percentage = Math.round((running_calories_expended / mCaloriesAverage) * 100);
+                // To calculate biking calories percentage in total calories
+                double biking_calories_expended = 0;
+                //biking_calories_expended = 200;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                        biking_calories_expended = fitnessActivity.getCalories_expended();
+                        break;
+                    }
+                }
+                //biking_calories_expended = 10;
+                Log.i("biking calories", biking_calories_expended + "");
+                biking_calories_percentage = Math.round((biking_calories_expended / mCaloriesAverage) * 100);
+                // To update decoview
+                updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
+                break;
+            case 1: // Distance
+                Log.i("distance average", mDistanceAverage + "");
+                double walking_distance_percentage = 0, running_distance_percentage = 0, biking_distance_percentage = 0;
+                double walking_distance_travelled = 0;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                        walking_distance_travelled = fitnessActivity.getDistance();
+                        break;
+                    }
+                }
+                //walking_calories_expended = 100;
+                Log.i("walking distance", walking_distance_travelled + "");
+                walking_distance_percentage = Math.round((walking_distance_travelled / mDistanceAverage) * 100);
+                // To calculate running calories percentage in total calories
+                double running_distance_travelled = 0;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                        running_distance_travelled = fitnessActivity.getDistance();
+                        break;
+                    }
+                }
+                //running_calories_expended = 60;
+                Log.i("running distance", running_distance_travelled + "");
+                running_distance_percentage = Math.round((running_distance_travelled / mDistanceAverage) * 100);
+                // To calculate biking calories percentage in total calories
+                double biking_distance_travelled = 0;
+                //biking_calories_expended = 200;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                        biking_distance_travelled = fitnessActivity.getDistance();
+                        break;
+                    }
+                }
+                //biking_calories_expended = 10;
+                Log.i("biking distance", biking_distance_travelled + "");
+                biking_distance_percentage = Math.round((biking_distance_travelled / mDistanceAverage) * 100);
+                // To update decoview
+                updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
+                break;
+            case 2: // Steps
+                Log.i("steps average", mStepsAverage + "");
+                double walking_steps_percentage = 0, running_steps_percentage = 0, biking_steps_percentage = 0;
+                double walking_steps_taken = 0;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                        walking_steps_taken = fitnessActivity.getStep_count();
+                        break;
+                    }
+                }
+                //walking_calories_expended = 100;
+                Log.i("walking distance", walking_steps_taken + "");
+                walking_steps_percentage = Math.round((walking_steps_taken / mStepsAverage) * 100);
+                // To calculate running calories percentage in total calories
+                double running_steps_taken = 0;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                        running_steps_taken = fitnessActivity.getStep_count();
+                        break;
+                    }
+                }
+                //running_calories_expended = 60;
+                Log.i("running distance", running_steps_taken + "");
+                running_steps_percentage = Math.round((running_steps_taken / mStepsAverage) * 100);
+                // To calculate biking calories percentage in total calories
+                double biking_steps_taken = 0;
+                //biking_calories_expended = 200;
+                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                        biking_steps_taken = fitnessActivity.getStep_count();
+                        break;
+                    }
+                }
+                //biking_calories_expended = 10;
+                Log.i("biking distance", biking_steps_taken + "");
+                biking_steps_percentage = Math.round((biking_steps_taken / mStepsAverage) * 100);
+                // To update decoview
+                updateProgressBar(walking_steps_percentage, running_steps_percentage, biking_steps_percentage);
+                break;
+            case 3: // Point
+                Log.i("steps average", mPointsAverage + "");
+                double today_points_percentage = 0;
+                double today_points = 0;
+                if (mWeeklyPointsList != null && mWeeklyPointsList.size() > 0) {
+                    today_points = mWeeklyPointsList.get(mWeeklyPointsList.size() - 1);
+                }
+                //walking_calories_expended = 100;
+                Log.i("today points", today_points + "");
+                today_points_percentage = Math.round((today_points / mPointsAverage) * 100);
+                // To update decoview
+                updateProgressBar(today_points_percentage, 0, 0);
+                break;
+            default:
+                break;
         }
     }
 
+    private float calculateDistanceAverage() {
+        float total_distance_of_week = 0;
+        for (int i = 0; i < mWeekFitnessHistoryList.size() - 1; i++) {
+            FitnessHistory fitnessHistory = mWeekFitnessHistoryList.get(i);
+            total_distance_of_week += (fitnessHistory.getWalkingDistance() + fitnessHistory.getRunningDistance() + fitnessHistory.getCyclingDistance()) / 1000;
+        }
+        return total_distance_of_week / 7;
+    }
+
+    private int calculateStepAverage() {
+        int total_steps_of_week = 0;
+        for (int i = 0; i < mWeekFitnessHistoryList.size() - 1; i++) {
+            FitnessHistory fitnessHistory = mWeekFitnessHistoryList.get(i);
+            total_steps_of_week += fitnessHistory.getWalkingSteps() + fitnessHistory.getRunningSteps();
+        }
+        return total_steps_of_week / 7;
+    }
+
     // To update fitness acitvity details in viewpager and in main view
-    private void updateFitnessActivities(int position) {
-        mWalkingActivityValueText.setText("");
-        mWalkingActivityDimesionText.setText("");
-        mRunningActivityValueText.setText("");
-        mRunningActivityDimensionText.setText("");
-        mCyclingActivityValueText.setText("");
-        mCyclingActivityDimensionText.setText("");
+   /* private void updateFitnessActivities(int position) {
         switch (position) {
             case 0:
                 // To calculate walking calories percentage in total calories
@@ -506,11 +527,60 @@ public class PointsFragment extends Fragment {
             default:
                 break;
         }
-    }
+    }*/
 
-    // To update decoview with each activity percentage
-    private void updateProgressBar(int walking_percentage, int running_percentage, int biking_percentage) {
+    private void updateProgressBar(double walking_percentage, double running_percentage, double biking_percentage) {
+        Log.i("activity percentage", walking_percentage + " " + running_percentage + " " + biking_percentage);
         if (biking_percentage > 0) {
+            mCircularProgressDecoView.moveTo(mBikingActivityIndex, (float) (walking_percentage + running_percentage + biking_percentage));
+        } else
+            mCircularProgressDecoView.moveTo(mBikingActivityIndex, 0);
+        if (running_percentage > 0) {
+            mCircularProgressDecoView.moveTo(mRunningActivityIndex, (float) (running_percentage + walking_percentage));
+        } else
+            mCircularProgressDecoView.moveTo(mRunningActivityIndex, 0);
+        if (walking_percentage > 0)
+            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, (float) walking_percentage);
+        else
+            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, 0);
+
+       /*FitnessActivity walkingActivityPercentage = new FitnessActivity();
+       walkingActivityPercentage.setName(FitnessActivities.WALKING);
+       walkingActivityPercentage.setCalories_percentage(walking_percentage);
+       FitnessActivity runningActivityPercentage = new FitnessActivity();
+       runningActivityPercentage.setName(FitnessActivities.RUNNING);
+       runningActivityPercentage.setCalories_percentage(running_percentage);
+       FitnessActivity bikingActivityPercentage = new FitnessActivity();
+       bikingActivityPercentage.setName(FitnessActivities.BIKING);
+       bikingActivityPercentage.setCalories_percentage(biking_percentage);
+       ArrayList<FitnessActivity> activitiesPercentageList = new ArrayList<>();
+       activitiesPercentageList.add(walkingActivityPercentage);
+       activitiesPercentageList.add(runningActivityPercentage);
+       activitiesPercentageList.add(bikingActivityPercentage);
+       Collections.sort(activitiesPercentageList, new Comparator<FitnessActivity>() {
+           @Override
+           public int compare(FitnessActivity lhs, FitnessActivity rhs) {
+               return Double.compare(lhs.getCalories_percentage(),rhs.getCalories_percentage());
+           }
+       });
+       double walking_calories_burnt = 0,running_calories_burnt = 0,cycling_calories_burnt = 0;
+       for(FitnessActivity fitnessActivity : activitiesPercentageList){
+           if(fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)){
+               walking_calories_burnt = fitnessActivity.getCalories_percentage();
+               //walking_calories_burnt = 10;
+               mCircularProgressDecoView.moveTo(mWalkingActivityIndex,(float)walking_calories_burnt);
+           }else if(fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)){
+               running_calories_burnt = fitnessActivity.getCalories_percentage();
+               //running_calories_burnt = 20;
+               mCircularProgressDecoView.moveTo(mRunningActivityIndex,(float)running_calories_burnt);
+           }else if(fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)){
+               cycling_calories_burnt = fitnessActivity.getCalories_percentage();
+               //cycling_calories_burnt = 30;
+               mCircularProgressDecoView.moveTo(mBikingActivityIndex,(float)cycling_calories_burnt);
+           }
+       }*/
+
+        /*if (biking_percentage > 0) {
             mCircularProgressDecoView.moveTo(mBikingActivityIndex, 100);
             if (running_percentage > 0) {
                 mCircularProgressDecoView.moveTo(mRunningActivityIndex, running_percentage + walking_percentage);
@@ -519,7 +589,7 @@ public class PointsFragment extends Fragment {
             mCircularProgressDecoView.moveTo(mRunningActivityIndex, 100);
         }
         if (walking_percentage > 0)
-            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, walking_percentage);
+            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, walking_percentage);*/
     }
 
     @Override
@@ -533,7 +603,6 @@ public class PointsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mImageLoaderHelper.loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
         if (mGoogleAPIClient == null) {
             if (checkLocationPermissions() && checkGetAccountsPermissions()) {
                 buildGoogleFitnessClient();
@@ -569,6 +638,66 @@ public class PointsFragment extends Fragment {
             mGoogleAPIClient.disconnect();
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.all_activities_image_container:
+                initialActivitiesSetUp();
+                break;
+            case R.id.walking_image_container:
+                mCurrentFitnessActivity = FitnessActivities.WALKING;
+                plotActivityChartByActivity();
+                mWalkingImageContainer.setBackgroundResource(R.drawable.activities_border);
+                mAllActivitiesImageContainer.setBackgroundResource(0);
+                mRunningImageContainer.setBackgroundResource(0);
+                mBikingImageContainer.setBackgroundResource(0);
+                break;
+            case R.id.running_image_container:
+                mCurrentFitnessActivity = FitnessActivities.RUNNING;
+                plotActivityChartByActivity();
+                mRunningImageContainer.setBackgroundResource(R.drawable.activities_border);
+                mAllActivitiesImageContainer.setBackgroundResource(0);
+                mWalkingImageContainer.setBackgroundResource(0);
+                mBikingImageContainer.setBackgroundResource(0);
+                break;
+            case R.id.cycling_image_container:
+                mCurrentFitnessActivity = FitnessActivities.BIKING;
+                plotActivityChartByActivity();
+                mBikingImageContainer.setBackgroundResource(R.drawable.activities_border);
+                mWalkingImageContainer.setBackgroundResource(0);
+                mRunningImageContainer.setBackgroundResource(0);
+                mAllActivitiesImageContainer.setBackgroundResource(0);
+                break;
+        }
+    }
+
+    private void initialActivitiesSetUp() {
+        mCurrentFitnessActivity = "all";
+        mAllActivitiesImageContainer.setBackgroundResource(R.drawable.activities_border);
+        mWalkingImageContainer.setBackgroundResource(0);
+        mRunningImageContainer.setBackgroundResource(0);
+        mBikingImageContainer.setBackgroundResource(0);
+        plotActivityChartByActivity();
+    }
+
+    private void plotActivityChartByActivity() {
+        switch (mActivitiesViewPager.getCurrentItem()) {
+            case 0:
+                plotActivityChart(mCurrentFitnessActivity, "calories");
+                break;
+            case 1:
+                plotActivityChart(mCurrentFitnessActivity, "distance");
+                break;
+            case 2:
+                plotActivityChart(mCurrentFitnessActivity, "steps");
+                break;
+            case 3:
+                plotActivityChart(mCurrentFitnessActivity, "points");
+                break;
+
+        }
+    }
+
     /**
      * Custom activity detail adapter for viewpager
      */
@@ -582,11 +711,13 @@ public class PointsFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return TotalCaloriesBurnedFragment.newInstance(mTotalCaloriesExpended);
+                    return TotalCaloriesBurnedFragment.newInstance(mTotalCaloriesExpended, (int) mCaloriesAverage);
                 case 1:
-                    return TotalDistanceTravelledFragment.newInstance(mTotalDistanceTravelled);
+                    return TotalDistanceTravelledFragment.newInstance(mTotalDistanceTravelled, mDistanceAverage);
                 case 2:
-                    return TotalStepsCountFragment.newInstance(mTotalStepCount);
+                    return TotalStepsCountFragment.newInstance(mTotalStepCount, mStepsAverage);
+                case 3:
+                    return TotalPointsEarnedFragment.newInstance(mTotalPointEarned, mPointsAverage);
 
             }
             return null;
@@ -594,7 +725,7 @@ public class PointsFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     }
 
@@ -609,22 +740,9 @@ public class PointsFragment extends Fragment {
                     @Override
                     public void onConnected(Bundle bundle) {
                         mFitnessEmail = Plus.AccountApi.getAccountName(mGoogleAPIClient);
-                        long end_time = Calendar.getInstance().getTimeInMillis();
-                        Calendar day_start_time = Calendar.getInstance();
-                        day_start_time.set(Calendar.HOUR_OF_DAY, 0);
-                        day_start_time.set(Calendar.MINUTE, 0);
-                        day_start_time.set(Calendar.SECOND, 0);
-                        day_start_time.set(Calendar.MILLISECOND, 0);
-                        long start_time = day_start_time.getTimeInMillis();
+                        mGoogleFitHelper = new GoogleFitHelper(getActivity(), mGoogleAPIClient);
                         if (!mIsGetFitnessDataAsyncRunning)
-                            new FitnessDataAsync().execute(start_time, end_time);
-                        /*if (mDateFilterSpinner.getSelectedItemPosition() == 0) {
-                            Log.i("Fitness Async", "called from onconnected callback");
-                            if (!mIsGetFitnessDataAsyncRunning)
-                                new FitnessDataAsync().execute(start_time, end_time);
-                        } else {
-                            mDateFilterSpinner.setSelection(0, true);
-                        }*/
+                            new FitnessDataAsync().execute();
                     }
 
                     @Override
@@ -645,10 +763,6 @@ public class PointsFragment extends Fragment {
                             GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), getActivity(), 0).show();
                             return;
                         }
-                        // The failure has a resolution. Resolve it.
-                        // Called typically when the app is not yet authorized, and an
-                        // authorization
-                        // dialog is displayed to the user.
                         try {
                             connectionResult.startResolutionForResult(getActivity(), REQUEST_CODE_RESOLUTION);
                         } catch (IntentSender.SendIntentException e) {
@@ -669,52 +783,37 @@ public class PointsFragment extends Fragment {
             mTotalCaloriesExpended = 0;
             mTotalDistanceTravelled = 0;
             mTotalStepCount = 0;
-            mFitnessActivityList.clear();
-            initializeActivitiesList();
             mActivitiesViewPager.setAdapter(new CustomPagerAdapter(getChildFragmentManager()));
             mActivitiesViewPager.setVisibility(View.GONE);
             mActivitiesProgressBar.setVisibility(View.VISIBLE);
             mCircularProgressDecoView.setVisibility(View.GONE);
             mFitnessActivityViewPagerContainer.setVisibility(View.GONE);
-            /*mBusinessOfferListViewPager.setVisibility(View.GONE);
-            mOfferListProgressBar.setVisibility(View.VISIBLE);*/
-            mActivitiesTextContainer.setVisibility(View.GONE);
-
         }
 
         @Override
         protected String doInBackground(Long... params) {
-            if (mGoogleAPIClient != null) {
-                getTodayFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getTodayFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
-                return "success";
-            } else
-                return null;
+            mWeekFitnessHistoryList = mGoogleFitHelper.getLastWeekData();
+            /*List<LocalDateTime> dates = new ArrayList<>();
+            LocalDateTime StartDate = new LocalDateTime().minusDays(7).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            int days = Days.daysBetween(StartDate, new LocalDateTime()).getDays();
+            for (int i = 0; i < days; i++) {
+                LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
+                dates.add(d);
+            }
+            mWeekFitnessHistoryList = new ArrayList<>();
+            for (LocalDateTime date : dates) {
+                LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                getFitnessActivityDetails("chart", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+            }
+            getTodayFitnessDetails("chart");*/
+            return "success";
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            /*if (!isDetached()) {
-                if (mDateFilterSpinner.getSelectedItemPosition() == 0)
-                    getBusinessList();
-                else
-                    updateUI(null);
-            }*/
-            //getBusinessList();
-
             new BusinessListAsync().execute();
-            new FitnessHistoryAsync().execute();
-
-            /*Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
-            for (FitnessActivity activity : mFitnessActivityList) {
-                Log.e("Nmae", activity.getName());
-                Log.e("calories", activity.getCalories_expended() + "");
-                Log.e("distaance", activity.getDistance() + "");
-                Log.e("stepcount", activity.getStep_count() + "");
-            }
-            Log.e("Total calories", mTotalCaloriesExpended + "");
-            Log.e("Total distaance", mTotalDistanceTravelled + "");
-            Log.e("Total stepcount", mTotalStepCount + "");*/
+            //new FitnessHistoryAsync().execute();
         }
     }
 
@@ -723,85 +822,85 @@ public class PointsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mBusinessOfferListViewPager.setVisibility(View.GONE);
-            mOfferListProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected Void doInBackground(Long... params) {
-            long last_calories_updated_time = mPreferenceManager.getLongValue(getString(R.string.last_updated_calories_time));
-            //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
-            if (last_calories_updated_time == 0) { // App installed today only,so send today fitnessDetails only
-                fitnessHistoryList = new ArrayList<>();
-                getTodayFitnessDetails();
-            } else { // Send fitness data from last synced date to current time
-                List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
-                LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
-                LocalDateTime currentDateTime = new LocalDateTime();
-                int days = Days.daysBetween(startDate, currentDateTime).getDays();
-                if (days == 0) {
-                    Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
-                    fitnessHistoryList = new ArrayList<>();
-                    if (startDate.get(DateTimeFieldType.dayOfMonth()) == currentDateTime.get(DateTimeFieldType.dayOfMonth())) { //// Calories already sent  for current date
-                        getFitnessActivityDetails("business_offer",Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
-                    } else { // Calories already sent yesterday but date difference is not 1...
-                        LocalDateTime startDateMidnight = startDate.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                        getFitnessActivityDetails("business_offer",Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), startDateMidnight.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, startDateMidnight);
-                        getTodayFitnessDetails();
+            try {
+                mFitnessHistoryList = mGoogleFitHelper.getFitnessHistoryData();
+                /*long last_calories_updated_time = mPreferenceManager.getLongValue(getString(R.string.last_updated_calories_time));
+                //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
+                //last_calories_updated_time = 1459098422000L;
+                if (last_calories_updated_time == 0) { // App installed today only,so send today fitnessDetails only
+                    mFitnessHistoryList = new ArrayList<>();
+                    getTodayFitnessDetails("business_offer");
+                } else { // Send fitness data from last synced date to current time
+                    List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
+                    LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
+                    LocalDateTime currentDateTime = new LocalDateTime();
+                    int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
+                    if(days == 0){
+                        Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
+                        getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                    }else{
+                        for (int i = 0; i < days; i++) {
+                            LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
+                            dates.add(d);
+                        }
+                        for(int i=0 ; i< dates.size() ; i++){
+                            LocalDateTime date = dates.get(i);
+                            LocalDateTime startDateTime,endDateTime;
+                            if(i == 0 ){// First position as start date
+                                startDateTime = date;
+                            }else{
+                                startDateTime = date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                            }
+                            endDateTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                            Log.i("start date : ", date.toString() + " " + " end date :" + endDateTime.toString());
+                            getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDateTime.toDateTime().getMillis(), endDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDateTime, endDateTime);
+                        }
+                        getTodayFitnessDetails("business_offer"); // To add today fitness details as last one
                     }
-                } else {
-                    for (int i = 0; i < days; i++) {
-                        LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
-                        dates.add(d);
-                    }
-                    fitnessHistoryList = new ArrayList<>();
-                    for (LocalDateTime date : dates) {
-                        LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                        Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
-                        getFitnessActivityDetails("business_offer",Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
-                    }
-                    getTodayFitnessDetails(); // To add today fitness details as last one
-                }
+
+                    *//*if (days == 0) {
+                        Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
+                        mFitnessHistoryList = new ArrayList<>();
+                        if (startDate.get(DateTimeFieldType.dayOfMonth()) == currentDateTime.get(DateTimeFieldType.dayOfMonth())) { //// Calories already sent  for current date
+                            getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                        } else { // Calories already sent yesterday but date difference is not 1...
+                            LocalDateTime startDateMidnight = startDate.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                            getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), startDateMidnight.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, startDateMidnight);
+                            getTodayFitnessDetails("business_offer");
+                        }
+                    } else {
+                        for (int i = 0; i < days; i++) {
+                            LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
+                            dates.add(d);
+                        }
+                        mFitnessHistoryList = new ArrayList<>();
+                        for (LocalDateTime date : dates) {
+                            LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                            Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
+                            //getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+                        }
+                        getTodayFitnessDetails("business_offer"); // To add today fitness details as last one
+                    }*//*
+                }*/
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            for (FitnessHistory history : fitnessHistoryList) {
-                Log.i("Time", history.getStartDateTime() + " " + history.getEndDateTime());
-                for (FitnessActivity activity : history.getFitnessActivitiesList()) {
-                    Log.i("Name", activity.getName());
-                    Log.i("calories", activity.getCalories_expended() + "");
-                    Log.i("distance", activity.getDistance() + "");
-                    Log.i("stepcount", activity.getStep_count() + "");
-                }
-            }
-            mBusinessOfferListViewPager.setVisibility(View.VISIBLE);
-            mOfferListProgressBar.setVisibility(View.GONE);
-            getBusinessList();
-            /*if(!isDetached()){
-                if(mDateFilterSpinner.getSelectedItemPosition() == 0)
-                    getBusinessList();
-                else
-                    updateUI(null);
-            }*/
-
-            /*Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
-            for (FitnessActivity activity : mFitnessActivityList) {
-                Log.e("Nmae", activity.getName());
-                Log.e("calories", activity.getCalories_expended() + "");
-                Log.e("distaance", activity.getDistance() + "");
-                Log.e("stepcount", activity.getStep_count() + "");
-            }
-            Log.e("Total calories", mTotalCaloriesExpended + "");
-            Log.e("Total distaance", mTotalDistanceTravelled + "");
-            Log.e("Total stepcount", mTotalStepCount + "");*/
+            getPointsList();
         }
     }
 
-    public class FitnessHistoryAsync extends AsyncTask<Long, Void, Void> {
+    /*public class FitnessHistoryAsync extends AsyncTask<Long, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -817,17 +916,17 @@ public class PointsFragment extends Fragment {
                 LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
                 dates.add(d);
             }
-            chartfitnessHistoryList = new ArrayList<>();
+            mWeekFitnessHistoryList = new ArrayList<>();
             for (LocalDateTime date : dates) {
                 LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
                 //Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
-                getFitnessActivityDetails("chart",Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+                getFitnessActivityDetails("chart", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
             }
-            /*if (mGoogleAPIClient != null) {
+            *//*if (mGoogleAPIClient != null) {
                 return getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
 
             } else
-                return null;*/
+                return null;*//*
             return null;
         }
 
@@ -835,7 +934,7 @@ public class PointsFragment extends Fragment {
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
             mBarChart.setVisibility(View.VISIBLE);
-            for (FitnessHistory history : chartfitnessHistoryList) {
+            for (FitnessHistory history : mWeekFitnessHistoryList) {
                 Log.i("Time", history.getStartDateTime() + " " + history.getEndDateTime() + " " + history.getTotalCaloriesBurnt());
                 for (FitnessActivity activity : history.getFitnessActivitiesList()) {
                     Log.i("Name", activity.getName());
@@ -844,65 +943,53 @@ public class PointsFragment extends Fragment {
                     Log.i("stepcount", activity.getStep_count() + "");
                 }
             }
-            plotActivityChart("calories");
-        }
-    }
 
-    private void plotActivityChart(String type) {
-        BarData barData = new BarData(getXAxisValues(), getDataSet(type));
+        }
+    }*/
+
+    private void plotActivityChart(String activity, String type) {
+        BarData barData;
+        if(type.equalsIgnoreCase("points")){
+            barData = new BarData(getPointsXAxisValues(), getPointDataSet());
+        }else{
+            barData = new BarData(getXAxisValues(), getDataSet(activity, type));
+        }
         barData.setGroupSpace(10);
         mBarChart.setData(barData);
         mBarChart.setDescription("");
         mBarChart.animateXY(2000, 2000);
         mBarChart.invalidate();
 
-
     }
 
-    private void getTodayFitnessDetails() {
+   /* private void getTodayFitnessDetails(String flag) {
         LocalDateTime currentDateTime = new LocalDateTime();
         long endTime = currentDateTime.toDateTime().getMillis();
         LocalDateTime startdateTime = currentDateTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
         long startTime = startdateTime.toDateTime().getMillis();
         Log.i("Time :", startdateTime.toString() + " " + currentDateTime.toDateTime().toString());
-        getFitnessActivityDetails("business_offer",Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startTime, endTime)).await(1, TimeUnit.MINUTES), startdateTime, currentDateTime);
-    }
+        getFitnessActivityDetails(flag, Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startTime, endTime)).await(1, TimeUnit.MINUTES), startdateTime, currentDateTime);
+    }*/
 
-    private void updateUI(ArrayList<BusinessDetails> businessList) {
+    private void updateUI() {
         if (!isDetached()) {
+            initialActivitiesSetUp();
+            FitnessHistory mTodayFitnessActivityData = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1);
+            mTotalStepCount = mTodayFitnessActivityData.getWalkingSteps() + mTodayFitnessActivityData.getRunningSteps();
+            mTotalCaloriesExpended = mTodayFitnessActivityData.getWalkingCaloriesBurnt() + mTodayFitnessActivityData.getRunningCaloriesBurnt() + mTodayFitnessActivityData.getCyclingCaloriesBurnt();
+            mTotalDistanceTravelled = ((mTodayFitnessActivityData.getWalkingDistance() + mTodayFitnessActivityData.getRunningDistance() + mTodayFitnessActivityData.getCyclingDistance()) / 1000);
+            mCaloriesAverage = mPreferenceManager.getIntValue(getString(R.string.calories_goal));
+            mDistanceAverage = calculateDistanceAverage();
+            mStepsAverage = calculateStepAverage();
             mActivitiesProgressBar.setVisibility(View.GONE);
-            mActivitiesTextContainer.setVisibility(View.VISIBLE);
+            mFitnessActivityImageContainer.setVisibility(View.VISIBLE);
             mCircularProgressDecoView.setVisibility(View.VISIBLE);
             mFitnessActivityViewPagerContainer.setVisibility(View.VISIBLE);
             mActivitiesViewPager.setVisibility(View.VISIBLE);
-            mBusinessOfferListViewPager.setVisibility(View.VISIBLE);
-            if (businessList != null) {
-                if (businessList.size() > 0) {
-                    if (!isDetached()) {
-                        mBusinessOfferListViewPager.setAdapter(new CustomBusinessOfferListAdapter(businessList));
-                        mBusinessOfferListViewPager.setInterval(5000);
-                        mBusinessOfferListViewPager.startAutoScroll(5000);
-                    }
-
-                } else {
-                    //mBusinessOfferListPagerContainer.setVisibility(View.INVISIBLE);
-                }
-            } else {
-                //mBusinessOfferListPagerContainer.setVisibility(View.VISIBLE);
-            }
-
-        /*if(mActivitiesPagerAdapter == null){
             mActivitiesPagerAdapter = new CustomPagerAdapter(getChildFragmentManager());
             mActivitiesViewPager.setAdapter(mActivitiesPagerAdapter);
-        }else {
-            //mActivitiesViewPager.destroyDrawingCache();
-            mActivitiesPagerAdapter.notifyDataSetChanged();
-        }*/
-            mOfferListProgressBar.setVisibility(View.GONE);
-            mActivitiesPagerAdapter = new CustomPagerAdapter(getChildFragmentManager());
-            mActivitiesViewPager.setAdapter(mActivitiesPagerAdapter);
-
             Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
+            mActivitiesViewPager.setCurrentItem(0, true);
             if (mActivitiesViewPager.getCurrentItem() == 0) {
                 resetActivitiesViewPager();
             } else {
@@ -919,7 +1006,7 @@ public class PointsFragment extends Fragment {
 
     }
 
-    private DataReadRequest getTodayFitnessData(long start_time, long end_time) {
+   /* private DataReadRequest getTodayFitnessData(long start_time, long end_time) {
         DataReadRequest mFitnessDataRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
@@ -951,16 +1038,16 @@ public class PointsFragment extends Fragment {
         if (dataReadResult.getBuckets().size() > 0) {
             FitnessHistory history = new FitnessHistory();
             ArrayList<FitnessActivity> fitnessActivitiesListofDay = new ArrayList<>();
-            Log.e("Fitness data called: ", startDateTime.toString() + " " + dataReadResult.getBuckets().size());
-            double total_walking_calories_of_day = 0, total_running_calories_of_day = 0,total_cycling_calories_of_day = 0,
-                     total_walking_distance_of_day = 0, total_running_distance_of_day = 0, total_cycling_distance_of_day = 0,
-                       total_walking_steps_of_day = 0, total_running_steps_of_day = 0;
+            //Log.e("Fitness data called: ", startDateTime.toString() + " " + dataReadResult.getBuckets().size());
+            double total_walking_calories_of_day = 0, total_running_calories_of_day = 0, total_cycling_calories_of_day = 0,
+                    total_walking_distance_of_day = 0, total_running_distance_of_day = 0, total_cycling_distance_of_day = 0,
+                    total_walking_steps_of_day = 0, total_running_steps_of_day = 0;
             for (Bucket bucket : dataReadResult.getBuckets()) {
-                /*DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                *//*DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                Log.i("Days : ", bucket.getStartTime(TimeUnit.DAYS) + " " + bucket.getEndTime(TimeUnit.DAYS) + " " );
                 Log.i("DAY ", "\tStart: " + dateFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)));
-                Log.i("DAY ", "\tEnd: " + dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));*/
-                Log.e("Activity", bucket.getActivity());
+                Log.i("DAY ", "\tEnd: " + dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));*//*
+                //Log.e("Activity", bucket.getActivity());
                 if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                     List<DataSet> dataSets = bucket.getDataSets();
                     int step_count = 0;
@@ -968,9 +1055,9 @@ public class PointsFragment extends Fragment {
                     for (DataSet dataSet : dataSets) {
                         //dumpDataSet(dataSet);
                         for (DataPoint dp : dataSet.getDataPoints()) {
-                            Log.d("TYPE", "\tType: " + dp.getDataType().getName());
+                            //Log.d("TYPE", "\tType: " + dp.getDataType().getName());
                             for (Field field : dp.getDataType().getFields()) {
-                                Log.i("Fields", "\tField: " + field.getName() + " Value: " + dp.getValue(field));
+                                //Log.i("Fields", "\tField: " + field.getName() + " Value: " + dp.getValue(field));
                                 if (field.getName().equalsIgnoreCase("steps") && !bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                                     step_count = dp.getValue(field).asInt();
                                 } else if (field.getName().equalsIgnoreCase("calories")) {
@@ -981,18 +1068,17 @@ public class PointsFragment extends Fragment {
                             }
                         }
                     }
-                    if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING) ) {
+                    if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING)) {
                         total_walking_calories_of_day = calories_expended;
                         total_walking_distance_of_day = distance;
                         total_walking_steps_of_day = step_count;
-                    }else if(bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING)){
+                    } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING)) {
                         total_running_calories_of_day = calories_expended;
                         total_running_distance_of_day = distance;
                         total_running_steps_of_day = step_count;
-                    }else if(bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)){
+                    } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                         total_cycling_calories_of_day = calories_expended;
                         total_cycling_distance_of_day = distance;
-
                     }
                     FitnessActivity activity = new FitnessActivity();
                     activity.setName(bucket.getActivity());
@@ -1010,98 +1096,17 @@ public class PointsFragment extends Fragment {
             history.setWalkingDistance(total_walking_distance_of_day);
             history.setCyclingDistance(total_cycling_distance_of_day);
             history.setRunningDistance(total_running_distance_of_day);
-            history.setWalkingSteps((int)total_walking_steps_of_day);
-            history.setRunningSteps((int)total_running_steps_of_day);
+            history.setWalkingSteps((int) total_walking_steps_of_day);
+            history.setRunningSteps((int) total_running_steps_of_day);
             history.setFitnessActivitiesList(fitnessActivitiesListofDay);
             if (source.equalsIgnoreCase("chart")) {
-                chartfitnessHistoryList.add(history);
+                mWeekFitnessHistoryList.add(history);
             } else // Business Offer webservice
-                fitnessHistoryList.add(history);
+                mFitnessHistoryList.add(history);
 
         }
-
         // [END parse_read_data_result]
     }
-
-    /*private ArrayList<FitnessHistory> getFitnessActivityDetails(DataReadResult dataReadResult,LocalDateTime startDateTime,LocalDateTime endDateTime) {
-        // [START parse_read_data_result]
-        // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
-        // as buckets containing DataSets, instead of just DataSets.
-        ArrayList<FitnessHistory> fitnessHistoryList = new ArrayList<>();
-        if (dataReadResult.getBuckets().size() > 0) {
-            *//*Log.i("FITNESS RESULT", "Number of returned buckets of DataSets is: "
-                    + dataReadResult.getBuckets().size());*//*
-            for (Bucket bucket : dataReadResult.getBuckets()) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                Log.i("Days : ", bucket.getStartTime(TimeUnit.DAYS) + " " + bucket.getEndTime(TimeUnit.DAYS) + " ");
-                Log.i("DAY ", "\tStart: " + dateFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)));
-                Log.i("DAY ", "\tEnd: " + dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));
-                FitnessHistory fitnessHistory = new FitnessHistory();
-                fitnessHistory.setStartDateTime(dateFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)));
-                fitnessHistory.setEndDateTime(dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));
-                ArrayList<FitnessActivity> fitnessActivitiesList = new ArrayList<>();
-                Log.e("Activity : ", bucket.getActivity());
-                List<DataSet> dataSets = bucket.getDataSets();
-                int step_count = 0;
-                double calories_expended = 0, distance = 0;
-                for (DataSet dataSet : dataSets) {
-                    //dumpDataSet(dataSet);
-
-                    for (DataPoint dp : dataSet.getDataPoints()) {
-                        Log.d("TYPE", "\tType: " + dp.getDataType().getName());
-                        for (Field field : dp.getDataType().getFields()) {
-
-                            Log.i("Fields", "\tField: " + field.getName() +
-                                    " Value: " + dp.getValue(field));
-
-                            if (field.getName().equalsIgnoreCase("steps") && !bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                                step_count = dp.getValue(field).asInt();
-                            } else if (field.getName().equalsIgnoreCase("calories")) {
-                                calories_expended = dp.getValue(field).asFloat();
-                            } else if (field.getName().equalsIgnoreCase("distance")) {
-                                distance = dp.getValue(field).asFloat();
-                            }
-                        }
-                    }
-                }
-                *//*if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                    List<DataSet> dataSets = bucket.getDataSets();
-                    int step_count = 0;
-                    double calories_expended = 0, distance = 0;
-                    for (DataSet dataSet : dataSets) {
-                        //dumpDataSet(dataSet);
-                        for (DataPoint dp : dataSet.getDataPoints()) {
-                            Log.d("TYPE", "\tType: " + dp.getDataType().getName());
-                            for (Field field : dp.getDataType().getFields()) {
-                                Log.i("Fields", "\tField: " + field.getName() +
-                                        " Value: " + dp.getValue(field));
-                                if (field.getName().equalsIgnoreCase("steps") && !bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                                    step_count = dp.getValue(field).asInt();
-                                } else if (field.getName().equalsIgnoreCase("calories")) {
-                                    calories_expended = dp.getValue(field).asFloat();
-                                } else if (field.getName().equalsIgnoreCase("distance")) {
-                                    distance = dp.getValue(field).asFloat();
-                                }
-                            }
-                        }
-                    }
-                    FitnessActivity activity = new FitnessActivity();
-                    activity.setName(bucket.getActivity());
-                    activity.setCalories_expended(calories_expended);
-                    activity.setDistance(distance / 1000);
-                    activity.setStep_count(step_count);
-                    fitnessActivitiesList.add(activity);
-                    fitnessHistoryList.add(fitnessHistory);
-                }
-*//*
-            }
-        } else if (dataReadResult.getDataSets().size() > 0) {
-            Log.i("FITNESS RESULT", "Number of returned DataSets is: "
-                    + dataReadResult.getDataSets().size());
-        }
-        return  fitnessHistoryList;
-        // [END parse_read_data_result]
-    }*/
 
     private void getTodayFitnessActivityDetails(DataReadResult dataReadResult) {
         // [START parse_read_data_result]
@@ -1113,13 +1118,13 @@ public class PointsFragment extends Fragment {
 
         if (dataReadResult.getBuckets().size() > 0) {
 
-            /*Log.i("FITNESS RESULT", "Number of returned buckets of DataSets is: "
-                    + dataReadResult.getBuckets().size());*/
+            *//*Log.i("FITNESS RESULT", "Number of returned buckets of DataSets is: "
+                    + dataReadResult.getBuckets().size());*//*
             for (Bucket bucket : dataReadResult.getBuckets()) {
-                /*DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                *//*DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                Log.i("Days : ", bucket.getStartTime(TimeUnit.DAYS) + " " + bucket.getEndTime(TimeUnit.DAYS) + " " );
                 Log.i("DAY ", "\tStart: " + dateFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)));
-                Log.i("DAY ", "\tEnd: " + dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));*/
+                Log.i("DAY ", "\tEnd: " + dateFormat.format(bucket.getEndTime(TimeUnit.MILLISECONDS)));*//*
                 //Log.e("Activity : ", bucket.getActivity());
                 if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING) || bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                     List<DataSet> dataSets = bucket.getDataSets();
@@ -1130,8 +1135,8 @@ public class PointsFragment extends Fragment {
                         for (DataPoint dp : dataSet.getDataPoints()) {
                             //Log.d("TYPE", "\tType: " + dp.getDataType().getName());
                             for (Field field : dp.getDataType().getFields()) {
-                                /*Log.i("Fields", "\tField: " + field.getName() +
-                                        " Value: " + dp.getValue(field));*/
+                                *//*Log.i("Fields", "\tField: " + field.getName() +
+                                        " Value: " + dp.getValue(field));*//*
                                 if (field.getName().equalsIgnoreCase("steps") && !bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
                                     step_count = dp.getValue(field).asInt();
                                     mTotalStepCount += step_count;
@@ -1151,11 +1156,11 @@ public class PointsFragment extends Fragment {
                     activity.setDistance(distance / 1000);
                     activity.setStep_count(step_count);
                     if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING)) {
-                        mFitnessActivityList.set(0, activity);
+                        //mFitnessActivityList.set(0, activity);
                     } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING)) {
-                        mFitnessActivityList.set(1, activity);
+                        //mFitnessActivityList.set(1, activity);
                     } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                        mFitnessActivityList.set(2, activity);
+                        //mFitnessActivityList.set(2, activity);
                     }
                 }
             }
@@ -1164,7 +1169,7 @@ public class PointsFragment extends Fragment {
                     + dataReadResult.getDataSets().size());
         }
         // [END parse_read_data_result]
-    }
+    }*/
 
     /**
      * Return the current state of the permissions needed.
@@ -1339,65 +1344,51 @@ public class PointsFragment extends Fragment {
         return true;
     }
 
-    private void getBusinessList() {
+    private void getPointsList() {
+        mWeeklyPointsList = new ArrayList<>();
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.BUSINESS_OFFER_LIST, new Response.Listener<String>() {
+        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.POINTS_LIST, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
                 if (response != null) {
                     try {
                         JSONObject responseJson = new JSONObject(response);
-                        if (!responseJson.optString("msg").trim().equalsIgnoreCase("No Offer Found")) {
-                            ArrayList mBusinessOfferList = new ArrayList<BusinessDetails>();
-                            mPointsEarnedText.setText(responseJson.optInt("yourpoint") + "!");
+                        if (responseJson.optInt("status") == 1) {
+                            mTotalPointEarned = responseJson.optInt("yourpoint");
                             if (!responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
                             } else
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), -1);
-                            JSONArray business_list = responseJson.optJSONArray("businesslist");
-                            if (business_list != null && business_list.length() > 0) {
-                                for (int i = 0; i < business_list.length(); i++) {
-                                    JSONObject business_object = business_list.optJSONObject(i);
-                                    BusinessDetails businessDetails = new BusinessDetails();
-                                    businessDetails.setName(business_object.optString("Business Name"));
-                                    businessDetails.setOffer_name(business_object.optString("offerName"));
-                                    businessDetails.setLogo(business_object.optString("Business Image"));
-                                    businessDetails.setPromo(business_object.optString("offerText"));
-                                    businessDetails.setPoints_needed(business_object.optInt("requiredPoints"));
-                                    businessDetails.setCoupon_expiry_date(business_object.optString("endingDate"));
-                                    businessDetails.setHow_to_reedem(business_object.optString("How to Redeem"));
-                                    businessDetails.setUrl(business_object.optString("site"));
-                                    businessDetails.setPhone_number(business_object.optInt("Phone No"));
-                                    businessDetails.setAddress(business_object.optString("Address"));
-                                    businessDetails.setPoints_needed(business_object.optInt(""));
-                                    businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
-                                    businessDetails.setCoupon(business_object.optString("couponCode"));
-                                    mBusinessOfferList.add(businessDetails);
+                            JSONArray points_list = responseJson.optJSONArray("weeklist");
+                            int total_points = 0;
+                            if (points_list != null && points_list.length() > 0) {
+                                for (int i = 0; i < points_list.length(); i++) {
+                                    JSONObject points_object = points_list.optJSONObject(i);
+                                    int points = points_object.optInt("TotalCalories");
+                                    mWeeklyPointsList.add(points);
+                                    total_points += points;
                                 }
+                                mPointsAverage = total_points / 7;
                             } else {
                                 if (!isDetached())
                                     Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
                             }
                             if (!isDetached())
-                                updateUI(mBusinessOfferList);
+                                updateUI();
                         } else {
                             if (!isDetached()) {
-                                updateUI(null);
+                                updateUI();
                                 Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
                             }
-
                         }
-
                     } catch (JSONException e) {
                         if (!isDetached()) {
-                            updateUI(null);
+                            updateUI();
                             e.printStackTrace();
                             Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
-
                         }
-
                     }
                 }
             }
@@ -1406,7 +1397,7 @@ public class PointsFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 try {
                     if (!isDetached()) {
-                        updateUI(null);
+                        updateUI();
                         Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
                     }
 
@@ -1425,7 +1416,7 @@ public class PointsFragment extends Fragment {
                     root.put("flag", "android");
                     root.put("fitness_email_id", mFitnessEmail);
                     JSONArray dates_array = new JSONArray();
-                    for (FitnessHistory history : fitnessHistoryList) {
+                    for (FitnessHistory history : mFitnessHistoryList) {
                         JSONObject fitnessSummaryObj = new JSONObject();
                         fitnessSummaryObj.put("start_datetime", history.getStartDateTime());
                         fitnessSummaryObj.put("end_datetime", history.getEndDateTime());
@@ -1576,7 +1567,7 @@ public class PointsFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             final BusinessDetails businessDetail = mBusinessList.get(position);
-            View itemView = mLayoutInflater.inflate(R.layout.pager_business_offer_list, container, false);
+            View itemView = mLayoutInflater.inflate(R.layout.list_row_business_offer, container, false);
             TextView offerRewardsText = (TextView) itemView.findViewById(R.id.txt_offer_promo);
             TextView nameText = (TextView) itemView.findViewById(R.id.txt_business_title);
             ImageView businessImage = (ImageView) itemView.findViewById(R.id.img_business_logo);
@@ -1622,28 +1613,93 @@ public class PointsFragment extends Fragment {
 
     private ArrayList<String> getXAxisValues() {
         ArrayList<String> xAxis = new ArrayList<>();
-        for(FitnessHistory history : chartfitnessHistoryList){
+        for (int i = 0; i < mWeekFitnessHistoryList.size(); i++) {
+            FitnessHistory history = mWeekFitnessHistoryList.get(i);
             xAxis.add(history.getStartDateTime().toString("MMM dd"));
         }
         return xAxis;
     }
 
-    private ArrayList<IBarDataSet> getDataSet(String type) {
+    private ArrayList<String> getPointsXAxisValues() {
+        ArrayList<String> xAxis = new ArrayList<>();
+        for (int i = 0; i < mWeeklyPointsList.size(); i++) {
+             xAxis.add(String.valueOf(i));
+        }
+        return xAxis;
+    }
+
+    private ArrayList<IBarDataSet> getDataSet(String activity, String type) {
         ArrayList<BarEntry> mBarEntry = new ArrayList<>();
-        for (int i = 0; i < chartfitnessHistoryList.size(); i++) {
-            FitnessHistory fitnessHistory = chartfitnessHistoryList.get(i);
-            BarEntry barEntry;
-                 if(type.equalsIgnoreCase("calories"))
-                    barEntry = new BarEntry(new float[]{(float)fitnessHistory.getWalkingCaloriesBurnt(),(float)fitnessHistory.getRunningCaloriesBurnt(),(float)fitnessHistory.getCyclingCaloriesBurnt()}, i);
-                 else if(type.equalsIgnoreCase("distance"))
-                     barEntry = new BarEntry(new float[]{(float)fitnessHistory.getWalkingDistance(),(float)fitnessHistory.getRunningDistance(),(float)fitnessHistory.getCyclingDistance()}, i);
-                 else  // Steps
-                     barEntry = new BarEntry(new float[]{(float)fitnessHistory.getWalkingSteps(),(float)fitnessHistory.getRunningSteps(),(float)fitnessHistory.getCyclingSteps()}, i);
-            mBarEntry.add(barEntry);
+        for (int i = 0; i < mWeekFitnessHistoryList.size(); i++) {
+            FitnessHistory fitnessHistory = mWeekFitnessHistoryList.get(i);
+            BarEntry barEntry = null;
+            switch (activity) {
+                case "all":
+                    if (type.equalsIgnoreCase("calories"))
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingCaloriesBurnt(), (float) fitnessHistory.getRunningCaloriesBurnt(), (float) fitnessHistory.getCyclingCaloriesBurnt()}, i);
+                    else if (type.equalsIgnoreCase("distance"))
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingDistance(), (float) fitnessHistory.getRunningDistance(), (float) fitnessHistory.getCyclingDistance()}, i);
+                    else  // Steps
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingSteps(), (float) fitnessHistory.getRunningSteps(), (float) fitnessHistory.getCyclingSteps()}, i);
+                    mBarEntry.add(barEntry);
+                    break;
+                case FitnessActivities.WALKING:
+                    if (type.equalsIgnoreCase("calories"))
+                        barEntry = new BarEntry((float) fitnessHistory.getWalkingCaloriesBurnt(), i);
+                    else if (type.equalsIgnoreCase("distance"))
+                        barEntry = new BarEntry((float) fitnessHistory.getWalkingDistance(), i);
+                    else if (type.equalsIgnoreCase("steps")) // Steps
+                        barEntry = new BarEntry(fitnessHistory.getWalkingSteps(), i);
+                    if (barEntry != null)
+                        mBarEntry.add(barEntry);
+                    break;
+                case FitnessActivities.RUNNING:
+                    if (type.equalsIgnoreCase("calories"))
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningCaloriesBurnt()}, i);
+                    else if (type.equalsIgnoreCase("distance"))
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningDistance()}, i);
+                    else  // Steps
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningSteps()}, i);
+                    if (barEntry != null)
+                        mBarEntry.add(barEntry);
+                    break;
+                case FitnessActivities.BIKING:
+                    if (type.equalsIgnoreCase("calories"))
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingCaloriesBurnt()}, i);
+                    else if (type.equalsIgnoreCase("distance"))
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingDistance()}, i);
+                    else  // Steps
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingSteps()}, i);
+                    if (barEntry != null)
+                        mBarEntry.add(barEntry);
+                    break;
+            }
         }
         BarDataSet barDataSet = new BarDataSet(mBarEntry, "Calories Burned");
         //barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-        barDataSet.setColors(getColors());
+        if (activity.equalsIgnoreCase("all"))
+            barDataSet.setColors(getColors());
+        else if (activity.equalsIgnoreCase(FitnessActivities.WALKING))
+            barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.walking_color));
+        else if (activity.equalsIgnoreCase(FitnessActivities.RUNNING))
+            barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.running_color));
+        else
+            barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.biking_color));
+        barDataSet.setDrawValues(false);
+        barDataSet.setBarSpacePercent(70f);
+        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+        dataSets.add(barDataSet);
+        return dataSets;
+    }
+
+    private ArrayList<IBarDataSet> getPointDataSet() {
+        ArrayList<BarEntry> mBarEntry = new ArrayList<>();
+        for (int i = 0; i < mWeeklyPointsList.size(); i++) {
+            BarEntry barEntry = new BarEntry((float) mWeeklyPointsList.get(i), i);
+            mBarEntry.add(barEntry);
+        }
+        BarDataSet barDataSet = new BarDataSet(mBarEntry, "Calories Burned");
+        barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.walking_color));
         barDataSet.setDrawValues(false);
         barDataSet.setBarSpacePercent(70f);
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();

@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.pluggdd.burnandearn.view.fragment.TrendsFragment">
+    tools:context="com.pluggdd.burnandearn.view.fragment.OffersAndRewardsFragment">
 
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/bar_chart"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/offers_and_rewards_recycle_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:visibility="gone"
-        />
+        android:visibility="gone">
+
+    </android.support.v7.widget.RecyclerView>
 
     <ProgressBar
         android:id="@+id/loading_progress_bar"
@@ -21,5 +21,18 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:visibility="visible" />
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_no_offers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:lineSpacingExtra="10dp"
+        android:text="@string/no_business_offer"
+        android:textSize="22sp"
+        android:textColor="@color/torqoise"
+        app:typeface="robotoCondensed"
+        android:visibility="gone"/>
 
 </FrameLayout>

@@ -12,4 +12,5 @@ public class WebserviceAPI {
     public static final String ALL_BUSINESS_OFFER_LIST = HOST_URL+"burnandearn_blist.php";
     public static final String SOCIAL_SHARE = HOST_URL+"socialshare.php";
     public static final String UPDATE_GCM_REG_TOKEN = HOST_URL+"updatedeviceid.php";
+    public static final String POINTS_LIST = HOST_URL+"lastweekpoints.php";
 }

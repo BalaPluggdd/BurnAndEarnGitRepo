@@ -1,6 +1,5 @@
 package com.pluggdd.burnandearn.view.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.pluggdd.burnandearn.R;
-import com.pluggdd.burnandearn.utils.FragmentInteraction;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,11 +21,11 @@ public class TotalStepsCountFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_STEPS_TAKEN = "steps_taken";
-    private static final String ARG_DATE_FILTER = "date_filter";
+    private static final String ARG_STEPS_AVEREAGE = "steps_average";
 
     // TODO: Rename and change types of parameters
-    private int mStepsTaken;
-    private TextView mTotalStepsCountText,mStepCountText,mStepUnitText;
+    private int mStepsTaken,mStepsAverage;
+    private TextView mTotalStepsCountText,mStepCountText,mStepUnitText,mStepsAverageText;
     public TotalStepsCountFragment() {
         // Required empty public constructor
     }
@@ -37,13 +35,15 @@ public class TotalStepsCountFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param steps_taken Parameter 1.
+     * @param stepsAverage
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalStepsCountFragment newInstance(int steps_taken) {
+    public static TotalStepsCountFragment newInstance(int steps_taken, int stepsAverage) {
         TotalStepsCountFragment fragment = new TotalStepsCountFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_STEPS_TAKEN,steps_taken);
+        args.putInt(ARG_STEPS_AVEREAGE,stepsAverage);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,7 +53,7 @@ public class TotalStepsCountFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mStepsTaken = getArguments().getInt(ARG_STEPS_TAKEN);
-
+            mStepsAverage = getArguments().getInt(ARG_STEPS_AVEREAGE);
         }
     }
 
@@ -64,13 +64,11 @@ public class TotalStepsCountFragment extends Fragment {
         mTotalStepsCountText = (TextView) view.findViewById(R.id.txt_activities_detail);
         mStepCountText = (TextView) view.findViewById(R.id.txt_activities_header);
         mStepUnitText = (TextView) view.findViewById(R.id.txt_activities_unit);
+        mStepsAverageText = (TextView) view.findViewById(R.id.txt_activities_average);
         mStepCountText.setText(getString(R.string.steps_taken));
         mTotalStepsCountText.setText(String.valueOf(mStepsTaken));
         mStepUnitText.setText(getString(R.string.steps_text));
-
-
+        mStepsAverageText.setText("You avg is "+mStepsAverage + " steps");
         return view;
     }
-
-
 }

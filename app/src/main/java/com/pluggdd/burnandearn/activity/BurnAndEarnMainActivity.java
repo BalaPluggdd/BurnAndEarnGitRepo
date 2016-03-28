@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
@@ -51,6 +52,7 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
     private PreferencesManager mPreferenceManager;
     private final int REQUEST_CODE_RESOLUTION = 100, REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE = 101, REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE = 102, REQUEST_BOTH_PERMISSION_CODE = 103;
     private boolean mIsPermissionRequestRaised;
+    public ArrayList<BusinessDetails> mBusinesOfferList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

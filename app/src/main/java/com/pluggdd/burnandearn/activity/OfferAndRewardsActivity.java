@@ -54,7 +54,6 @@ public class OfferAndRewardsActivity extends BaseActivity{
             return true;
         }
         return super.onOptionsItemSelected(item);
-
     }
 
     @Override
@@ -66,9 +65,9 @@ public class OfferAndRewardsActivity extends BaseActivity{
     private void setUpTabs() {
         // To add Tabs
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new OffersAndRewardsFragment(), "Week");
-        adapter.addFragment(new OffersAndRewardsFragment(), "Fortnight");
-        adapter.addFragment(new OffersAndRewardsFragment(), "Month");
+        adapter.addFragment(OffersAndRewardsFragment.newInstance(1), "Week");
+        adapter.addFragment(OffersAndRewardsFragment.newInstance(2), "Fortnight");
+        adapter.addFragment(OffersAndRewardsFragment.newInstance(3), "Month");
         mTabViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mTabViewPager);
     }

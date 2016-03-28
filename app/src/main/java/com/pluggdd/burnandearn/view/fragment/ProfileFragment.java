@@ -76,20 +76,20 @@ import java.util.Map;
  */
 public class ProfileFragment extends Fragment {
 
-    private static final String FIRST_NAME="FirstName",LASTNAME="LastName",EMAIL="email",PROFILE_URL="profile_url",GENDER="gender",DOB="dob",SOURCE_PAGE_FLAG="source_flag";
-    public  static final int IMAGE_CAPTURE_REQUEST_CODE = 1,PICK_IMAGE_REQUEST = 2,REQUEST_BOTH_PERMISSION_CODE = 3;
+    private static final String FIRST_NAME = "FirstName", LASTNAME = "LastName", EMAIL = "email", PROFILE_URL = "profile_url", GENDER = "gender", DOB = "dob", SOURCE_PAGE_FLAG = "source_flag";
+    public static final int IMAGE_CAPTURE_REQUEST_CODE = 1, PICK_IMAGE_REQUEST = 2, REQUEST_BOTH_PERMISSION_CODE = 3;
     private FragmentInteraction mFragmentInteraction;
     private Button mSubmitButton;
     private PreferencesManager mPreferenceManager;
-    private String mEmail,mFirstName,mLastName,mFacebookId,mProfileImageUrl,mDateofBirth;
+    private String mEmail, mFirstName, mLastName, mFacebookId, mProfileImageUrl, mDateofBirth;
     private int mGender = -1; // 0 - male , 1 - Female , 2 - Other
     private ImageView mProfileImage;
-    private EditText mFirstNameEdt,mLastNameEdt,mEmailEdt,mDateOfBirthEdt;
-    private RadioButton mMaleOption,mFemaleOption,mOtherOption;
+    private EditText mFirstNameEdt, mLastNameEdt, mEmailEdt, mDateOfBirthEdt;
+    private RadioButton mMaleOption, mFemaleOption, mOtherOption;
     private ProgressBar mLoadingProgress;
     private Spinner mGoalSetUpSpinner;
     private DatePickerDialog mDatePickerDialog;
-    private String mSourcePageFlag,mCapturedImagePath,mImageBase64;
+    private String mSourcePageFlag, mCapturedImagePath, mImageBase64;
     private boolean mIsPermissionRequestRaised;
     private View mView;
 
@@ -97,10 +97,10 @@ public class ProfileFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ProfileFragment getInstance(String source_flag){
+    public static ProfileFragment getInstance(String source_flag) {
         ProfileFragment profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(SOURCE_PAGE_FLAG,source_flag);
+        bundle.putString(SOURCE_PAGE_FLAG, source_flag);
         profileFragment.setArguments(bundle);
         return profileFragment;
     }
@@ -108,15 +108,15 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null){
+        if (getArguments() != null) {
             mSourcePageFlag = getArguments().getString(SOURCE_PAGE_FLAG);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView =  inflater.inflate(R.layout.fragment_profile, container, false);
+        mView = inflater.inflate(R.layout.fragment_profile, container, false);
         mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
         mFirstNameEdt = (EditText) mView.findViewById(R.id.edt_first_name);
         mLastNameEdt = (EditText) mView.findViewById(R.id.edt_last_name);
@@ -130,24 +130,24 @@ public class ProfileFragment extends Fragment {
         mLoadingProgress = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
         mPreferenceManager = new PreferencesManager(getContext());
         // To populate values
-        new PicassoImageLoaderHelper(getContext(),mProfileImage,mLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
+        new PicassoImageLoaderHelper(getContext(), mProfileImage, mLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
         mFirstNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)));
         mLastNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.last_name)));
         mEmailEdt.setText(mPreferenceManager.getStringValue(getString(R.string.email)));
         mFacebookId = mPreferenceManager.getStringValue(getString(R.string.facebookId));
         mProfileImageUrl = mPreferenceManager.getStringValue(getString(R.string.profile_image_url));
         mGender = mPreferenceManager.getIntValue(getString(R.string.gender));
-        if(mGender == 0){
+        if (mGender == 0) {
             mMaleOption.setChecked(true);
-        }else if(mGender == 1){
+        } else if (mGender == 1) {
             mFemaleOption.setChecked(true);
-        }else if(mGender == 2){
+        } else if (mGender == 2) {
             mOtherOption.setChecked(true);
         }
         mDateOfBirthEdt.setText(mPreferenceManager.getStringValue(getString(R.string.dob)));
         mFirstNameEdt.setSelection(mFirstNameEdt.getText().toString().length());
 
-        mGoalSetUpSpinner.setSelection(mPreferenceManager.getIntValue(getString(R.string.user_goal)),true);
+        mGoalSetUpSpinner.setSelection(mPreferenceManager.getIntValue(getString(R.string.user_goal)), true);
         mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,9 +163,9 @@ public class ProfileFragment extends Fragment {
                 mDatePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                       mDateOfBirthEdt.setText(String.format("%02d",dayOfMonth)+"-"+String.format("%02d",(monthOfYear+1))+"-"+year);
+                        mDateOfBirthEdt.setText(String.format("%02d", dayOfMonth) + "-" + String.format("%02d", (monthOfYear + 1)) + "-" + year);
                     }
-                },calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH));
+                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                 mDatePickerDialog.show();
             }
 
@@ -178,36 +178,36 @@ public class ProfileFragment extends Fragment {
                 mLastName = mLastNameEdt.getText().toString();
                 mEmail = mEmailEdt.getText().toString();
                 mDateofBirth = mDateOfBirthEdt.getText().toString();
-                if(mMaleOption.isChecked())
+                if (mMaleOption.isChecked())
                     mGender = 0;
-                else if(mFemaleOption.isChecked())
+                else if (mFemaleOption.isChecked())
                     mGender = 1;
                 else
                     mGender = 2;
 
-               if(TextUtils.isEmpty(mFirstName)){
-                   Snackbar.make(mView, "Enter first name", Snackbar.LENGTH_SHORT).show();
-               }else if(TextUtils.isEmpty(mLastName)){
-                   Snackbar.make(mView, "Enter last name", Snackbar.LENGTH_SHORT).show();
-               }else if(TextUtils.isEmpty(mEmail)){
-                   Snackbar.make(mView, "Enter email address", Snackbar.LENGTH_SHORT).show();
-               }else if(!Patterns.EMAIL_ADDRESS.matcher(mEmailEdt.getText().toString()).matches()){
-                   Snackbar.make(mView, "Enter valid email address", Snackbar.LENGTH_SHORT).show();
-               }else if(TextUtils.isEmpty(mDateofBirth)){
-                   Snackbar.make(mView, "Choose date of birth", Snackbar.LENGTH_SHORT).show();
-               }else if(mGender == -1){
-                   Snackbar.make(mView, "Choose any gender", Snackbar.LENGTH_SHORT).show();
-               }else{
-                   if(new NetworkCheck().ConnectivityCheck(getActivity())){
-                       new UpdateProfileTask().execute();
-                   }else{
-                       Snackbar.make(mView, "Please check your network connectivity", Snackbar.LENGTH_SHORT).show();
-                   }
-               }
+                if (TextUtils.isEmpty(mFirstName)) {
+                    Snackbar.make(mView, "Enter first name", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mLastName)) {
+                    Snackbar.make(mView, "Enter last name", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mEmail)) {
+                    Snackbar.make(mView, "Enter email address", Snackbar.LENGTH_SHORT).show();
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(mEmailEdt.getText().toString()).matches()) {
+                    Snackbar.make(mView, "Enter valid email address", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mDateofBirth)) {
+                    Snackbar.make(mView, "Choose date of birth", Snackbar.LENGTH_SHORT).show();
+                } else if (mGender == -1) {
+                    Snackbar.make(mView, "Choose any gender", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    if (new NetworkCheck().ConnectivityCheck(getActivity())) {
+                        new UpdateProfileTask().execute();
+                    } else {
+                        Snackbar.make(mView, "Please check your network connectivity", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
-        return  mView;
+        return mView;
     }
 
     @Override
@@ -221,7 +221,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle() == "Camera") {
-              checkPermissionAndLaunchCameraIntent();
+            checkPermissionAndLaunchCameraIntent();
         } else if (item.getTitle() == "Gallery") {
             Intent intent = new Intent();
             intent.setType("image/jpeg");
@@ -234,10 +234,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == getActivity().RESULT_OK){
-            switch (requestCode){
+        if (resultCode == getActivity().RESULT_OK) {
+            switch (requestCode) {
                 case IMAGE_CAPTURE_REQUEST_CODE:
-                    mProfileImage.setImageBitmap(decodeSampledBitmapFromFile(mCapturedImagePath, mProfileImage.getWidth()*2, mProfileImage.getHeight()*2));
+                    mProfileImage.setImageBitmap(decodeSampledBitmapFromFile(mCapturedImagePath, mProfileImage.getWidth() * 2, mProfileImage.getHeight() * 2));
                     break;
                 case PICK_IMAGE_REQUEST:
                     mProfileImage.setImageBitmap(decodeSampledBitmapFromStream(data, mProfileImage.getWidth(), mProfileImage.getHeight()));
@@ -279,7 +279,7 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,@NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.i("Permission Result", "onRequestPermissionResult");
         switch (requestCode) {
             case REQUEST_BOTH_PERMISSION_CODE: {
@@ -341,14 +341,14 @@ public class ProfileFragment extends Fragment {
         return resized_bitmap;
     }
 
-    public Bitmap decodeSampledBitmapFromStream(Intent intent,int reqWidth, int reqHeight) {
+    public Bitmap decodeSampledBitmapFromStream(Intent intent, int reqWidth, int reqHeight) {
         try {
             Uri uri = intent.getData();
             InputStream is = getActivity().getContentResolver().openInputStream(uri);
-             // First decode with inJustDecodeBounds=true to check dimensions
+            // First decode with inJustDecodeBounds=true to check dimensions
             final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(is,null,options);
+            BitmapFactory.decodeStream(is, null, options);
             // Calculate inSampleSize
             options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
             // Decode bitmap with inSampleSize set
@@ -356,7 +356,7 @@ public class ProfileFragment extends Fragment {
             Bitmap resized_bitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(uri), null, options);
             convertImageto64(resized_bitmap);
             return resized_bitmap;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -375,7 +375,7 @@ public class ProfileFragment extends Fragment {
 
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight  && (halfWidth / inSampleSize) > reqWidth) {
+            while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
                 inSampleSize *= 2;
             }
         }
@@ -383,18 +383,18 @@ public class ProfileFragment extends Fragment {
         return inSampleSize;
     }
 
-    private void convertImageto64(Bitmap profile_photo){
+    private void convertImageto64(Bitmap profile_photo) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         profile_photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         mImageBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP);
     }
 
-    private class UpdateProfileTask extends AsyncTask<String,Void,Void> {
+    private class UpdateProfileTask extends AsyncTask<String, Void, Void> {
 
         private ProgressDialog mLoadingProgress;
 
-        public UpdateProfileTask(){
+        public UpdateProfileTask() {
             mLoadingProgress = new ProgressDialog(getActivity());
         }
 
@@ -408,16 +408,16 @@ public class ProfileFragment extends Fragment {
 
         @Override
         protected Void doInBackground(String... params) {
-            if(mImageBase64 == null){
+            if (mImageBase64 == null) {
                 try {
                     Bitmap profile_photo = BitmapFactory.decodeStream((InputStream) new URL(mProfileImageUrl).getContent());
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     profile_photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                     byte[] byteArray = byteArrayOutputStream.toByteArray();
                     mImageBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
-                    mImageBase64="";
+                    mImageBase64 = "";
                 }
             }
             return null;
@@ -441,7 +441,7 @@ public class ProfileFragment extends Fragment {
                 if (response != null) {
                     try {
                         JSONObject responseJson = new JSONObject(response);
-                        if (responseJson.optInt("status") == 1 || responseJson.optInt("status") == 2 ) {
+                        if (responseJson.optInt("status") == 1 || responseJson.optInt("status") == 2) {
                             PreferencesManager mPreferenceManager = new PreferencesManager(getActivity());
                             mPreferenceManager.setStringValue(getString(R.string.user_id), responseJson.optString("userid"));
                             mPreferenceManager.setStringValue(getString(R.string.facebook_share), responseJson.optString("facebook_share"));
@@ -452,18 +452,18 @@ public class ProfileFragment extends Fragment {
                             mPreferenceManager.setIntValue(getString(R.string.gender), responseJson.optInt("gender"));
                             mPreferenceManager.setStringValue(getString(R.string.dob), responseJson.optString("dob").split("-")[2] + "-" + responseJson.optString("dob").split("-")[1] + "-" + responseJson.optString("dob").split("-")[0]);
                             mPreferenceManager.setIntValue(getString(R.string.user_goal), mGoalSetUpSpinner.getSelectedItemPosition());
-                            if(responseJson.optString("lastcaloriesupdate")!= null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")){
+                            if (responseJson.optString("lastcaloriesupdate") != null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
-                            }else
+                            } else
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), 0);
 
-                            if(mSourcePageFlag.equalsIgnoreCase("login")){ // From login fragment
+                            if (mSourcePageFlag.equalsIgnoreCase("login")) { // From login fragment
                                 mPreferenceManager.setBooleanValue(getString(R.string.is_goal_set), true);
                                 Bundle bundle = new Bundle();
                                 bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
                                 mFragmentInteraction.changeFragment(bundle);
-                            }else{
+                            } else {
                                 Snackbar.make(mView, "Profile Updated Successfully", Snackbar.LENGTH_SHORT).show();
                             }
                         } else {
@@ -489,34 +489,36 @@ public class ProfileFragment extends Fragment {
                 params.put("firstName", mFirstName);
                 params.put("lastName", mLastName);
                 params.put("emailId", mEmail);
-                params.put("image",mImageBase64);
-                params.put("dob",mDateofBirth.split("-")[2]+"-"+mDateofBirth.split("-")[1]+"-"+mDateofBirth.split("-")[0]);
-                params.put("usergoal",getSelectedUserGoal());
-                params.put("gender",String.valueOf(mGender));
-                params.put("deviceId",mPreferenceManager.getStringValue(getString(R.string.gcm_reg_id)));
-                params.put("deviceType",String.valueOf(0));
+                params.put("image", mImageBase64);
+                params.put("dob", mDateofBirth.split("-")[2] + "-" + mDateofBirth.split("-")[1] + "-" + mDateofBirth.split("-")[0]);
+                // To add Selected goal to preference
+                mPreferenceManager.setIntValue(getString(R.string.calories_goal), getSelectedUserGoal());
+                params.put("usergoal", String.valueOf(getSelectedUserGoal()));
+                params.put("gender", String.valueOf(mGender));
+                params.put("deviceId", mPreferenceManager.getStringValue(getString(R.string.gcm_reg_id)));
+                params.put("deviceType", String.valueOf(0));
                 return params;
             }
         }));
     }
 
-    private String getSelectedUserGoal() {
+    private int getSelectedUserGoal() {
 
-        switch (mGoalSetUpSpinner.getSelectedItemPosition()){
+        switch (mGoalSetUpSpinner.getSelectedItemPosition()) {
             case 0:
-                return  "1000";
-            case  1:
-                return "2000";
+                return 1000;
+            case 1:
+                return 2000;
             case 2:
-                return "3000";
+                return 3000;
             case 3:
-                return "4000";
+                return 4000;
             case 4:
-                return "5000";
+                return 5000;
             case 5:
-                return "6000";
+                return 6000;
             default:
-                return "1000";
+                return 1000;
         }
     }
 

@@ -1,6 +1,5 @@
 package com.pluggdd.burnandearn.view.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.pluggdd.burnandearn.R;
-import com.pluggdd.burnandearn.utils.FragmentInteraction;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,11 +21,12 @@ public class TotalCaloriesBurnedFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_CALORIES_BURNED = "calories_burned";
-    private static final String ARG_DATE_FILTER = "date_filter";
+    private static final String ARG_CALORIES_AVERAGE = "calories_average";
 
     // TODO: Rename and change types of parameters
     private double mCaloriesBurned;
-    private TextView mTotalCaloriedBurnedText,mCaloriesBurntText,mCaloriesUnitText;
+    private int mCaloriesAverage;
+    private TextView mTotalCaloriedBurnedText,mCaloriesBurntText,mCaloriesUnitText,mCaloriesAverageText;
 
     public TotalCaloriesBurnedFragment() {
         // Required empty public constructor
@@ -39,13 +38,15 @@ public class TotalCaloriesBurnedFragment extends Fragment {
      *
      * @param calories_burned Parameter 1.
 
+     * @param caloriesAverage
      * @return A new instance of fragment TotalCaloriesBurnedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TotalCaloriesBurnedFragment newInstance(double calories_burned) {
+    public static TotalCaloriesBurnedFragment newInstance(double calories_burned, int caloriesAverage) {
         TotalCaloriesBurnedFragment fragment = new TotalCaloriesBurnedFragment();
         Bundle args = new Bundle();
         args.putDouble(ARG_CALORIES_BURNED, calories_burned);
+        args.putInt(ARG_CALORIES_AVERAGE, caloriesAverage);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,7 +56,7 @@ public class TotalCaloriesBurnedFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mCaloriesBurned = getArguments().getDouble(ARG_CALORIES_BURNED);
-
+            mCaloriesAverage = getArguments().getInt(ARG_CALORIES_AVERAGE);
         }
     }
 
@@ -66,9 +67,11 @@ public class TotalCaloriesBurnedFragment extends Fragment {
         mCaloriesBurntText = (TextView) view.findViewById(R.id.txt_activities_header);
         mTotalCaloriedBurnedText = (TextView) view.findViewById(R.id.txt_activities_detail);
         mCaloriesUnitText = (TextView) view.findViewById(R.id.txt_activities_unit);
+        mCaloriesAverageText = (TextView) view.findViewById(R.id.txt_activities_average);
         mCaloriesBurntText.setText(getString(R.string.calories_burnt));
         mTotalCaloriedBurnedText.setText(String.valueOf(Math.round(mCaloriesBurned)));
         mCaloriesUnitText.setText(getString(R.string.calories_unit));
+        mCaloriesAverageText.setText("Your goal is "+ mCaloriesAverage+ " cal");
         return view;
     }
 

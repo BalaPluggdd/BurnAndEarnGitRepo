@@ -7,7 +7,10 @@ public class FitnessActivity {
 
     private String name;
     private int step_count=-1;
-    private double distance=-1,calories_expended=-1;
+    private double distance=-1,calories_expended=-1,calories_percentage,distance_percentage,steps_percentage;
+
+    public FitnessActivity() {
+    }
 
     public String getName() {
         return name;
@@ -39,5 +42,29 @@ public class FitnessActivity {
 
     public void setDistance(double distance) {
         this.distance = distance;
+    }
+
+    public double getCalories_percentage() {
+        return calories_percentage;
+    }
+
+    public void setCalories_percentage(double calories_percentage) {
+        this.calories_percentage = calories_percentage;
+    }
+
+    public double getDistance_percentage() {
+        return distance_percentage;
+    }
+
+    public void setDistance_percentage(double distance_percentage) {
+        this.distance_percentage = distance_percentage;
+    }
+
+    public double getSteps_percentage() {
+        return steps_percentage;
+    }
+
+    public void setSteps_percentage(double steps_percentage) {
+        this.steps_percentage = steps_percentage;
     }
 }
