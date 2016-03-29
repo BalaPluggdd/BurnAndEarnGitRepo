@@ -51,6 +51,7 @@ public class OffersAndRewardsFragment extends Fragment {
     private TextView mNoOfferText;
     private int mFlag;
     private ArrayList<BusinessDetails> mBusinessOfferList = new ArrayList<>();
+    private boolean mIsOfferListLoaded = false;
 
     public OffersAndRewardsFragment() {
         // Required empty public constructor
@@ -85,10 +86,7 @@ public class OffersAndRewardsFragment extends Fragment {
         return view;
     }
 
-
-
-
-    private void getBusinessOfferList(){
+     private void getBusinessOfferList(){
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
         mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.ALL_BUSINESS_OFFER_LIST, new Response.Listener<String>() {
             @Override
@@ -127,8 +125,8 @@ public class OffersAndRewardsFragment extends Fragment {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.VISIBLE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
-                                if(!isDetached())
-                                    Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();
+                                /*if(!isDetached())
+                                    Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();*/
 
                             }
 
@@ -136,8 +134,8 @@ public class OffersAndRewardsFragment extends Fragment {
                             mLoadingProgressBar.setVisibility(View.GONE);
                             mNoOfferText.setVisibility(View.VISIBLE);
                             mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
-                            if(!isDetached())
-                                Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();
+                            /*if(!isDetached())
+                                Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();*/
 
                         }
 
@@ -146,8 +144,8 @@ public class OffersAndRewardsFragment extends Fragment {
                         mLoadingProgressBar.setVisibility(View.GONE);
                         mNoOfferText.setVisibility(View.VISIBLE);
                         mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
-                        if(!isDetached())
-                            Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
+                        /*if(!isDetached())
+                            Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();*/
 
                     }
                 }
@@ -159,8 +157,8 @@ public class OffersAndRewardsFragment extends Fragment {
                     mLoadingProgressBar.setVisibility(View.GONE);
                     mNoOfferText.setVisibility(View.VISIBLE);
                     mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
-                    if(isVisible())
-                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
+                    /*if(isVisible())
+                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();*/
                 }catch (Exception e){
                     e.printStackTrace();
                 }

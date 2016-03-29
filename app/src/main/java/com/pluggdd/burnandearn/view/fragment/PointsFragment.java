@@ -206,6 +206,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_selected);
         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
+        mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
         updateFitnessActivities(0);
     }
 
@@ -289,6 +290,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 Log.i("biking calories", biking_calories_expended + "");
                 biking_calories_percentage = Math.round((biking_calories_expended / mCaloriesAverage) * 100);
                 // To update decoview
+                //walking_calories_percentage = 30 ; running_calories_percentage = 0; biking_calories_percentage = 10;
                 updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
                 break;
             case 1: // Distance
@@ -328,6 +330,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 Log.i("biking distance", biking_distance_travelled + "");
                 biking_distance_percentage = Math.round((biking_distance_travelled / mDistanceAverage) * 100);
                 // To update decoview
+                //walking_distance_percentage = 0 ; running_distance_percentage = 20; biking_distance_percentage = 10;
                 updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
                 break;
             case 2: // Steps
@@ -366,6 +369,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 //biking_calories_expended = 10;
                 Log.i("biking distance", biking_steps_taken + "");
                 biking_steps_percentage = Math.round((biking_steps_taken / mStepsAverage) * 100);
+                //walking_steps_percentage = 10 ; running_steps_percentage = 80; biking_steps_percentage = 0;
                 // To update decoview
                 updateProgressBar(walking_steps_percentage, running_steps_percentage, biking_steps_percentage);
                 break;
@@ -380,6 +384,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 Log.i("today points", today_points + "");
                 today_points_percentage = Math.round((today_points / mPointsAverage) * 100);
                 // To update decoview
+                //today_points_percentage = 20 ;
                 updateProgressBar(today_points_percentage, 0, 0);
                 break;
             default:
@@ -532,54 +537,58 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private void updateProgressBar(double walking_percentage, double running_percentage, double biking_percentage) {
         Log.i("activity percentage", walking_percentage + " " + running_percentage + " " + biking_percentage);
         if (biking_percentage > 0) {
-            mCircularProgressDecoView.moveTo(mBikingActivityIndex, (float) (walking_percentage + running_percentage + biking_percentage));
-        } else
-            mCircularProgressDecoView.moveTo(mBikingActivityIndex, 0);
+            mCircularProgressDecoView.addEvent(new DecoEvent.Builder((float) (walking_percentage + running_percentage + biking_percentage)).setDuration(2000).setIndex(mBikingActivityIndex).build());
+            //mCircularProgressDecoView.moveTo(mBikingActivityIndex, (float) (walking_percentage + running_percentage + biking_percentage));
+        }else{
+            mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setDuration(2000).setIndex(mBikingActivityIndex).setListener(new DecoEvent.ExecuteEventListener() {
+                @Override
+                public void onEventStart(DecoEvent decoEvent) {
+
+                }
+
+                @Override
+                public void onEventEnd(DecoEvent decoEvent) {
+                    mCircularProgressDecoView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_HIDE, false).setDuration(1000).setIndex(mBikingActivityIndex).build());
+                }
+            }).build());
+        }
         if (running_percentage > 0) {
-            mCircularProgressDecoView.moveTo(mRunningActivityIndex, (float) (running_percentage + walking_percentage));
-        } else
-            mCircularProgressDecoView.moveTo(mRunningActivityIndex, 0);
-        if (walking_percentage > 0)
-            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, (float) walking_percentage);
-        else
-            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, 0);
+            //mCircularProgressDecoView.moveTo(mRunningActivityIndex, (float) (running_percentage + walking_percentage));
+            mCircularProgressDecoView.addEvent(new DecoEvent.Builder((float) (walking_percentage + running_percentage)).setDuration(2000).setIndex(mRunningActivityIndex).build());
+        }else{
+            mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setIndex(mRunningActivityIndex).setDuration(2000).setListener(new DecoEvent.ExecuteEventListener() {
+                @Override
+                public void onEventStart(DecoEvent decoEvent) {
 
-       /*FitnessActivity walkingActivityPercentage = new FitnessActivity();
-       walkingActivityPercentage.setName(FitnessActivities.WALKING);
-       walkingActivityPercentage.setCalories_percentage(walking_percentage);
-       FitnessActivity runningActivityPercentage = new FitnessActivity();
-       runningActivityPercentage.setName(FitnessActivities.RUNNING);
-       runningActivityPercentage.setCalories_percentage(running_percentage);
-       FitnessActivity bikingActivityPercentage = new FitnessActivity();
-       bikingActivityPercentage.setName(FitnessActivities.BIKING);
-       bikingActivityPercentage.setCalories_percentage(biking_percentage);
-       ArrayList<FitnessActivity> activitiesPercentageList = new ArrayList<>();
-       activitiesPercentageList.add(walkingActivityPercentage);
-       activitiesPercentageList.add(runningActivityPercentage);
-       activitiesPercentageList.add(bikingActivityPercentage);
-       Collections.sort(activitiesPercentageList, new Comparator<FitnessActivity>() {
-           @Override
-           public int compare(FitnessActivity lhs, FitnessActivity rhs) {
-               return Double.compare(lhs.getCalories_percentage(),rhs.getCalories_percentage());
-           }
-       });
-       double walking_calories_burnt = 0,running_calories_burnt = 0,cycling_calories_burnt = 0;
-       for(FitnessActivity fitnessActivity : activitiesPercentageList){
-           if(fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)){
-               walking_calories_burnt = fitnessActivity.getCalories_percentage();
-               //walking_calories_burnt = 10;
-               mCircularProgressDecoView.moveTo(mWalkingActivityIndex,(float)walking_calories_burnt);
-           }else if(fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)){
-               running_calories_burnt = fitnessActivity.getCalories_percentage();
-               //running_calories_burnt = 20;
-               mCircularProgressDecoView.moveTo(mRunningActivityIndex,(float)running_calories_burnt);
-           }else if(fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)){
-               cycling_calories_burnt = fitnessActivity.getCalories_percentage();
-               //cycling_calories_burnt = 30;
-               mCircularProgressDecoView.moveTo(mBikingActivityIndex,(float)cycling_calories_burnt);
-           }
-       }*/
+                }
 
+                @Override
+                public void onEventEnd(DecoEvent decoEvent) {
+                    mCircularProgressDecoView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_HIDE, false).setDuration(1000).setIndex(mRunningActivityIndex).build());
+                }
+            }).build());
+
+            //mCircularProgressDecoView.moveTo(mRunningActivityIndex, 0);
+        }
+        if (walking_percentage > 0) {
+            mCircularProgressDecoView.addEvent(new DecoEvent.Builder((float) (walking_percentage)).setDuration(2000).setIndex(mWalkingActivityIndex).build());
+            //mCircularProgressDecoView.moveTo(mWalkingActivityIndex, (float) walking_percentage);
+        }else {
+            //mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setIndex(mWalkingActivityIndex).setDuration(2000).build());
+            mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setDuration(2000).setIndex(mWalkingActivityIndex).setListener(new DecoEvent.ExecuteEventListener() {
+                @Override
+                public void onEventStart(DecoEvent decoEvent) {
+
+                }
+
+                @Override
+                public void onEventEnd(DecoEvent decoEvent) {
+                    mCircularProgressDecoView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_HIDE, false).setDuration(1000).setIndex(mWalkingActivityIndex).build());
+                }
+            }).build());
+
+            //mCircularProgressDecoView.moveTo(mWalkingActivityIndex, 0);
+        }
         /*if (biking_percentage > 0) {
             mCircularProgressDecoView.moveTo(mBikingActivityIndex, 100);
             if (running_percentage > 0) {
@@ -1355,7 +1364,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
-                            mTotalPointEarned = responseJson.optInt("yourpoint");
+                            mTotalPointEarned = responseJson.optInt("grandtotalpoints");
                             if (!responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());

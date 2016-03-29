@@ -62,7 +62,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'
     compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile 'com.github.bmarrdev:android-DecoView-charting:v0.9.3'
+    compile 'com.github.bmarrdev:android-DecoView-charting:v0.9.6'
     compile 'com.google.android.gms:play-services-plus:8.3.0'
     compile 'com.google.android.gms:play-services-fitness:8.3.0'
     compile 'com.google.android.gms:play-services-auth:8.3.0'
