@@ -1,10 +1,17 @@
 package com.pluggdd.burnandearn.view.fragment;
 
 import android.Manifest;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -16,6 +23,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -56,15 +64,18 @@ import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.activity.OfferDetailActivity;
+import com.pluggdd.burnandearn.activity.ShareActivity;
 import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
 import com.pluggdd.burnandearn.utils.GoogleFitHelper;
+import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 
+import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
@@ -90,6 +101,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private ImageView mViewPagerIndicator1Image, mViewPagerIndicator2Image, mViewPagerIndicator3Image, mViewPagerIndicator4Image;
     private ProgressBar mActivitiesProgressBar;
     private BarChart mBarChart;
+    private Context mContext;
     private GoogleApiClient mGoogleAPIClient;
     private int mTotalStepCount = 0, mStepsAverage = 0, mPointsAverage = 0;
     private double mTotalCaloriesExpended = 0, mCaloriesAverage = 0, mTotalDistanceTravelled = 0, mDistanceAverage = 0;
@@ -126,8 +138,8 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         mRunningImageContainer = (RelativeLayout) mView.findViewById(R.id.running_image_container);
         mBikingImageContainer = (RelativeLayout) mView.findViewById(R.id.cycling_image_container);
         mBarChart = (BarChart) mView.findViewById(R.id.bar_chart);
-        mPreferenceManager = new PreferencesManager(getContext());
-        mActivitiesViewPager.setOffscreenPageLimit(0);
+        mPreferenceManager = new PreferencesManager(mContext);
+        mActivitiesViewPager.setOffscreenPageLimit(1);
         checkAndBuildGoogleApiClient();
         initializeActivitiesBarChart();
         // Initial set up for circular decoview
@@ -190,14 +202,17 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     private void initializeActivitiesBarChart() {
         mBarChart.setDescription("");    // Hide the description
-        mBarChart.getAxisLeft().setDrawLabels(false);
-        mBarChart.getAxisRight().setDrawLabels(false);
-        mBarChart.getXAxis().setDrawLabels(false);
-        mBarChart.getLegend().setEnabled(false);
+        mBarChart.getAxisLeft().setDrawLabels(true);
+        mBarChart.getAxisLeft().setTextColor(Color.WHITE);
+        mBarChart.getAxisRight().setDrawLabels(true);
+        mBarChart.getAxisRight().setTextColor(Color.WHITE);
+        mBarChart.getXAxis().setDrawLabels(true);
+        mBarChart.getLegend().setEnabled(true);
         mBarChart.setDrawGridBackground(false);
-        mBarChart.getXAxis().setEnabled(false);
-        mBarChart.getAxisLeft().setEnabled(false);
-        mBarChart.getAxisRight().setEnabled(false);
+        mBarChart.getXAxis().setTextColor(Color.WHITE);
+        mBarChart.getLegend().setTextColor(Color.WHITE);
+        mBarChart.getLegend().setCustom(getColors(),new String[]{"Walking","Running","Biking"});
+
     }
 
     // To reset viewpager to initial position
@@ -265,7 +280,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //walking_calories_expended = 100;
                 Log.i("walking calories", walking_calories_expended + "");
-                walking_calories_percentage = Math.round((walking_calories_expended / mCaloriesAverage) * 100);
+                walking_calories_percentage = (walking_calories_expended / mCaloriesAverage) * 100;
                 // To calculate running calories percentage in total calories
                 double running_calories_expended = 0;
                 for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
@@ -276,7 +291,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //running_calories_expended = 60;
                 Log.i("running calories", running_calories_expended + "");
-                running_calories_percentage = Math.round((running_calories_expended / mCaloriesAverage) * 100);
+                running_calories_percentage = (running_calories_expended / mCaloriesAverage) * 100;
                 // To calculate biking calories percentage in total calories
                 double biking_calories_expended = 0;
                 //biking_calories_expended = 200;
@@ -288,7 +303,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //biking_calories_expended = 10;
                 Log.i("biking calories", biking_calories_expended + "");
-                biking_calories_percentage = Math.round((biking_calories_expended / mCaloriesAverage) * 100);
+                biking_calories_percentage = (biking_calories_expended / mCaloriesAverage) * 100;
                 // To update decoview
                 //walking_calories_percentage = 30 ; running_calories_percentage = 0; biking_calories_percentage = 10;
                 updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
@@ -305,7 +320,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //walking_calories_expended = 100;
                 Log.i("walking distance", walking_distance_travelled + "");
-                walking_distance_percentage = Math.round((walking_distance_travelled / mDistanceAverage) * 100);
+                walking_distance_percentage = (walking_distance_travelled / mDistanceAverage) * 100;
                 // To calculate running calories percentage in total calories
                 double running_distance_travelled = 0;
                 for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
@@ -316,7 +331,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //running_calories_expended = 60;
                 Log.i("running distance", running_distance_travelled + "");
-                running_distance_percentage = Math.round((running_distance_travelled / mDistanceAverage) * 100);
+                running_distance_percentage = (running_distance_travelled / mDistanceAverage) * 100;
                 // To calculate biking calories percentage in total calories
                 double biking_distance_travelled = 0;
                 //biking_calories_expended = 200;
@@ -328,7 +343,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //biking_calories_expended = 10;
                 Log.i("biking distance", biking_distance_travelled + "");
-                biking_distance_percentage = Math.round((biking_distance_travelled / mDistanceAverage) * 100);
+                biking_distance_percentage = (biking_distance_travelled / mDistanceAverage) * 100;
                 // To update decoview
                 //walking_distance_percentage = 0 ; running_distance_percentage = 20; biking_distance_percentage = 10;
                 updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
@@ -345,7 +360,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //walking_calories_expended = 100;
                 Log.i("walking distance", walking_steps_taken + "");
-                walking_steps_percentage = Math.round((walking_steps_taken / mStepsAverage) * 100);
+                walking_steps_percentage = (walking_steps_taken / mStepsAverage) * 100;
                 // To calculate running calories percentage in total calories
                 double running_steps_taken = 0;
                 for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
@@ -356,7 +371,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //running_calories_expended = 60;
                 Log.i("running distance", running_steps_taken + "");
-                running_steps_percentage = Math.round((running_steps_taken / mStepsAverage) * 100);
+                running_steps_percentage = (running_steps_taken / mStepsAverage) * 100;
                 // To calculate biking calories percentage in total calories
                 double biking_steps_taken = 0;
                 //biking_calories_expended = 200;
@@ -368,7 +383,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //biking_calories_expended = 10;
                 Log.i("biking distance", biking_steps_taken + "");
-                biking_steps_percentage = Math.round((biking_steps_taken / mStepsAverage) * 100);
+                biking_steps_percentage = (biking_steps_taken / mStepsAverage) * 100;
                 //walking_steps_percentage = 10 ; running_steps_percentage = 80; biking_steps_percentage = 0;
                 // To update decoview
                 updateProgressBar(walking_steps_percentage, running_steps_percentage, biking_steps_percentage);
@@ -382,7 +397,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
                 //walking_calories_expended = 100;
                 Log.i("today points", today_points + "");
-                today_points_percentage = Math.round((today_points / mPointsAverage) * 100);
+                today_points_percentage = (today_points / mPointsAverage) * 100;
                 // To update decoview
                 //today_points_percentage = 20 ;
                 updateProgressBar(today_points_percentage, 0, 0);
@@ -539,7 +554,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         if (biking_percentage > 0) {
             mCircularProgressDecoView.addEvent(new DecoEvent.Builder((float) (walking_percentage + running_percentage + biking_percentage)).setDuration(2000).setIndex(mBikingActivityIndex).build());
             //mCircularProgressDecoView.moveTo(mBikingActivityIndex, (float) (walking_percentage + running_percentage + biking_percentage));
-        }else{
+        } else {
             mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setDuration(2000).setIndex(mBikingActivityIndex).setListener(new DecoEvent.ExecuteEventListener() {
                 @Override
                 public void onEventStart(DecoEvent decoEvent) {
@@ -555,7 +570,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         if (running_percentage > 0) {
             //mCircularProgressDecoView.moveTo(mRunningActivityIndex, (float) (running_percentage + walking_percentage));
             mCircularProgressDecoView.addEvent(new DecoEvent.Builder((float) (walking_percentage + running_percentage)).setDuration(2000).setIndex(mRunningActivityIndex).build());
-        }else{
+        } else {
             mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setIndex(mRunningActivityIndex).setDuration(2000).setListener(new DecoEvent.ExecuteEventListener() {
                 @Override
                 public void onEventStart(DecoEvent decoEvent) {
@@ -573,7 +588,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         if (walking_percentage > 0) {
             mCircularProgressDecoView.addEvent(new DecoEvent.Builder((float) (walking_percentage)).setDuration(2000).setIndex(mWalkingActivityIndex).build());
             //mCircularProgressDecoView.moveTo(mWalkingActivityIndex, (float) walking_percentage);
-        }else {
+        } else {
             //mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setIndex(mWalkingActivityIndex).setDuration(2000).build());
             mCircularProgressDecoView.addEvent(new DecoEvent.Builder(0).setDuration(2000).setIndex(mWalkingActivityIndex).setListener(new DecoEvent.ExecuteEventListener() {
                 @Override
@@ -607,6 +622,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         if (resultCode == getActivity().RESULT_OK && requestCode == REQUEST_CODE_RESOLUTION) {
             mGoogleAPIClient.connect();
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 
     @Override
@@ -740,7 +761,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     // To build Google api client
     private void buildGoogleFitnessClient() {
-        mGoogleAPIClient = new GoogleApiClient.Builder(getActivity())
+        mGoogleAPIClient = new GoogleApiClient.Builder(mContext)
                 .addApi(Fitness.HISTORY_API)
                 .addApi(Plus.API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
@@ -749,7 +770,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onConnected(Bundle bundle) {
                         mFitnessEmail = Plus.AccountApi.getAccountName(mGoogleAPIClient);
-                        mGoogleFitHelper = new GoogleFitHelper(getActivity(), mGoogleAPIClient);
+                        mGoogleFitHelper = new GoogleFitHelper(mContext, mGoogleAPIClient);
                         if (!mIsGetFitnessDataAsyncRunning)
                             new FitnessDataAsync().execute();
                     }
@@ -905,7 +926,13 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            getPointsList();
+            if(new NetworkCheck().ConnectivityCheck(mContext)){
+                getPointsList();
+            }else{
+                updateUI();
+                Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -958,9 +985,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     private void plotActivityChart(String activity, String type) {
         BarData barData;
-        if(type.equalsIgnoreCase("points")){
+        if (type.equalsIgnoreCase("points")) {
             barData = new BarData(getPointsXAxisValues(), getPointDataSet());
-        }else{
+        } else {
             barData = new BarData(getXAxisValues(), getDataSet(activity, type));
         }
         barData.setGroupSpace(10);
@@ -982,36 +1009,43 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     private void updateUI() {
         if (!isDetached()) {
-            initialActivitiesSetUp();
-            FitnessHistory mTodayFitnessActivityData = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1);
-            mTotalStepCount = mTodayFitnessActivityData.getWalkingSteps() + mTodayFitnessActivityData.getRunningSteps();
-            mTotalCaloriesExpended = mTodayFitnessActivityData.getWalkingCaloriesBurnt() + mTodayFitnessActivityData.getRunningCaloriesBurnt() + mTodayFitnessActivityData.getCyclingCaloriesBurnt();
-            mTotalDistanceTravelled = ((mTodayFitnessActivityData.getWalkingDistance() + mTodayFitnessActivityData.getRunningDistance() + mTodayFitnessActivityData.getCyclingDistance()) / 1000);
-            mCaloriesAverage = mPreferenceManager.getIntValue(getString(R.string.calories_goal));
-            mDistanceAverage = calculateDistanceAverage();
-            mStepsAverage = calculateStepAverage();
-            mActivitiesProgressBar.setVisibility(View.GONE);
-            mFitnessActivityImageContainer.setVisibility(View.VISIBLE);
-            mCircularProgressDecoView.setVisibility(View.VISIBLE);
-            mFitnessActivityViewPagerContainer.setVisibility(View.VISIBLE);
-            mActivitiesViewPager.setVisibility(View.VISIBLE);
-            mActivitiesPagerAdapter = new CustomPagerAdapter(getChildFragmentManager());
-            mActivitiesViewPager.setAdapter(mActivitiesPagerAdapter);
-            Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
-            mActivitiesViewPager.setCurrentItem(0, true);
-            if (mActivitiesViewPager.getCurrentItem() == 0) {
-                resetActivitiesViewPager();
-            } else {
+            if (mWeekFitnessHistoryList.size() > 0) {
+                initialActivitiesSetUp();
+                FitnessHistory mTodayFitnessActivityData = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1);
+                mTotalStepCount = mTodayFitnessActivityData.getWalkingSteps() + mTodayFitnessActivityData.getRunningSteps();
+                mTotalCaloriesExpended = mTodayFitnessActivityData.getWalkingCaloriesBurnt() + mTodayFitnessActivityData.getRunningCaloriesBurnt() + mTodayFitnessActivityData.getCyclingCaloriesBurnt();
+                mTotalDistanceTravelled = ((mTodayFitnessActivityData.getWalkingDistance() + mTodayFitnessActivityData.getRunningDistance() + mTodayFitnessActivityData.getCyclingDistance()) / 1000);
+                mCaloriesAverage = mPreferenceManager.getIntValue(getString(R.string.calories_goal));
+                mDistanceAverage = calculateDistanceAverage();
+                mStepsAverage = calculateStepAverage();
+                mActivitiesProgressBar.setVisibility(View.GONE);
+                mFitnessActivityImageContainer.setVisibility(View.VISIBLE);
+                mCircularProgressDecoView.setVisibility(View.VISIBLE);
+                mFitnessActivityViewPagerContainer.setVisibility(View.VISIBLE);
+                mActivitiesViewPager.setVisibility(View.VISIBLE);
+                mActivitiesPagerAdapter = new CustomPagerAdapter(getChildFragmentManager());
+                mActivitiesViewPager.setAdapter(mActivitiesPagerAdapter);
+                Log.i("viewpager position", " " + mActivitiesViewPager.getCurrentItem());
                 mActivitiesViewPager.setCurrentItem(0, true);
-                mCircularProgressDecoView.executeReset();
-                createBackgroundSeries();
-                createBikingActivitySeries();
-                createRunningActivitySeries();
-                createWalkingActivitySeries();
-                resetActivitiesViewPager();
+                if (mActivitiesViewPager.getCurrentItem() == 0) {
+                    resetActivitiesViewPager();
+                } else {
+                    mActivitiesViewPager.setCurrentItem(0, true);
+                    mCircularProgressDecoView.executeReset();
+                    createBackgroundSeries();
+                    createBikingActivitySeries();
+                    createRunningActivitySeries();
+                    createWalkingActivitySeries();
+                    resetActivitiesViewPager();
+                }
+
             }
-            mIsGetFitnessDataAsyncRunning = false;
+        } else {
+            Snackbar.make(mView,"Can't able to get fitness data from Google Fit.Please try after sometime",Snackbar.LENGTH_SHORT).show();
+
         }
+        mIsGetFitnessDataAsyncRunning = false;
+
 
     }
 
@@ -1184,13 +1218,13 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
      * Return the current state of the permissions needed.
      */
     private boolean checkLocationPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
+        int permissionState = ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean checkGetAccountsPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
+        int permissionState = ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.GET_ACCOUNTS);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
@@ -1354,103 +1388,152 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getPointsList() {
-        mWeeklyPointsList = new ArrayList<>();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.POINTS_LIST, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i("response", response);
-                if (response != null) {
-                    try {
-                        JSONObject responseJson = new JSONObject(response);
-                        if (responseJson.optInt("status") == 1) {
-                            mTotalPointEarned = responseJson.optInt("grandtotalpoints");
-                            if (!responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
-                                LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
-                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
-                            } else
-                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), -1);
-                            JSONArray points_list = responseJson.optJSONArray("weeklist");
-                            int total_points = 0;
-                            if (points_list != null && points_list.length() > 0) {
-                                for (int i = 0; i < points_list.length(); i++) {
-                                    JSONObject points_object = points_list.optJSONObject(i);
-                                    int points = points_object.optInt("TotalCalories");
-                                    mWeeklyPointsList.add(points);
-                                    total_points += points;
+        if (isAdded()) {
+            mWeeklyPointsList = new ArrayList<>();
+            RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
+            mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.POINTS_LIST, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("response", response);
+                    if (response != null) {
+                        try {
+                            JSONObject responseJson = new JSONObject(response);
+                            if (responseJson.optInt("status") == 1) {
+                                mTotalPointEarned = responseJson.optInt("grandtotalpoints");
+                                mPreferenceManager.setIntValue(getString(R.string.your_total_points), mTotalPointEarned);
+                                if (!responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
+                                    LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
+                                    mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
+                                } else
+                                    mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), -1);
+
+                                JSONArray points_list = responseJson.optJSONArray("weeklist");
+                                int total_points = 0;
+                                if (points_list != null && points_list.length() > 0) {
+                                    for (int i = 0; i < points_list.length(); i++) {
+                                        JSONObject points_object = points_list.optJSONObject(i);
+                                        int points = points_object.optInt("TotalCalories");
+                                        mWeeklyPointsList.add(points);
+                                        total_points += points;
+                                    }
+                                    mPointsAverage = total_points / 7;
+                                } else {
+                                    if (!isDetached())
+                                        Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
                                 }
-                                mPointsAverage = total_points / 7;
-                            } else {
                                 if (!isDetached())
-                                    Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                                    updateUI();
+                            } else {
+                                if (!isDetached()) {
+                                    updateUI();
+                                    Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                            if (!isDetached())
-                                updateUI();
-                        } else {
+                            // To show notification when user achieves his goal
+                            if (mTotalCaloriesExpended >= mPreferenceManager.getIntValue(getString(R.string.calories_goal))) {
+                                long last_notification_time = mPreferenceManager.getLongValue(getString(R.string.notification_time));
+                                if (last_notification_time == 0)
+                                    showNotification();
+                                else {
+                                    LocalDateTime startDate = new LocalDateTime(last_notification_time);
+                                    LocalDateTime currentDateTime = new LocalDateTime();
+                                    int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
+                                    if (days > 0) {
+                                        showNotification();
+                                    }
+                                }
+
+                            }
+
+
+                        } catch (JSONException e) {
                             if (!isDetached()) {
                                 updateUI();
-                                Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                                Toast.makeText(mContext, "Failure response from server", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    } catch (JSONException e) {
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    try {
                         if (!isDetached()) {
                             updateUI();
-                            e.printStackTrace();
-                            Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Unable to connect to server", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                try {
-                    if (!isDetached()) {
-                        updateUI();
-                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
-                    }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                String json_request = "";
-                try {
-                    JSONObject root = new JSONObject();
-                    root.put("user_id", mPreferenceManager.getStringValue(getString(R.string.user_id)));
-                    root.put("flag", "android");
-                    root.put("fitness_email_id", mFitnessEmail);
-                    JSONArray dates_array = new JSONArray();
-                    for (FitnessHistory history : mFitnessHistoryList) {
-                        JSONObject fitnessSummaryObj = new JSONObject();
-                        fitnessSummaryObj.put("start_datetime", history.getStartDateTime());
-                        fitnessSummaryObj.put("end_datetime", history.getEndDateTime());
-                        JSONArray activities_array = new JSONArray();
-                        for (FitnessActivity activity : history.getFitnessActivitiesList()) {
-                            JSONObject activityObj = new JSONObject();
-                            activityObj.put("name", activity.getName());
-                            activityObj.put("calories_burnt", activity.getCalories_expended() == -1 ? 0 : activity.getCalories_expended());
-                            activityObj.put("step_count", activity.getStep_count() == -1 ? 0 : activity.getStep_count());
-                            activityObj.put("distance", activity.getDistance() == -1 ? 0 : activity.getDistance());
-                            activities_array.put(activityObj);
-                        }
-                        fitnessSummaryObj.put("activities", activities_array);
-                        dates_array.put(fitnessSummaryObj);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    root.put("date", dates_array);
-                    json_request = root.toString();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-                Log.i("json request", json_request);
-                params.put("jsonrequest", json_request);
-                return params;
-            }
-        }));
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    String json_request = "";
+                    try {
+                        JSONObject root = new JSONObject();
+                        root.put("user_id", mPreferenceManager.getStringValue(getString(R.string.user_id)));
+                        root.put("flag", "android");
+                        root.put("fitness_email_id", mFitnessEmail);
+                        JSONArray dates_array = new JSONArray();
+                        for (FitnessHistory history : mFitnessHistoryList) {
+                            JSONObject fitnessSummaryObj = new JSONObject();
+                            fitnessSummaryObj.put("start_datetime", history.getStartDateTime());
+                            fitnessSummaryObj.put("end_datetime", history.getEndDateTime());
+                            JSONArray activities_array = new JSONArray();
+                            for (FitnessActivity activity : history.getFitnessActivitiesList()) {
+                                JSONObject activityObj = new JSONObject();
+                                activityObj.put("name", activity.getName());
+                                activityObj.put("calories_burnt", activity.getCalories_expended() == -1 ? 0 : activity.getCalories_expended());
+                                activityObj.put("step_count", activity.getStep_count() == -1 ? 0 : activity.getStep_count());
+                                activityObj.put("distance", activity.getDistance() == -1 ? 0 : activity.getDistance());
+                                activities_array.put(activityObj);
+                            }
+                            fitnessSummaryObj.put("activities", activities_array);
+                            dates_array.put(fitnessSummaryObj);
+                        }
+                        root.put("date", dates_array);
+                        json_request = root.toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("json request", json_request);
+                    params.put("jsonrequest", json_request);
+                    return params;
+                }
+            }));
+        }
+
+    }
+
+    private void showNotification() {
+        NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(mContext);
+        mNotificationBuilder.setSmallIcon(R.drawable.ic_logo);
+        mNotificationBuilder.setContentTitle(getString(R.string.goal_achieved_notification_header));
+        mNotificationBuilder.setAutoCancel(true);
+        String content = getString(R.string.goal_achieved_notification_content) + " " + String.valueOf(mPreferenceManager.getIntValue(getString(R.string.calories_goal))) + " " + getString(R.string.calories_unit);
+        mNotificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));
+        mNotificationBuilder.setContentText(content);
+        //Intent shareIntent = new Intent(mContext, ShareActivity.class);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, content);
+        shareIntent.setType("text/plain");
+        /*shareIntent.putExtra(getString(R.string.from_notification), true);
+        TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
+        taskStackBuilder.addParentStack(ShareActivity.class);
+        taskStackBuilder.addNextIntent(shareIntent);
+        // To add pending intent
+        PendingIntent pendingIntent = taskStackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);*/
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, Intent.createChooser(shareIntent, "Share"), PendingIntent.FLAG_UPDATE_CURRENT);
+        // To add Share button
+        NotificationCompat.Action mShareAction = new NotificationCompat.Action.Builder(R.drawable.ic_share, "Share", pendingIntent).build();
+        mNotificationBuilder.addAction(mShareAction);
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, mNotificationBuilder.build());
+        mPreferenceManager.setLongValue(getString(R.string.notification_time), new LocalDateTime().toDateTime().getMillis());
     }
 
 
@@ -1488,14 +1571,14 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                                 }
                             } else {
                                 if (!isDetached())
-                                    Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
                             }
                             if (!isDetached())
                              updateUI(mBusinessOfferList);
                         } else {
                             if (!isDetached()){
                                 updateUI(null);
-                                Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
                             }
 
                         }
@@ -1504,7 +1587,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                         if(!isDetached()){
                             updateUI(null);
                             e.printStackTrace();
-                            Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Failure response from server", Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -1563,7 +1646,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
         CustomBusinessOfferListAdapter(ArrayList<BusinessDetails> businessList) {
             if (!isDetached()) {
-                mLayoutInflater = LayoutInflater.from(getContext());
+                mLayoutInflater = LayoutInflater.from(mContext);
                 mBusinessList = businessList;
             }
         }
@@ -1584,7 +1667,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             nameText.setText(businessDetail.getName());
             nameText.setSelected(true);
             if (!isDetached())
-                new PicassoImageLoaderHelper(getContext(), businessImage, logoProgressBar).loadImage(businessDetail.getLogo());
+                new PicassoImageLoaderHelper(mContext, businessImage, logoProgressBar).loadImage(businessDetail.getLogo());
             offerRewardsText.setText(businessDetail.getPromo());
             Button mGrabNowButton = (Button) itemView.findViewById(R.id.btn_grab_now);
             mGrabNowButton.setOnClickListener(new View.OnClickListener() {
@@ -1593,7 +1676,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     /*Bundle bundle = new Bundle();
                     bundle.putString(getString(R.string.page_flag), PointsFragment.this.getClass().getSimpleName());
                     mListener.changeFragment(bundle);*/
-                    Intent intent = new Intent(getActivity(), OfferDetailActivity.class);
+                    Intent intent = new Intent(mContext, OfferDetailActivity.class);
                     intent.putExtra(getString(R.string.logo_url), businessDetail.getLogo());
                     intent.putExtra(getString(R.string.business_name), businessDetail.getName());
                     intent.putExtra(getString(R.string.offer_name), businessDetail.getOffer_name());
@@ -1624,7 +1707,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         ArrayList<String> xAxis = new ArrayList<>();
         for (int i = 0; i < mWeekFitnessHistoryList.size(); i++) {
             FitnessHistory history = mWeekFitnessHistoryList.get(i);
-            xAxis.add(history.getStartDateTime().toString("MMM dd"));
+            xAxis.add(history.getStartDateTime().toString("E"));
         }
         return xAxis;
     }
@@ -1632,7 +1715,8 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private ArrayList<String> getPointsXAxisValues() {
         ArrayList<String> xAxis = new ArrayList<>();
         for (int i = 0; i < mWeeklyPointsList.size(); i++) {
-             xAxis.add(String.valueOf(i));
+            LocalDateTime dateTime = new LocalDateTime().minusDays(7-i);
+            xAxis.add(dateTime.toString("E"));
         }
         return xAxis;
     }
@@ -1647,7 +1731,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingCaloriesBurnt(), (float) fitnessHistory.getRunningCaloriesBurnt(), (float) fitnessHistory.getCyclingCaloriesBurnt()}, i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingDistance(), (float) fitnessHistory.getRunningDistance(), (float) fitnessHistory.getCyclingDistance()}, i);
+                        barEntry = new BarEntry(new float[]{(float) (fitnessHistory.getWalkingDistance()/1000), (float) (fitnessHistory.getRunningDistance()/1000), (float) (fitnessHistory.getCyclingDistance()/1000)}, i);
                     else  // Steps
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingSteps(), (float) fitnessHistory.getRunningSteps(), (float) fitnessHistory.getCyclingSteps()}, i);
                     mBarEntry.add(barEntry);
@@ -1656,7 +1740,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry((float) fitnessHistory.getWalkingCaloriesBurnt(), i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry((float) fitnessHistory.getWalkingDistance(), i);
+                        barEntry = new BarEntry((float) fitnessHistory.getWalkingDistance()/1000, i);
                     else if (type.equalsIgnoreCase("steps")) // Steps
                         barEntry = new BarEntry(fitnessHistory.getWalkingSteps(), i);
                     if (barEntry != null)
@@ -1666,7 +1750,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningCaloriesBurnt()}, i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningDistance()}, i);
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningDistance()/1000}, i);
                     else  // Steps
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningSteps()}, i);
                     if (barEntry != null)
@@ -1676,7 +1760,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingCaloriesBurnt()}, i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingDistance()}, i);
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingDistance()/1000}, i);
                     else  // Steps
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingSteps()}, i);
                     if (barEntry != null)
@@ -1685,15 +1769,15 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             }
         }
         BarDataSet barDataSet = new BarDataSet(mBarEntry, "Calories Burned");
-        //barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        //barDataSet.setColor(ContextCompat.getColor(mContext, R.color.colorAccent));
         if (activity.equalsIgnoreCase("all"))
             barDataSet.setColors(getColors());
         else if (activity.equalsIgnoreCase(FitnessActivities.WALKING))
-            barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.walking_color));
+            barDataSet.setColor(ContextCompat.getColor(mContext, R.color.walking_color));
         else if (activity.equalsIgnoreCase(FitnessActivities.RUNNING))
-            barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.running_color));
+            barDataSet.setColor(ContextCompat.getColor(mContext, R.color.running_color));
         else
-            barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.biking_color));
+            barDataSet.setColor(ContextCompat.getColor(getActivity(), R.color.biking_color));
         barDataSet.setDrawValues(false);
         barDataSet.setBarSpacePercent(70f);
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
@@ -1708,7 +1792,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             mBarEntry.add(barEntry);
         }
         BarDataSet barDataSet = new BarDataSet(mBarEntry, "Calories Burned");
-        barDataSet.setColor(ContextCompat.getColor(getContext(), R.color.walking_color));
+        barDataSet.setColor(ContextCompat.getColor(mContext, R.color.walking_color));
         barDataSet.setDrawValues(false);
         barDataSet.setBarSpacePercent(70f);
         ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
@@ -1722,9 +1806,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         // have as many colors as stack-values per entry
         int[] colors = new int[stacksize];
 
-        colors[0] = ContextCompat.getColor(getContext(), R.color.walking_color);
-        colors[1] = ContextCompat.getColor(getContext(), R.color.running_color);
-        colors[2] = ContextCompat.getColor(getContext(), R.color.biking_color);
+        colors[0] = ContextCompat.getColor(mContext, R.color.walking_color);
+        colors[1] = ContextCompat.getColor(mContext, R.color.running_color);
+        colors[2] = ContextCompat.getColor(mContext, R.color.biking_color);
 
         return colors;
     }

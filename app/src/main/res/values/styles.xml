@@ -11,6 +11,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:panelFullBackground">@android:color/white</item>
         <!--<item name="android:spinnerStyle">@style/mySpinnerItemStyle</item>-->
 
     </style>
@@ -20,12 +21,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@android:color/darker_gray</item>
+        <item name="colorControlNormal">@android:color/white</item>
 
     </style>
 
-    <style name="ThemeOverlay.MyApp.ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
-        <!-- Parent theme sets colorControlNormal to textColorPrimary. -->
+   <!-- <style name="ThemeOverlay.MyApp.ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
+        &lt;!&ndash; Parent theme sets colorControlNormal to textColorPrimary. &ndash;&gt;
         <item name="android:textColorPrimary">@color/colorAccent</item>
     </style>
 
@@ -33,6 +34,10 @@
         <item name="android:textColor">@android:color/black</item>
 
     </style>
+
+    <style name ="MyPopupMenu" parent="android:Theme.Holo.Light">
+        <item name="android:popupBackground">@android:color/holo_green_light</item>
+    </style>-->
 
     <!--<style name="CustomMaterialThemeBase" parent="Theme.AppCompat.NoActionBar">
         &lt;!&ndash; Customize your theme here. &ndash;&gt;
@@ -53,7 +58,7 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" ></style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/offers_rewards_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_margin="5dp"
     android:elevation="10dp"
     android:orientation="vertical"
@@ -20,23 +20,22 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/img_business_logo_container"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_above="@id/txt_business_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/img_business_logo"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:layout_alignParentLeft="true"
-                     />
+                    android:layout_gravity="center"
+                    android:layout_alignParentLeft="true"/>
 
                 <ProgressBar
                     android:id="@+id/logo_progress_bar"
@@ -45,15 +44,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center" />
 
-
             </FrameLayout>
 
             <com.pluggdd.burnandearn.font.RobotoTextView
                 android:id="@+id/txt_business_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/img_business_logo"
-                android:layout_marginTop="5dp"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="2"
@@ -62,9 +58,11 @@
                 app:typeface="robotoCondensed" />
 
             <RelativeLayout
+                android:id="@+id/call_location_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
+                android:visibility="visible"
+                android:layout_alignParentBottom="true">
 
                 <ImageView
                     android:id="@+id/img_call"
@@ -82,15 +80,16 @@
             </RelativeLayout>
 
 
+
         </LinearLayout>
 
 
-        <RelativeLayout
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_weight="2"
-            android:gravity="center"
             android:orientation="vertical">
 
             <com.pluggdd.burnandearn.font.RobotoTextView
@@ -105,13 +104,11 @@
                 app:typeface="robotoCondensed" />
 
             <com.pluggdd.burnandearn.font.RobotoTextView
-                android:id="@+id/txt_terms_and_conditions"
+                android:id="@+id/txt_points_needed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="10dp"
-                android:text="@string/terms_and_conditions"
+                android:layout_below="@id/txt_offer_promo"
+                android:layout_marginTop="5dp"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 app:typeface="robotoCondensed" />
@@ -121,11 +118,11 @@
                 android:id="@+id/btn_grab_now"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@id/txt_terms_and_conditions"
+                android:layout_below="@id/txt_points_needed"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
-                android:layout_marginBottom="15dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
                 android:background="@color/orange"
                 android:minHeight="30dp"
                 android:paddingBottom="5dp"
@@ -137,20 +134,18 @@
                 android:textSize="18sp" />
 
             <com.pluggdd.burnandearn.font.RobotoTextView
-                android:id="@+id/txt_points_needed"
+                android:id="@+id/txt_terms_and_conditions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@id/btn_grab_now"
-                android:layout_below="@id/txt_offer_promo"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="5dp"
                 android:layout_marginTop="10dp"
+                android:text="@string/terms_and_conditions"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 app:typeface="robotoCondensed" />
 
-
-        </RelativeLayout>
-
-
+        </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>
 

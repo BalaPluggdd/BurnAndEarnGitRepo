@@ -3,6 +3,7 @@ package com.pluggdd.burnandearn.view.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,8 @@ import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
+import com.pluggdd.burnandearn.utils.NetworkCheck;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.view.adapter.OfferRewardsAdapter;
@@ -46,10 +49,14 @@ import java.util.Map;
 public class OffersAndRewardsFragment extends Fragment {
 
     public static final String ARG_FLAG = "Flag";
+    public static final String ARG_PAGE_FLAG = "PageFlag";
+    private Context mContext;
+    private View mView;
     private RecyclerView mOfferAndRewardsRecyclerView;
     private ProgressBar mLoadingProgressBar;
     private TextView mNoOfferText;
     private int mFlag;
+    private String mPageFlag;
     private ArrayList<BusinessDetails> mBusinessOfferList = new ArrayList<>();
     private boolean mIsOfferListLoaded = false;
 
@@ -57,10 +64,11 @@ public class OffersAndRewardsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static OffersAndRewardsFragment newInstance(int flag){
+    public static OffersAndRewardsFragment newInstance(int flag, String pageFlag){
         OffersAndRewardsFragment mOfferAndRewardFragment = new OffersAndRewardsFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_FLAG, flag);
+        bundle.putString(ARG_PAGE_FLAG,pageFlag);
         mOfferAndRewardFragment.setArguments(bundle);
         return mOfferAndRewardFragment;
     }
@@ -70,25 +78,50 @@ public class OffersAndRewardsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
             mFlag = getArguments().getInt(ARG_FLAG);
+            mPageFlag = getArguments().getString(ARG_PAGE_FLAG);
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            if(new NetworkCheck().ConnectivityCheck(mContext)){
+                getBusinessOfferList();
+            }else{
+                Toast.makeText(mContext,getString(R.string.no_network),Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_offers_and_rewards, container, false);
-        mLoadingProgressBar = (ProgressBar) view.findViewById(R.id.loading_progress_bar);
-        mOfferAndRewardsRecyclerView = (RecyclerView) view.findViewById(R.id.offers_and_rewards_recycle_view);
-        mNoOfferText = (TextView) view.findViewById(R.id.txt_no_offers);
+        mView = inflater.inflate(R.layout.fragment_offers_and_rewards, container, false);
+        mLoadingProgressBar = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
+        mOfferAndRewardsRecyclerView = (RecyclerView) mView.findViewById(R.id.offers_and_rewards_recycle_view);
+        mNoOfferText = (TextView) mView.findViewById(R.id.txt_no_offers);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mOfferAndRewardsRecyclerView.setLayoutManager(layoutManager);
-        getBusinessOfferList();
-        return view;
+        return mView;
     }
 
-     private void getBusinessOfferList(){
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    private void getBusinessOfferList(){
         RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.ALL_BUSINESS_OFFER_LIST, new Response.Listener<String>() {
+         String url;
+         if(mPageFlag.equalsIgnoreCase(getString(R.string.my_offers)) || mPageFlag.equalsIgnoreCase(getString(R.string.my_offers_inactive)))
+             url = WebserviceAPI.MY_OFFERS;
+         else
+             url = WebserviceAPI.ALL_BUSINESS_OFFER_LIST;
+
+        mRequestQueue.add((new StringRequest(Request.Method.POST,url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
@@ -96,12 +129,13 @@ public class OffersAndRewardsFragment extends Fragment {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         mBusinessOfferList = new ArrayList<BusinessDetails>();
-                        if (!responseJson.optString("msg").trim().equalsIgnoreCase("No Offer Found")) {
+                        if (responseJson.optInt("status") == 1) {
                             JSONArray business_list = responseJson.optJSONArray("businesslist");
                             if (business_list != null && business_list.length() > 0) {
                                 for (int i = 0; i < business_list.length(); i++) {
                                     JSONObject business_object = business_list.optJSONObject(i);
                                     BusinessDetails businessDetails = new BusinessDetails();
+                                    businessDetails.setId(Integer.valueOf(business_object.optInt("Businessid")));
                                     businessDetails.setName(business_object.optString("Business Name"));
                                     businessDetails.setOffer_name(business_object.optString("offerName"));
                                     businessDetails.setLogo(business_object.optString("Business Image"));
@@ -119,7 +153,7 @@ public class OffersAndRewardsFragment extends Fragment {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.VISIBLE);
-                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,OffersAndRewardsFragment.this));
+                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,mPageFlag));
 
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);
@@ -167,6 +201,8 @@ public class OffersAndRewardsFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
+                if(mPageFlag.equalsIgnoreCase(getString(R.string.my_offers)) || mPageFlag.equalsIgnoreCase(getString(R.string.my_offers_inactive)))
+                    params.put("userId", new PreferencesManager(getContext()).getStringValue(getString(R.string.user_id)));
                 params.put("flag", String.valueOf(mFlag));
                 return params;
             }

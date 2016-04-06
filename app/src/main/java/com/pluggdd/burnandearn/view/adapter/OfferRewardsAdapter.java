@@ -27,6 +27,7 @@ import com.pluggdd.burnandearn.activity.OfferDetailActivity;
 import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.view.fragment.OffersAndRewardsFragment;
 
 import java.util.ArrayList;
@@ -38,15 +39,16 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
 
     private Context mContext;
     private int mLastPosition = -1;
-    private OffersAndRewardsFragment mFragment;
     private ArrayList<BusinessDetails> mBusinessOfferList;
+    private PreferencesManager mPreferenceManager;
+    private String mPageFlag;
 
 
-    public OfferRewardsAdapter(Context context, ArrayList<BusinessDetails> mBusinessList,OffersAndRewardsFragment fragment) {
+    public OfferRewardsAdapter(Context context, ArrayList<BusinessDetails> mBusinessList, String pageFlag) {
         mContext = context;
-        mFragment = fragment;
         mBusinessOfferList = mBusinessList;
-
+        mPreferenceManager = new PreferencesManager(mContext);
+        mPageFlag = pageFlag;
     }
 
     @Override
@@ -63,7 +65,25 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
         holder.sNameText.setText(businessDetail.getName());
         new PicassoImageLoaderHelper(mContext, holder.sBusinessImage, holder.sLogoProgressBar).loadImage(businessDetail.getLogo());
         holder.sOfferRewardsText.setText(businessDetail.getPromo());
-        holder.sPointsNeeded.setText("Points needed : " + businessDetail.getPoints_needed());
+
+        if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers))) { // Active My Offers
+            holder.sRedeemButton.setVisibility(View.GONE);
+            holder.sPointsNeeded.setText("Coupon code :" + businessDetail.getCoupon());
+        }else if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers_inactive))) { // Active My Offers
+            holder.sRedeemButton.setVisibility(View.GONE);
+            holder.sPhoneImage.setVisibility(View.GONE);
+            holder.sLocationImage.setVisibility(View.GONE);
+            holder.sPointsNeeded.setText("Expired on " + businessDetail.getCoupon_expiry_date());
+        }else{
+            if(businessDetail.getPoints_needed() >= mPreferenceManager.getIntValue(mContext.getString(R.string.your_total_points))){
+                holder.sRedeemButton.setVisibility(View.GONE);
+                holder.sPointsNeeded.setVisibility(View.VISIBLE);
+            }else{
+                holder.sPointsNeeded.setVisibility(View.INVISIBLE);
+                holder.sRedeemButton.setVisibility(View.GONE);
+            }
+            holder.sPointsNeeded.setText("Points needed : " + businessDetail.getPoints_needed());
+        }
 
         holder.sPhoneImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +97,6 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
                     e.printStackTrace();
 
                 }
-
             }
         });
 
@@ -100,6 +119,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, OfferDetailActivity.class);
+                intent.putExtra(mContext.getString(R.string.business_id),businessDetail.getId());
                 intent.putExtra(mContext.getString(R.string.logo_url),businessDetail.getLogo());
                 intent.putExtra(mContext.getString(R.string.business_name),businessDetail.getName());
                 intent.putExtra(mContext.getString(R.string.offer_name),businessDetail.getOffer_name());

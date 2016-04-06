@@ -2,6 +2,7 @@ package com.pluggdd.burnandearn.view.fragment;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -59,6 +60,7 @@ import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
 import com.pluggdd.burnandearn.utils.GoogleFitHelper;
+import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
@@ -86,6 +88,7 @@ import java.util.concurrent.TimeUnit;
 public class TrendsFragment extends Fragment {
 
     public static final int REQUEST_CODE_RESOLUTION = 1000, REQUEST_BOTH_PERMISSION_CODE = 1001;
+    private Context mContext;
     private View mView;
     private ProgressBar mLoadingProgressBar;
     private GoogleApiClient mGoogleAPIClient;
@@ -151,6 +154,11 @@ public class TrendsFragment extends Fragment {
         if (resultCode == getActivity().RESULT_OK && requestCode == REQUEST_CODE_RESOLUTION) {
             mGoogleAPIClient.connect();
         }
+    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 
     @Override
@@ -341,7 +349,12 @@ public class TrendsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            getBusinessList();
+            if(new NetworkCheck().ConnectivityCheck(mContext)){
+                getBusinessList();
+            }else{
+                Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+            }
+
             /*for (FitnessHistory history : mFitnessHistoryList) {
                 Log.i("Time", history.getStartDateTime() + " " + history.getEndDateTime() + " " + history.getTotalCaloriesBurnt());
                 for (FitnessActivity activity : history.getFitnessActivitiesList()) {
@@ -434,7 +447,8 @@ public class TrendsFragment extends Fragment {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
                             ((BurnAndEarnMainActivity) getActivity()).mBusinesOfferList = new ArrayList<BusinessDetails>();
-                            //mTotalPointEarned = responseJson.optInt("yourpoint");
+                            int totalPointEarned = responseJson.optInt("yourpoint");
+                            mPreferenceManager.setIntValue(getString(R.string.your_total_points),totalPointEarned);
                             //mPointsEarnedText.setText(responseJson.optInt("yourpoint") + "!");
                             if (!responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000") ) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
@@ -446,6 +460,7 @@ public class TrendsFragment extends Fragment {
                                 for (int i = 0; i < business_list.length(); i++) {
                                     JSONObject business_object = business_list.optJSONObject(i);
                                     BusinessDetails businessDetails = new BusinessDetails();
+                                    businessDetails.setId(Integer.valueOf(business_object.optString("Businessid")));
                                     businessDetails.setName(business_object.optString("Business Name"));
                                     businessDetails.setOffer_name(business_object.optString("offerName"));
                                     businessDetails.setLogo(business_object.optString("Business Image"));
@@ -478,7 +493,7 @@ public class TrendsFragment extends Fragment {
                             mNoOfferText.setVisibility(View.VISIBLE);
                             mBusinessOfferRecyclerView.setVisibility(View.GONE);
                             if (!isDetached())
-                                Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), responseJson.optString("msg"), Toast.LENGTH_SHORT).show();
                         }
 
                     } catch (JSONException e) {

@@ -9,7 +9,6 @@
     android:padding="5dp"
     tools:context=".view.fragment.PointsFragment">
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -44,7 +43,8 @@
                         android:id="@+id/img_logo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
+                        android:layout_margin="5dp"
+                        android:layout_centerInParent="true"
                         android:adjustViewBounds="true"
                         android:src="@drawable/ic_all_activities" />
                 </RelativeLayout>
@@ -59,8 +59,7 @@
                     android:id="@+id/walking_image_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    >
+                    android:layout_centerInParent="true">
 
 
                     <ImageView
@@ -198,7 +197,6 @@
                         android:layout_toRightOf="@id/viewpager_indicator3_image"
                         android:src="@drawable/viewpager_indicator_unselected" />
 
-
                 </RelativeLayout>
 
 
@@ -209,15 +207,21 @@
 
     </RelativeLayout>
 
-    <!-- Bar chart  !-->
-
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/bar_chart"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@drawable/background_gradient">
 
-    </com.github.mikephil.charting.charts.BarChart>
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/bar_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
 
+        </com.github.mikephil.charting.charts.BarChart>
 
+    </FrameLayout>
+
+    <!-- Bar chart  !-->
 </LinearLayout>

@@ -29,6 +29,7 @@ import com.facebook.share.widget.ShareButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
@@ -81,7 +82,12 @@ public class ShareFragment extends Fragment {
         mFBShareButton.registerCallback(mFBCallBackManager, new FacebookCallback<Sharer.Result>() {
             @Override
             public void onSuccess(Sharer.Result result) {
-                socialShare("facebook");
+                if (new NetworkCheck().ConnectivityCheck(getActivity())) {
+                    socialShare("facebook");
+                } else {
+                    Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override

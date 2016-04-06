@@ -30,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -47,15 +48,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.model.City;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
+import com.pluggdd.burnandearn.view.adapter.CityAdapter;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
@@ -76,23 +80,25 @@ import java.util.Map;
  */
 public class ProfileFragment extends Fragment {
 
-    private static final String FIRST_NAME = "FirstName", LASTNAME = "LastName", EMAIL = "email", PROFILE_URL = "profile_url", GENDER = "gender", DOB = "dob", SOURCE_PAGE_FLAG = "source_flag";
+    private static final String SOURCE_PAGE_FLAG = "source_flag";
     public static final int IMAGE_CAPTURE_REQUEST_CODE = 1, PICK_IMAGE_REQUEST = 2, REQUEST_BOTH_PERMISSION_CODE = 3;
+    private Context mContext;
     private FragmentInteraction mFragmentInteraction;
     private Button mSubmitButton;
     private PreferencesManager mPreferenceManager;
-    private String mEmail, mFirstName, mLastName, mFacebookId, mProfileImageUrl, mDateofBirth;
-    private int mGender = -1; // 0 - male , 1 - Female , 2 - Other
+    private String mEmail, mFirstName, mLastName, mFacebookId, mProfileImageUrl, mDateofBirth,mCompany;
+    private int mGender = -1, mSelectedCityId; // 0 - male , 1 - Female , 2 - Other
     private ImageView mProfileImage;
-    private EditText mFirstNameEdt, mLastNameEdt, mEmailEdt, mDateOfBirthEdt;
+    private EditText mFirstNameEdt, mLastNameEdt, mEmailEdt, mDateOfBirthEdt,mCompanyEdt;
     private RadioButton mMaleOption, mFemaleOption, mOtherOption;
-    private ProgressBar mLoadingProgress;
-    private Spinner mGoalSetUpSpinner;
+    private ProgressBar mProfileLoadingProgress;
+    private Spinner mGoalSetUpSpinner,mCitySpinner;
     private DatePickerDialog mDatePickerDialog;
     private String mSourcePageFlag, mCapturedImagePath, mImageBase64;
     private boolean mIsPermissionRequestRaised;
+    private ArrayList<City> mCityList = new ArrayList<>();
     private View mView;
-
+    private ProgressDialog mLoadingProgressDialog;
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -122,15 +128,17 @@ public class ProfileFragment extends Fragment {
         mLastNameEdt = (EditText) mView.findViewById(R.id.edt_last_name);
         mEmailEdt = (EditText) mView.findViewById(R.id.edt_email);
         mDateOfBirthEdt = (EditText) mView.findViewById(R.id.edt_dob);
+        mCitySpinner = (Spinner) mView.findViewById(R.id.spinner_city);
+        mCompanyEdt = (EditText) mView.findViewById(R.id.edt_company);
         mSubmitButton = (Button) mView.findViewById(R.id.btn_submit);
         mMaleOption = (RadioButton) mView.findViewById(R.id.rbtn_male);
         mFemaleOption = (RadioButton) mView.findViewById(R.id.rbtn_female);
         mOtherOption = (RadioButton) mView.findViewById(R.id.rbtn_other);
         mGoalSetUpSpinner = (Spinner) mView.findViewById(R.id.spinner_goal);
-        mLoadingProgress = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
+        mProfileLoadingProgress = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
         mPreferenceManager = new PreferencesManager(getContext());
         // To populate values
-        new PicassoImageLoaderHelper(getContext(), mProfileImage, mLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
+        new PicassoImageLoaderHelper(getContext(), mProfileImage, mProfileLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
         mFirstNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)));
         mLastNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.last_name)));
         mEmailEdt.setText(mPreferenceManager.getStringValue(getString(R.string.email)));
@@ -145,9 +153,10 @@ public class ProfileFragment extends Fragment {
             mOtherOption.setChecked(true);
         }
         mDateOfBirthEdt.setText(mPreferenceManager.getStringValue(getString(R.string.dob)));
+        mCompanyEdt.setText(mPreferenceManager.getStringValue(getString(R.string.company)));
         mFirstNameEdt.setSelection(mFirstNameEdt.getText().toString().length());
-
         mGoalSetUpSpinner.setSelection(mPreferenceManager.getIntValue(getString(R.string.user_goal)), true);
+        mSelectedCityId = mPreferenceManager.getIntValue(getString(R.string.city_id));
         mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -156,6 +165,16 @@ public class ProfileFragment extends Fragment {
         });
 
         registerForContextMenu(mProfileImage);
+        // Loading Progress
+        mLoadingProgressDialog = new ProgressDialog(getActivity());
+        mLoadingProgressDialog.setCancelable(false);
+        mLoadingProgressDialog.show();
+        if(new NetworkCheck().ConnectivityCheck(getActivity())){
+            getcityList(mLoadingProgressDialog);
+        }else{
+            Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+        }
+
         mDateOfBirthEdt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,6 +190,21 @@ public class ProfileFragment extends Fragment {
 
         });
 
+        mCitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(mCityList != null && mCityList.size() >0){
+                    City selectedCity = mCityList.get(position);
+                    mSelectedCityId = selectedCity.getId();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,6 +212,7 @@ public class ProfileFragment extends Fragment {
                 mLastName = mLastNameEdt.getText().toString();
                 mEmail = mEmailEdt.getText().toString();
                 mDateofBirth = mDateOfBirthEdt.getText().toString();
+                mCompany = mCompanyEdt.getText().toString();
                 if (mMaleOption.isChecked())
                     mGender = 0;
                 else if (mFemaleOption.isChecked())
@@ -195,13 +230,15 @@ public class ProfileFragment extends Fragment {
                     Snackbar.make(mView, "Enter valid email address", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mDateofBirth)) {
                     Snackbar.make(mView, "Choose date of birth", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mCompany)) {
+                    Snackbar.make(mView, "Enter company name", Snackbar.LENGTH_SHORT).show();
                 } else if (mGender == -1) {
                     Snackbar.make(mView, "Choose any gender", Snackbar.LENGTH_SHORT).show();
                 } else {
                     if (new NetworkCheck().ConnectivityCheck(getActivity())) {
                         new UpdateProfileTask().execute();
                     } else {
-                        Snackbar.make(mView, "Please check your network connectivity", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(mView,getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -278,19 +315,18 @@ public class ProfileFragment extends Fragment {
         return true;
     }
 
-
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.i("Permission Result", "onRequestPermissionResult");
         switch (requestCode) {
             case REQUEST_BOTH_PERMISSION_CODE: {
                 mIsPermissionRequestRaised = true;
                 Map<String, Integer> perms = new HashMap<String, Integer>();
-                perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
-                perms.put(Manifest.permission.GET_ACCOUNTS, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
                 for (int i = 0; i < permissions.length; i++)
                     perms.put(permissions[i], grantResults[i]);
-                if (perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        && perms.get(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED) {
+                if (perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     dispatchTakePictureIntent(IMAGE_CAPTURE_REQUEST_CODE);
                 } else {
                     Snackbar.make(
@@ -392,18 +428,10 @@ public class ProfileFragment extends Fragment {
 
     private class UpdateProfileTask extends AsyncTask<String, Void, Void> {
 
-        private ProgressDialog mLoadingProgress;
-
-        public UpdateProfileTask() {
-            mLoadingProgress = new ProgressDialog(getActivity());
-        }
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mLoadingProgress.setMessage("Updating please wait !!!");
-            mLoadingProgress.setCancelable(false);
-            mLoadingProgress.show();
+            mLoadingProgressDialog.setMessage("Updating please wait !!!");
         }
 
         @Override
@@ -426,7 +454,7 @@ public class ProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            updateProfile(mLoadingProgress);
+            updateProfile(mLoadingProgressDialog);
         }
     }
 
@@ -451,7 +479,10 @@ public class ProfileFragment extends Fragment {
                             mPreferenceManager.setStringValue(getString(R.string.profile_image_url), responseJson.optString("profilepicture"));
                             mPreferenceManager.setIntValue(getString(R.string.gender), responseJson.optInt("gender"));
                             mPreferenceManager.setStringValue(getString(R.string.dob), responseJson.optString("dob").split("-")[2] + "-" + responseJson.optString("dob").split("-")[1] + "-" + responseJson.optString("dob").split("-")[0]);
+                            mPreferenceManager.setStringValue(getString(R.string.email), responseJson.optString("emailid"));
                             mPreferenceManager.setIntValue(getString(R.string.user_goal), mGoalSetUpSpinner.getSelectedItemPosition());
+                            mPreferenceManager.setIntValue(getString(R.string.city_id), mSelectedCityId);
+                            mPreferenceManager.setStringValue(getString(R.string.company), responseJson.optString("companyname"));
                             if (responseJson.optString("lastcaloriesupdate") != null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
@@ -495,11 +526,62 @@ public class ProfileFragment extends Fragment {
                 mPreferenceManager.setIntValue(getString(R.string.calories_goal), getSelectedUserGoal());
                 params.put("usergoal", String.valueOf(getSelectedUserGoal()));
                 params.put("gender", String.valueOf(mGender));
+                params.put("city", String.valueOf(mSelectedCityId));
+                params.put("companyname", mCompany);
                 params.put("deviceId", mPreferenceManager.getStringValue(getString(R.string.gcm_reg_id)));
                 params.put("deviceType", String.valueOf(0));
                 return params;
             }
         }));
+    }
+
+    private void getcityList(final ProgressDialog mLoadingProgress) {
+        mLoadingProgress.setMessage("Loading city please wait!!!");
+        mLoadingProgress.show();
+        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
+        mRequestQueue.add((new StringRequest(Request.Method.GET, WebserviceAPI.CITY_LIST, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(" login response", response);
+                mLoadingProgress.dismiss();
+                if (response != null) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response);
+                        mCityList = new ArrayList<City>();
+                        if (responseJson.optInt("status") == 1) {
+                            JSONArray cityArray = responseJson.optJSONArray("citylist");
+                            int previous_selected_cityId = 0;
+                            if(cityArray != null && cityArray.length() > 0){
+                                for(int i=0 ; i< cityArray.length() ; i++){
+                                    JSONObject cityObject = cityArray.getJSONObject(i);
+                                    City city = new City();
+                                    city.setId(cityObject.optInt("cityid"));
+                                    city.setName(cityObject.optString("cityname"));
+                                    mCityList.add(city);
+                                    if(mSelectedCityId == city.getId())
+                                        previous_selected_cityId = i;
+                                }
+                                mCitySpinner.setAdapter(new CityAdapter(mContext,mCityList));
+                                mCitySpinner.setSelection(previous_selected_cityId,true);
+                            }else{
+                                Snackbar.make(mView, responseJson.optString("msg"), Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Snackbar.make(mView, responseJson.optString("msg"), Snackbar.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                mLoadingProgress.dismiss();
+                Snackbar.make(mView, "Unable to connect to server", Snackbar.LENGTH_SHORT).show();
+            }
+        })));
     }
 
     private int getSelectedUserGoal() {
@@ -526,6 +608,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
         if (context instanceof FragmentInteraction) {
             mFragmentInteraction = (FragmentInteraction) context;
         } else {

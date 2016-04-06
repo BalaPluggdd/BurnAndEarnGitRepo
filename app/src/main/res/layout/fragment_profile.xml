@@ -87,7 +87,7 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/blue"
+        android:background="@drawable/ic_app_background"
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/email"
                 android:layout_marginTop="5dp"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
 
@@ -124,7 +124,8 @@
                 android:backgroundTint="@color/colorAccent"
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
-                android:textColor="@android:color/white" />
+                android:textColorHint="@android:color/darker_gray"
+                android:textColor="@android:color/black" />
 
 
             <com.pluggdd.burnandearn.font.RobotoTextView
@@ -132,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="@string/dob"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
 
@@ -143,10 +144,11 @@
                 android:layout_marginTop="5dp"
                 android:backgroundTint="@color/colorAccent"
                 android:hint="@string/hint_dob"
+                android:textColorHint="@android:color/darker_gray"
                 android:singleLine="true"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/black" />
 
 
             <com.pluggdd.burnandearn.font.RobotoTextView
@@ -154,14 +156,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="@string/sex"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <RadioGroup
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:theme="@style/AppTheme.PopupOverlay">
 
                 <RadioButton
                     android:id="@+id/rbtn_male"
@@ -169,7 +172,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:text="@string/male"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/black" />
 
                 <RadioButton
                     android:id="@+id/rbtn_female"
@@ -177,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:text="@string/female"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/black" />
 
                 <RadioButton
                     android:id="@+id/rbtn_other"
@@ -185,34 +188,54 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:text="@string/other"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/black" />
 
             </RadioGroup>
 
-
-            <!--<com.pluggdd.burnandearn.font.RobotoTextView
+            <com.pluggdd.burnandearn.font.RobotoTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/choose_your_age_group"
-                android:textColor="@android:color/white"
+                android:layout_marginTop="5dp"
+                android:text="@string/city"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <Spinner
-                android:id="@+id/spinner_age_group"
+                android:id="@+id/spinner_city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:entries="@array/age_group">
+                android:entries="@array/goal_setup"
+                android:theme="@style/AppTheme.PopupOverlay">
 
-            </Spinner>-->
+            </Spinner>
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/company"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/edt_company"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="@color/colorAccent"
+                android:hint="@string/hint_company"
+                android:singleLine="true"
+                android:textColorHint="@android:color/darker_gray"
+                android:textColor="@android:color/black" />
+
 
             <com.pluggdd.burnandearn.font.RobotoTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="@string/choose_your_goal"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <Spinner
@@ -220,7 +243,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:entries="@array/goal_setup">
+                android:entries="@array/goal_setup"
+                android:theme="@style/AppTheme.PopupOverlay">
 
             </Spinner>
 

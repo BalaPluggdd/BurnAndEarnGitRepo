@@ -13,4 +13,7 @@ public class WebserviceAPI {
     public static final String SOCIAL_SHARE = HOST_URL+"socialshare.php";
     public static final String UPDATE_GCM_REG_TOKEN = HOST_URL+"updatedeviceid.php";
     public static final String POINTS_LIST = HOST_URL+"lastweekpoints.php";
+    public static final String ADD_MY_OFFER = HOST_URL+"add_my_offers.php";
+    public static final String MY_OFFERS = HOST_URL + "view_added_offer.php";
+    public static final String CITY_LIST = HOST_URL + "get_city.php";
 }

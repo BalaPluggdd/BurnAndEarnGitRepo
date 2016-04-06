@@ -150,46 +150,50 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                             @Override
                             public void onCompleted(JSONObject object, GraphResponse response) {
                                 // Application code
-                                Log.v("LoginActivity", response.toString());
-                                if (response.getError() != null) {
-                                    Snackbar.make(mView, "Unable to connect with facebook please try after sometime", Snackbar.LENGTH_SHORT).show();
-                                } else {
-                                    String first_name = object.optString("first_name");
-                                    String last_name = object.optString("last_name");
-                                    String email_id = object.optString("email");
-                                    String facebook_id = object.optString("id");
-                                    String gender = object.optString("gender");
-                                    String birthday = object.optString("birthday");
-                                    Log.i("gender:birthday", " " + gender + " " + birthday);
-                                    mPreferenceManager.setStringValue(getString(R.string.facebookId),facebook_id);
-                                    mPreferenceManager.setStringValue(getString(R.string.first_name), first_name);
-                                    mPreferenceManager.setStringValue(getString(R.string.last_name), last_name);
-                                    mPreferenceManager.setStringValue(getString(R.string.email), email_id);
-                                    //836913896406276
-                                    mPreferenceManager.setStringValue(getString(R.string.profile_image_url), "https://graph.facebook.com/" + facebook_id + "/picture?type=large&width=400&height=400");
-                                    if(gender != null){
-                                        if(gender.equalsIgnoreCase("male"))
-                                            mPreferenceManager.setIntValue(getString(R.string.gender), 0);
-                                        else if(gender.equalsIgnoreCase("female"))
-                                            mPreferenceManager.setIntValue(getString(R.string.gender),1);
-                                        else if(gender.equalsIgnoreCase("other"))
-                                            mPreferenceManager.setIntValue(getString(R.string.gender),2);
-                                    }
-                                    if(birthday != null && !birthday.equalsIgnoreCase(""))
-                                        mPreferenceManager.setStringValue(getString(R.string.dob),birthday.split("/")[1]+"-"+birthday.split("/")[0]+"-"+birthday.split("/")[2]);
-                                    navigateToDashboard();
+                                try {
+                                    Log.v("LoginActivity", response.toString());
+                                    if (response.getError() != null) {
+                                        Snackbar.make(mView, "Unable to connect with facebook please try after sometime", Snackbar.LENGTH_SHORT).show();
+                                    } else {
+                                        String first_name = object.optString("first_name");
+                                        String last_name = object.optString("last_name");
+                                        String email_id = object.optString("email");
+                                        String facebook_id = object.optString("id");
+                                        String gender = object.optString("gender");
+                                        String birthday = object.optString("birthday");
+                                        Log.i("gender:birthday", " " + gender + " " + birthday);
+                                        mPreferenceManager.setStringValue(getString(R.string.facebookId), facebook_id);
+                                        mPreferenceManager.setStringValue(getString(R.string.first_name), first_name);
+                                        mPreferenceManager.setStringValue(getString(R.string.last_name), last_name);
+                                        mPreferenceManager.setStringValue(getString(R.string.email), email_id);
+                                        //836913896406276
+                                        mPreferenceManager.setStringValue(getString(R.string.profile_image_url), "https://graph.facebook.com/" + facebook_id + "/picture?type=large&width=400&height=400");
+                                        if (gender != null) {
+                                            if (gender.equalsIgnoreCase("male"))
+                                                mPreferenceManager.setIntValue(getString(R.string.gender), 0);
+                                            else if (gender.equalsIgnoreCase("female"))
+                                                mPreferenceManager.setIntValue(getString(R.string.gender), 1);
+                                            else if (gender.equalsIgnoreCase("other"))
+                                                mPreferenceManager.setIntValue(getString(R.string.gender), 2);
+                                        }
+                                        if (birthday != null && !birthday.equalsIgnoreCase(""))
+                                            mPreferenceManager.setStringValue(getString(R.string.dob), birthday.split("/")[1] + "-" + birthday.split("/")[0] + "-" + birthday.split("/")[2]);
+                                        navigateToDashboard();
                                     /*if (new NetworkCheck().ConnectivityCheck(getContext())) {
                                         signUp(mProgressDialog, "facebook", first_name, last_name, email_id, facebook_id);
                                     } else {
                                         Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                                     }*/
 
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
 
                             }
                         });
                 Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,first_name,last_name,name,email,gender,birthday");
+                parameters.putString("fields", "id,first_name,last_name,name,email,gender,birthday,location");
                 request.setParameters(parameters);
                 request.executeAsync();
             }

@@ -126,5 +126,17 @@
     <string name="points_earned">You have earned</string>
     <string name="points">points</string>
     <string name="no_business_offer">Burn more calories to avail offers</string>
+    <string name="business_id">businessId</string>
+    <string name="goal_achieved_notification_header">Congrats Your Goal Achieved !!!</string>
+    <string name="goal_achieved_notification_content">You have achieved your goal of burning</string>
+    <string name="from_notification">From Notification</string>
+    <string name="notification_time">notify time</string>
+    <string name="title_activity_my_offers">My Offers</string>
+    <string name="my_offers_inactive">My Offers Inactive</string>
+    <string name="city">City</string>
+    <string name="hint_city">city</string>
+    <string name="hint_company">company</string>
+    <string name="company">Company</string>
+    <string name="city_id">City Id</string>
 
 </resources>

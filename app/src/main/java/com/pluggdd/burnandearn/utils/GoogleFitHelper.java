@@ -13,6 +13,7 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
+import com.google.android.gms.fitness.service.FitnessSensorService;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
@@ -46,18 +47,27 @@ public class GoogleFitHelper {
             List<LocalDateTime> dates = new ArrayList<>();
             LocalDateTime StartDate = new LocalDateTime().minusDays(6).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             int days = Days.daysBetween(StartDate, new LocalDateTime()).getDays();
+            Log.i("Days",days + " ");
             for (int i = 0; i < days; i++) {
                 LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
                 dates.add(d);
             }
             for (LocalDateTime date : dates) {
                 LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                getFitnessActivityDetails(fitnessHistories, Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+                Log.i("date", date.toString());
+                FitnessHistory history = getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+                if(history != null)
+                fitnessHistories.add(history);
             }
-            getTodayFitnessDetails(fitnessHistories);
-        } catch (Exception e) {
+            Log.i("Fitness History",fitnessHistories.size() + " ");
+            FitnessHistory history = getTodayFitnessDetails();
+            if(history != null)
+                fitnessHistories.add(history);
 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        Log.i("Fitness History",fitnessHistories.size() + " ");
         return fitnessHistories;
     }
 
@@ -68,15 +78,19 @@ public class GoogleFitHelper {
             //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
             //last_calories_updated_time = 1459098422000L;
             if (last_calories_updated_time == 0) { // App installed today only,so send today fitnessDetails only
-                getTodayFitnessDetails(fitnessHistoryList);
+                FitnessHistory history = getTodayFitnessDetails();
+                if(history != null)
+                     fitnessHistoryList.add(history);
             } else { // Send fitness data from last synced date to current time
                 List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
                 LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
                 LocalDateTime currentDateTime = new LocalDateTime();
                 int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
                 if (days == 0) {
-                    Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
-                    getFitnessActivityDetails(fitnessHistoryList, Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                    //Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
+                    FitnessHistory history = getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
+                    if(history != null)
+                      fitnessHistoryList.add(history);
                 } else {
                     for (int i = 0; i < days; i++) {
                         LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
@@ -91,10 +105,14 @@ public class GoogleFitHelper {
                             startDateTime = date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
                         }
                         endDateTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                        Log.i("start date : ", date.toString() + " " + " end date :" + endDateTime.toString());
-                        getFitnessActivityDetails(fitnessHistoryList, Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startDateTime.toDateTime().getMillis(), endDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDateTime, endDateTime);
+                        //Log.i("start date : ", date.toString() + " " + " end date :" + endDateTime.toString());
+                        FitnessHistory history = getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startDateTime.toDateTime().getMillis(), endDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDateTime, endDateTime);
+                        if(history != null)
+                          fitnessHistoryList.add(history);
                     }
-                    getTodayFitnessDetails(fitnessHistoryList); // To add today fitness details as last one
+                    FitnessHistory history = getTodayFitnessDetails();
+                    if(history != null)
+                    fitnessHistoryList.add(history); // To add today fitness details as last one
                 }
             }
         } catch (Exception e) {
@@ -114,22 +132,22 @@ public class GoogleFitHelper {
         return mFitnessDataRequest;
     }
 
-    private void getTodayFitnessDetails(ArrayList<FitnessHistory> fitnessHistories) {
+    private FitnessHistory getTodayFitnessDetails() {
         LocalDateTime currentDateTime = new LocalDateTime();
         long endTime = currentDateTime.toDateTime().getMillis();
         LocalDateTime startdateTime = currentDateTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
         long startTime = startdateTime.toDateTime().getMillis();
         Log.i("Time :", startdateTime.toString() + " " + currentDateTime.toDateTime().toString());
-        getFitnessActivityDetails(fitnessHistories, Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startTime, endTime)).await(1, TimeUnit.MINUTES), startdateTime, currentDateTime);
+        return getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startTime, endTime)).await(1, TimeUnit.MINUTES), startdateTime, currentDateTime);
     }
 
-    private void getFitnessActivityDetails(ArrayList<FitnessHistory> fitnessHistories, DataReadResult dataReadResult, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    private FitnessHistory getFitnessActivityDetails(DataReadResult dataReadResult, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         // [START parse_read_data_result]
         // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
         // as buckets containing DataSets, instead of just DataSets.
-
+        FitnessHistory history = null;
         if (dataReadResult.getBuckets().size() > 0) {
-            FitnessHistory history = new FitnessHistory();
+            history = new FitnessHistory();
             ArrayList<FitnessActivity> fitnessActivitiesListofDay = new ArrayList<>();
             //Log.e("Fitness data called: ", startDateTime.toString() + " " + dataReadResult.getBuckets().size());
             double total_walking_calories_of_day = 0, total_running_calories_of_day = 0, total_cycling_calories_of_day = 0,
@@ -192,10 +210,9 @@ public class GoogleFitHelper {
             history.setWalkingSteps((int) total_walking_steps_of_day);
             history.setRunningSteps((int) total_running_steps_of_day);
             history.setFitnessActivitiesList(fitnessActivitiesListofDay);
-            fitnessHistories.add(history);
-
         }
         // [END parse_read_data_result]
+        return  history;
     }
 
 }

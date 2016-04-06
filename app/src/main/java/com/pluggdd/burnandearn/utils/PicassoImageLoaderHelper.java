@@ -2,10 +2,14 @@ package com.pluggdd.burnandearn.utils;
 
 import android.content.Context;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Helper class to load image from url using Picasso Library
@@ -26,6 +30,7 @@ public class PicassoImageLoaderHelper {
 
 
     public void loadImage(String url){
+        url = url.replaceAll(" ","%20");
         mLoadingProgressBar.setVisibility(View.VISIBLE);
         if(url != null && !url.equalsIgnoreCase("")){
             mPicasso
@@ -39,7 +44,7 @@ public class PicassoImageLoaderHelper {
 
                         @Override
                         public void onError() {
-
+                            mLoadingProgressBar.setVisibility(View.GONE);
                         }
                     });
 

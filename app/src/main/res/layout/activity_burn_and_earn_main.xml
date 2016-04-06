@@ -7,17 +7,20 @@
     android:layout_height="match_parent"
     android:id="@+id/parent_view"
     tools:context=".activity.BurnAndEarnMainActivity"
-    android:background="@drawable/ic_app_background">
+    >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
             android:background="?attr/colorPrimary">
 
             <FrameLayout
@@ -34,8 +37,9 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_profile"
-                android:layout_width="54dp"
-                android:layout_height="54dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+
                 />
             </FrameLayout>
 
@@ -46,31 +50,6 @@
                 android:textSize="24sp"
                 android:textColor="@android:color/white"
                 app:typeface="robotoCondensed"/>
-
-
-            <!--<ImageView
-                android:id="@+id/img_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_back"
-                android:visibility="gone"
-                />
-
-                        <com.pluggdd.burnandearn.font.RobotoTextView
-                            android:id="@+id/txt_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:visibility="gone"
-                            android:textColor="@android:color/white"
-                            />
-
-                        <Spinner
-                            android:id="@+id/activities_time_spinner"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:entries="@array/activities_selection"></Spinner>
-            -->
 
         </android.support.v7.widget.Toolbar>
 

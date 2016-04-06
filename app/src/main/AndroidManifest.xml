@@ -79,6 +79,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
         </activity>
+
+        <activity
+            android:name=".activity.MyOffersActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/title_activity_my_offers"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
+
+
         <activity
             android:name=".activity.ShareActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -148,7 +161,9 @@
         </service>
         <service
             android:name=".service.RegistrationIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+
     </application>
 
 </manifest>

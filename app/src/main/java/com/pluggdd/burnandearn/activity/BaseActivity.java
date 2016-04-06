@@ -16,6 +16,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
     }
 
@@ -37,6 +38,10 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             case R.id.action_offers_and_rewards:
                 startActivity(new Intent(BaseActivity.this,OfferAndRewardsActivity.class));
+                overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+                break;
+            case R.id.action_my_offers:
+                startActivity(new Intent(BaseActivity.this,MyOffersActivity.class));
                 overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
                 break;
             case R.id.action_share:

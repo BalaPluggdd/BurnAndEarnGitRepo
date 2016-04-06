@@ -1,6 +1,8 @@
 package com.pluggdd.burnandearn.activity;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -60,7 +62,7 @@ public class ShareActivity extends BaseActivity {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("Adding points please wait");
         mProgressDialog.setCancelable(false);
-
+        cancelNotification();
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.facebook.katana&hl=en"))
                 .setContentTitle(getString(R.string.app_name))
@@ -120,7 +122,7 @@ public class ShareActivity extends BaseActivity {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optString("msg").equalsIgnoreCase("Points Credited")) {
-                            new PreferencesManager(ShareActivity.this).setStringValue(getString(R.string.facebook_share),"yes");
+                            new PreferencesManager(ShareActivity.this).setStringValue(getString(R.string.facebook_share), "yes");
                             Snackbar.make(mParentView, "Points added to your profile", Snackbar.LENGTH_SHORT).show();
                         } else {
                             Snackbar.make(mParentView, "Points already added, want to restrict this", Snackbar.LENGTH_SHORT).show();
@@ -154,4 +156,8 @@ public class ShareActivity extends BaseActivity {
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
     }
 
+    public void cancelNotification() {
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(1);
+    }
 }

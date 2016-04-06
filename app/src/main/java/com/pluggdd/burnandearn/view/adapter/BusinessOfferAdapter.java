@@ -61,6 +61,7 @@ public class BusinessOfferAdapter extends RecyclerView.Adapter<BusinessOfferAdap
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, OfferDetailActivity.class);
+                intent.putExtra(mContext.getString(R.string.business_id), businessDetail.getId());
                 intent.putExtra(mContext.getString(R.string.logo_url), businessDetail.getLogo());
                 intent.putExtra(mContext.getString(R.string.business_name), businessDetail.getName());
                 intent.putExtra(mContext.getString(R.string.offer_name), businessDetail.getOffer_name());

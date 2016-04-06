@@ -1,22 +1,46 @@
 package com.pluggdd.burnandearn.activity;
 
-import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.model.BusinessDetails;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
+import com.pluggdd.burnandearn.utils.VolleySingleton;
+import com.pluggdd.burnandearn.utils.WebserviceAPI;
+import com.pluggdd.burnandearn.view.adapter.OfferRewardsAdapter;
 import com.pluggdd.burnandearn.view.fragment.OffersAndRewardsFragment;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class OfferAndRewardsActivity extends BaseActivity{
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class MyOffersActivity extends BaseActivity {
 
     private TabLayout mTabLayout;
     private ViewPager mTabViewPager;
@@ -36,7 +60,7 @@ public class OfferAndRewardsActivity extends BaseActivity{
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.removeItem(R.id.action_offers_and_rewards);
+        menu.removeItem(R.id.action_my_offers);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -59,9 +83,8 @@ public class OfferAndRewardsActivity extends BaseActivity{
     private void setUpTabs() {
         // To add Tabs
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(OffersAndRewardsFragment.newInstance(1, getString(R.string.action_offers_and_rewards)), "Week");
-        adapter.addFragment(OffersAndRewardsFragment.newInstance(2, getString(R.string.action_offers_and_rewards)), "Fortnight");
-        adapter.addFragment(OffersAndRewardsFragment.newInstance(3, getString(R.string.action_offers_and_rewards)), "Month");
+        adapter.addFragment(OffersAndRewardsFragment.newInstance(1,getString(R.string.my_offers)), "Active");
+        adapter.addFragment(OffersAndRewardsFragment.newInstance(0,getString(R.string.my_offers_inactive)), "InActive");
         mTabViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mTabViewPager);
     }
@@ -94,6 +117,4 @@ public class OfferAndRewardsActivity extends BaseActivity{
             return mFragmentTitleList.get(position);
         }
     }
-
-
 }
