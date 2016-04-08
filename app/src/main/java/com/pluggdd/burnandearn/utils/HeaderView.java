@@ -13,7 +13,7 @@ import com.pluggdd.burnandearn.R;
 public class HeaderView extends LinearLayout{
 
     TextView title;
-    TextView subTitle;
+    //TextView subTitle;
 
 
     public HeaderView(Context context) {
@@ -38,9 +38,7 @@ public class HeaderView extends LinearLayout{
     protected void onFinishInflate() {
         super.onFinishInflate();
         title = (TextView) findViewById(R.id.header_view_title);
-        subTitle = (TextView) findViewById(R.id.header_view_sub_title);
-
-
+        //subTitle = (TextView) findViewById(R.id.header_view_sub_title);
         // ButterKnife.bind(this);
     }
 
@@ -50,7 +48,7 @@ public class HeaderView extends LinearLayout{
 
     public void bindTo(String title, String subTitle) {
         hideOrSetText(this.title, title);
-        hideOrSetText(this.subTitle, subTitle);
+        //hideOrSetText(this.subTitle, subTitle);
     }
 
     private void hideOrSetText(TextView tv, String text) {

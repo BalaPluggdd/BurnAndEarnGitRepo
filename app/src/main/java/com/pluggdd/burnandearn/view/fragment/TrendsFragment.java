@@ -471,9 +471,9 @@ public class TrendsFragment extends Fragment {
                                     businessDetails.setUrl(business_object.optString("site"));
                                     businessDetails.setPhone_number(business_object.optInt("Phone No"));
                                     businessDetails.setAddress(business_object.optString("Address"));
-                                    businessDetails.setPoints_needed(business_object.optInt(""));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
+                                    businessDetails.setOffer_name(business_object.optString("offerimage"));
                                     mBusinesOfferList.add(businessDetails);
                                 }
                                 mLoadingProgressBar.setVisibility(View.GONE);
@@ -485,7 +485,7 @@ public class TrendsFragment extends Fragment {
                                 mNoOfferText.setVisibility(View.VISIBLE);
                                 mBusinessOfferRecyclerView.setVisibility(View.GONE);
                                 if (!isDetached())
-                                    Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
 
                             }
                         } else {
@@ -493,7 +493,7 @@ public class TrendsFragment extends Fragment {
                             mNoOfferText.setVisibility(View.VISIBLE);
                             mBusinessOfferRecyclerView.setVisibility(View.GONE);
                             if (!isDetached())
-                                Toast.makeText(getContext(), responseJson.optString("msg"), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, responseJson.optString("msg"), Toast.LENGTH_SHORT).show();
                         }
 
                     } catch (JSONException e) {
@@ -501,7 +501,7 @@ public class TrendsFragment extends Fragment {
                         mNoOfferText.setVisibility(View.VISIBLE);
                         mBusinessOfferRecyclerView.setVisibility(View.GONE);
                         if (!isDetached())
-                            Toast.makeText(getContext(), "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
 
                     }
                 }

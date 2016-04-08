@@ -10,20 +10,21 @@
         android:id="@+id/header_view_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
+        android:textColor="@android:color/white"
         android:textSize="22sp"
         android:textStyle="bold"
+        android:background="@drawable/transparent_background_light"
         app:typeface="robotoBoldCondensed"
         />
 
     <!-- Subtitle -->
-    <TextView
+    <!--<TextView
         android:id="@+id/header_view_sub_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:textSize="18sp"
-        />
+        />-->
 
 
 </com.pluggdd.burnandearn.utils.HeaderView>

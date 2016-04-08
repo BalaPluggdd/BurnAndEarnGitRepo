@@ -2,6 +2,7 @@ package com.pluggdd.burnandearn.view.fragment;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class ShareFragment extends Fragment {
     private View mView;
     private CallbackManager mFBCallBackManager;
     private ShareButton mFBShareButton;
+    private Context mContext;
     private ProgressDialog mProgressDialog;
 
     public ShareFragment() {
@@ -112,6 +114,12 @@ public class ShareFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mFBCallBackManager.onActivityResult(requestCode, resultCode, data);
@@ -129,7 +137,7 @@ public class ShareFragment extends Fragment {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optString("msg").equalsIgnoreCase("Points Credited")) {
-                            new PreferencesManager(getContext()).setStringValue(getString(R.string.facebook_share),"yes");
+                            new PreferencesManager((mContext)).setStringValue(getString(R.string.facebook_share),"yes");
                             Snackbar.make(mView, "Points added to your profile", Snackbar.LENGTH_SHORT).show();
                         } else {
                             Snackbar.make(mView, "Points already added, want to restrict this", Snackbar.LENGTH_SHORT).show();
@@ -150,7 +158,7 @@ public class ShareFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("userId", new PreferencesManager(getContext()).getStringValue(getString(R.string.user_id)));
+                params.put("userId", new PreferencesManager(mContext).getStringValue(getString(R.string.user_id)));
                 params.put("social_share", social_flag);
                 return params;
             }

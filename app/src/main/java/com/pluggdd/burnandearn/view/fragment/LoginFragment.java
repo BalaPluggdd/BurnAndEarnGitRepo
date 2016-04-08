@@ -92,6 +92,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     private PreferencesManager mPreferenceManager;
     private SignInButton mGooglePlusSignInButton;
     private ProgressDialog mProgressDialog;
+    private Context mContext;
 
 
     public LoginFragment() {
@@ -223,6 +224,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
         if (mGoogleAPIClient != null)
             mGoogleAPIClient.connect();
         if (context instanceof FragmentInteraction) {
@@ -480,7 +482,7 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
 
     private boolean isPackageInstalled(String packagename) {
         try {
-            getContext().getPackageManager().getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+            mContext.getPackageManager().getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
             return false;

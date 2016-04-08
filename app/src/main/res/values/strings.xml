@@ -125,6 +125,7 @@
     <string name="calories_goal">calories goal</string>
     <string name="points_earned">You have earned</string>
     <string name="points">points</string>
+    <string name="points_txt">POINTS</string>
     <string name="no_business_offer">Burn more calories to avail offers</string>
     <string name="business_id">businessId</string>
     <string name="goal_achieved_notification_header">Congrats Your Goal Achieved !!!</string>
@@ -138,5 +139,26 @@
     <string name="hint_company">company</string>
     <string name="company">Company</string>
     <string name="city_id">City Id</string>
+    <string name="fontello_clock">&#xE800;</string>
+    <string name="fontello_phone">&#xE803;</string>
+    <string name="fontello_location">&#xE802;</string>
+    <string name="ends_in">ENDS IN</string>
+    <string name="days">DAYS</string>
+    <string name="minutes">MINUTES</string>
+    <string name="seconds">SECONDS</string>
+    <string name="hours">HOURS</string>
+    <string name="no_image">Image Not Available</string>
+    <string name="valid_till">VALID TILL : </string>
+    <string name="terms_and_conditions_label">TERMS AND CONDITIONS</string>
+    <string name="points_needed">points_needed</string>
+    <string name="address">address</string>
+    <string name="expire_date">expire_date</string>
+    <string name="offer_image_url">Offer Image Url</string>
+    <string name="activity_image_transition">image transition</string>
+    <string name="activity_logo_transition">logo transition</string>
+    <string name="activity_points_needed_transition">points_needed_transition</string>
+    <string name="website">website</string>
+    <string name="phone_number">phone_number</string>
+    <string name="confirm_redeem_dialog_content">YOU HAVE CHOOSEN TO AVAIL THE OFFER</string>
 
 </resources>

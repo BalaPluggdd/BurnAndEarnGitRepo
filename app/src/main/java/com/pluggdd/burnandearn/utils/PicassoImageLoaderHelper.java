@@ -30,9 +30,9 @@ public class PicassoImageLoaderHelper {
 
 
     public void loadImage(String url){
-        url = url.replaceAll(" ","%20");
         mLoadingProgressBar.setVisibility(View.VISIBLE);
         if(url != null && !url.equalsIgnoreCase("")){
+            url = url.replaceAll(" ","%20");
             mPicasso
                     .load(url)
                     .noFade()

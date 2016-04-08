@@ -153,6 +153,7 @@ public class GoogleFitHelper {
             double total_walking_calories_of_day = 0, total_running_calories_of_day = 0, total_cycling_calories_of_day = 0,
                     total_walking_distance_of_day = 0, total_running_distance_of_day = 0, total_cycling_distance_of_day = 0,
                     total_walking_steps_of_day = 0, total_running_steps_of_day = 0;
+            boolean isWalkingDone = false,isRunningDone = false ,isCyclingDone = false;
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 /*DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                Log.i("Days : ", bucket.getStartTime(TimeUnit.DAYS) + " " + bucket.getEndTime(TimeUnit.DAYS) + " " );
@@ -163,6 +164,7 @@ public class GoogleFitHelper {
                     List<DataSet> dataSets = bucket.getDataSets();
                     int step_count = 0;
                     double calories_expended = 0, distance = 0;
+
                     for (DataSet dataSet : dataSets) {
                         //dumpDataSet(dataSet);
                         for (DataPoint dp : dataSet.getDataPoints()) {
@@ -180,14 +182,17 @@ public class GoogleFitHelper {
                         }
                     }
                     if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                        isWalkingDone = true;
                         total_walking_calories_of_day = calories_expended;
                         total_walking_distance_of_day = distance;
                         total_walking_steps_of_day = step_count;
                     } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                        isRunningDone = true;
                         total_running_calories_of_day = calories_expended;
                         total_running_distance_of_day = distance;
                         total_running_steps_of_day = step_count;
                     } else if (bucket.getActivity().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                        isCyclingDone = true;
                         total_cycling_calories_of_day = calories_expended;
                         total_cycling_distance_of_day = distance;
                     }
@@ -198,6 +203,31 @@ public class GoogleFitHelper {
                     activity.setStep_count(step_count);
                     fitnessActivitiesListofDay.add(activity);
                 }
+            }
+            // To add not existing activity
+            if(!isWalkingDone){
+                FitnessActivity activity = new FitnessActivity();
+                activity.setName(FitnessActivities.WALKING);
+                activity.setCalories_expended(0);
+                activity.setDistance(0);
+                activity.setStep_count(0);
+                fitnessActivitiesListofDay.add(activity);
+            }
+            if(!isRunningDone){
+                FitnessActivity activity = new FitnessActivity();
+                activity.setName(FitnessActivities.RUNNING);
+                activity.setCalories_expended(0);
+                activity.setDistance(0);
+                activity.setStep_count(0);
+                fitnessActivitiesListofDay.add(activity);
+            }
+            if(!isCyclingDone){
+                FitnessActivity activity = new FitnessActivity();
+                activity.setName(FitnessActivities.BIKING);
+                activity.setCalories_expended(0);
+                activity.setDistance(0);
+                activity.setStep_count(0);
+                fitnessActivitiesListofDay.add(activity);
             }
             history.setStartDateTime(startDateTime);
             history.setEndDateTime(endDateTime);

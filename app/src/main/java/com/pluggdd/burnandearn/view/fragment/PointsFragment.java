@@ -211,7 +211,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         mBarChart.setDrawGridBackground(false);
         mBarChart.getXAxis().setTextColor(Color.WHITE);
         mBarChart.getLegend().setTextColor(Color.WHITE);
-        mBarChart.getLegend().setCustom(getColors(),new String[]{"Walking","Running","Biking"});
+        mBarChart.getLegend().setCustom(getColors(), new String[]{"Walking", "Running", "Biking"});
 
     }
 
@@ -266,144 +266,146 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void updateFitnessActivities(int position) {
-        ArrayList<FitnessActivity> mTodayFitnessActivityList = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1).getFitnessActivitiesList();
-        switch (position) {
-            case 0: // Calories
-                Log.i("calories average", mCaloriesAverage + "");
-                double walking_calories_percentage = 0, running_calories_percentage = 0, biking_calories_percentage = 0;
-                double walking_calories_expended = 0;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
-                        walking_calories_expended = fitnessActivity.getCalories_expended();
-                        break;
+        if(mWeekFitnessHistoryList.size() > 0){
+            ArrayList<FitnessActivity> mTodayFitnessActivityList = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1).getFitnessActivitiesList();
+            switch (position) {
+                case 0: // Calories
+                    Log.i("calories average", mCaloriesAverage + "");
+                    double walking_calories_percentage = 0, running_calories_percentage = 0, biking_calories_percentage = 0;
+                    double walking_calories_expended = 0;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                            walking_calories_expended = fitnessActivity.getCalories_expended();
+                            break;
+                        }
                     }
-                }
-                //walking_calories_expended = 100;
-                Log.i("walking calories", walking_calories_expended + "");
-                walking_calories_percentage = (walking_calories_expended / mCaloriesAverage) * 100;
-                // To calculate running calories percentage in total calories
-                double running_calories_expended = 0;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
-                        running_calories_expended = fitnessActivity.getCalories_expended();
-                        break;
+                    //walking_calories_expended = 100;
+                    Log.i("walking calories", walking_calories_expended + "");
+                    walking_calories_percentage = (walking_calories_expended / mCaloriesAverage) * 100;
+                    // To calculate running calories percentage in total calories
+                    double running_calories_expended = 0;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                            running_calories_expended = fitnessActivity.getCalories_expended();
+                            break;
+                        }
                     }
-                }
-                //running_calories_expended = 60;
-                Log.i("running calories", running_calories_expended + "");
-                running_calories_percentage = (running_calories_expended / mCaloriesAverage) * 100;
-                // To calculate biking calories percentage in total calories
-                double biking_calories_expended = 0;
-                //biking_calories_expended = 200;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                        biking_calories_expended = fitnessActivity.getCalories_expended();
-                        break;
+                    //running_calories_expended = 60;
+                    Log.i("running calories", running_calories_expended + "");
+                    running_calories_percentage = (running_calories_expended / mCaloriesAverage) * 100;
+                    // To calculate biking calories percentage in total calories
+                    double biking_calories_expended = 0;
+                    //biking_calories_expended = 200;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                            biking_calories_expended = fitnessActivity.getCalories_expended();
+                            break;
+                        }
                     }
-                }
-                //biking_calories_expended = 10;
-                Log.i("biking calories", biking_calories_expended + "");
-                biking_calories_percentage = (biking_calories_expended / mCaloriesAverage) * 100;
-                // To update decoview
-                //walking_calories_percentage = 30 ; running_calories_percentage = 0; biking_calories_percentage = 10;
-                updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
-                break;
-            case 1: // Distance
-                Log.i("distance average", mDistanceAverage + "");
-                double walking_distance_percentage = 0, running_distance_percentage = 0, biking_distance_percentage = 0;
-                double walking_distance_travelled = 0;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
-                        walking_distance_travelled = fitnessActivity.getDistance();
-                        break;
+                    //biking_calories_expended = 10;
+                    Log.i("biking calories", biking_calories_expended + "");
+                    biking_calories_percentage = (biking_calories_expended / mCaloriesAverage) * 100;
+                    // To update decoview
+                    //walking_calories_percentage = 30 ; running_calories_percentage = 0; biking_calories_percentage = 10;
+                    updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
+                    break;
+                case 1: // Distance
+                    Log.i("distance average", mDistanceAverage + "");
+                    double walking_distance_percentage = 0, running_distance_percentage = 0, biking_distance_percentage = 0;
+                    double walking_distance_travelled = 0;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                            walking_distance_travelled = fitnessActivity.getDistance();
+                            break;
+                        }
                     }
-                }
-                //walking_calories_expended = 100;
-                Log.i("walking distance", walking_distance_travelled + "");
-                walking_distance_percentage = (walking_distance_travelled / mDistanceAverage) * 100;
-                // To calculate running calories percentage in total calories
-                double running_distance_travelled = 0;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
-                        running_distance_travelled = fitnessActivity.getDistance();
-                        break;
+                    //walking_calories_expended = 100;
+                    Log.i("walking distance", walking_distance_travelled + "");
+                    walking_distance_percentage = (walking_distance_travelled / mDistanceAverage) * 100;
+                    // To calculate running calories percentage in total calories
+                    double running_distance_travelled = 0;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                            running_distance_travelled = fitnessActivity.getDistance();
+                            break;
+                        }
                     }
-                }
-                //running_calories_expended = 60;
-                Log.i("running distance", running_distance_travelled + "");
-                running_distance_percentage = (running_distance_travelled / mDistanceAverage) * 100;
-                // To calculate biking calories percentage in total calories
-                double biking_distance_travelled = 0;
-                //biking_calories_expended = 200;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                        biking_distance_travelled = fitnessActivity.getDistance();
-                        break;
+                    //running_calories_expended = 60;
+                    Log.i("running distance", running_distance_travelled + "");
+                    running_distance_percentage = (running_distance_travelled / mDistanceAverage) * 100;
+                    // To calculate biking calories percentage in total calories
+                    double biking_distance_travelled = 0;
+                    //biking_calories_expended = 200;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                            biking_distance_travelled = fitnessActivity.getDistance();
+                            break;
+                        }
                     }
-                }
-                //biking_calories_expended = 10;
-                Log.i("biking distance", biking_distance_travelled + "");
-                biking_distance_percentage = (biking_distance_travelled / mDistanceAverage) * 100;
-                // To update decoview
-                //walking_distance_percentage = 0 ; running_distance_percentage = 20; biking_distance_percentage = 10;
-                updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
-                break;
-            case 2: // Steps
-                Log.i("steps average", mStepsAverage + "");
-                double walking_steps_percentage = 0, running_steps_percentage = 0, biking_steps_percentage = 0;
-                double walking_steps_taken = 0;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
-                        walking_steps_taken = fitnessActivity.getStep_count();
-                        break;
+                    //biking_calories_expended = 10;
+                    Log.i("biking distance", biking_distance_travelled + "");
+                    biking_distance_percentage = (biking_distance_travelled / mDistanceAverage) * 100;
+                    // To update decoview
+                    //walking_distance_percentage = 0 ; running_distance_percentage = 20; biking_distance_percentage = 10;
+                    updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
+                    break;
+                case 2: // Steps
+                    Log.i("steps average", mStepsAverage + "");
+                    double walking_steps_percentage = 0, running_steps_percentage = 0, biking_steps_percentage = 0;
+                    double walking_steps_taken = 0;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.WALKING)) {
+                            walking_steps_taken = fitnessActivity.getStep_count();
+                            break;
+                        }
                     }
-                }
-                //walking_calories_expended = 100;
-                Log.i("walking distance", walking_steps_taken + "");
-                walking_steps_percentage = (walking_steps_taken / mStepsAverage) * 100;
-                // To calculate running calories percentage in total calories
-                double running_steps_taken = 0;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
-                        running_steps_taken = fitnessActivity.getStep_count();
-                        break;
+                    //walking_calories_expended = 100;
+                    Log.i("walking distance", walking_steps_taken + "");
+                    walking_steps_percentage = (walking_steps_taken / mStepsAverage) * 100;
+                    // To calculate running calories percentage in total calories
+                    double running_steps_taken = 0;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.RUNNING)) {
+                            running_steps_taken = fitnessActivity.getStep_count();
+                            break;
+                        }
                     }
-                }
-                //running_calories_expended = 60;
-                Log.i("running distance", running_steps_taken + "");
-                running_steps_percentage = (running_steps_taken / mStepsAverage) * 100;
-                // To calculate biking calories percentage in total calories
-                double biking_steps_taken = 0;
-                //biking_calories_expended = 200;
-                for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
-                    if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
-                        biking_steps_taken = fitnessActivity.getStep_count();
-                        break;
+                    //running_calories_expended = 60;
+                    Log.i("running distance", running_steps_taken + "");
+                    running_steps_percentage = (running_steps_taken / mStepsAverage) * 100;
+                    // To calculate biking calories percentage in total calories
+                    double biking_steps_taken = 0;
+                    //biking_calories_expended = 200;
+                    for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
+                        if (fitnessActivity.getName().equalsIgnoreCase(FitnessActivities.BIKING)) {
+                            biking_steps_taken = fitnessActivity.getStep_count();
+                            break;
+                        }
                     }
-                }
-                //biking_calories_expended = 10;
-                Log.i("biking distance", biking_steps_taken + "");
-                biking_steps_percentage = (biking_steps_taken / mStepsAverage) * 100;
-                //walking_steps_percentage = 10 ; running_steps_percentage = 80; biking_steps_percentage = 0;
-                // To update decoview
-                updateProgressBar(walking_steps_percentage, running_steps_percentage, biking_steps_percentage);
-                break;
-            case 3: // Point
-                Log.i("steps average", mPointsAverage + "");
-                double today_points_percentage = 0;
-                double today_points = 0;
-                if (mWeeklyPointsList != null && mWeeklyPointsList.size() > 0) {
-                    today_points = mWeeklyPointsList.get(mWeeklyPointsList.size() - 1);
-                }
-                //walking_calories_expended = 100;
-                Log.i("today points", today_points + "");
-                today_points_percentage = (today_points / mPointsAverage) * 100;
-                // To update decoview
-                //today_points_percentage = 20 ;
-                updateProgressBar(today_points_percentage, 0, 0);
-                break;
-            default:
-                break;
+                    //biking_calories_expended = 10;
+                    Log.i("biking distance", biking_steps_taken + "");
+                    biking_steps_percentage = (biking_steps_taken / mStepsAverage) * 100;
+                    //walking_steps_percentage = 10 ; running_steps_percentage = 80; biking_steps_percentage = 0;
+                    // To update decoview
+                    updateProgressBar(walking_steps_percentage, running_steps_percentage, biking_steps_percentage);
+                    break;
+                case 3: // Point
+                    Log.i("steps average", mPointsAverage + "");
+                    double today_points_percentage = 0;
+                    double today_points = 0;
+                    if (mWeeklyPointsList != null && mWeeklyPointsList.size() > 0) {
+                        today_points = mWeeklyPointsList.get(mWeeklyPointsList.size() - 1);
+                    }
+                    //walking_calories_expended = 100;
+                    Log.i("today points", today_points + "");
+                    today_points_percentage = (today_points / mPointsAverage) * 100;
+                    // To update decoview
+                    //today_points_percentage = 20 ;
+                    updateProgressBar(today_points_percentage, 0, 0);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

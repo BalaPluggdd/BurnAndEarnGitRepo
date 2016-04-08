@@ -148,20 +148,19 @@ public class OffersAndRewardsFragment extends Fragment {
                                     businessDetails.setAddress(business_object.optString("Address"));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
+                                    businessDetails.setOfferLogo(business_object.optString("offerimage"));
                                     mBusinessOfferList.add(businessDetails);
                                 }
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.VISIBLE);
                                 mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,mPageFlag));
-
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.VISIBLE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
                                 /*if(!isDetached())
                                     Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();*/
-
                             }
 
                         } else {
@@ -202,7 +201,7 @@ public class OffersAndRewardsFragment extends Fragment {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 if(mPageFlag.equalsIgnoreCase(getString(R.string.my_offers)) || mPageFlag.equalsIgnoreCase(getString(R.string.my_offers_inactive)))
-                    params.put("userId", new PreferencesManager(getContext()).getStringValue(getString(R.string.user_id)));
+                    params.put("userId", new PreferencesManager(mContext).getStringValue(getString(R.string.user_id)));
                 params.put("flag", String.valueOf(mFlag));
                 return params;
             }

@@ -5,7 +5,7 @@ package com.pluggdd.burnandearn.model;
  */
 public class BusinessDetails {
 
-    private String name,offer_name,logo,promo,how_to_reedem,terms_and_conditions,url,coupon,coupon_expiry_date,address;
+    private String name,offer_name,logo,offerLogo,promo,how_to_reedem,terms_and_conditions,url,coupon,coupon_expiry_date,address;
     private int id,points_needed,phone_number;
 
     public String getName() {
@@ -110,5 +110,13 @@ public class BusinessDetails {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getOfferLogo() {
+        return offerLogo;
+    }
+
+    public void setOfferLogo(String offerLogo) {
+        this.offerLogo = offerLogo;
     }
 }

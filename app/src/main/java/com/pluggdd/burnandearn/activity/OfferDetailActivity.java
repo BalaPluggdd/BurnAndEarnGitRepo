@@ -3,6 +3,7 @@ package com.pluggdd.burnandearn.activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.model.BusinessDetails;
+import com.pluggdd.burnandearn.utils.CustomCountDownTimer;
 import com.pluggdd.burnandearn.utils.HeaderView;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
@@ -37,6 +39,8 @@ import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.view.adapter.OfferRewardsAdapter;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,20 +50,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class OfferDetailActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener{
+public class OfferDetailActivity extends AppCompatActivity{
 
     private Toolbar mToolBar;
-    private AppBarLayout mAppBarLayout;
-    private CollapsingToolbarLayout collapsingToolbarLayout;
-    private HeaderView toolbarHeaderView,floatHeaderView;
-    private TextView mHeaderTitle,mHeaderSubTitle;
-    private boolean isHideToolbarView = false;
-    private ImageView mBusinessLogo;
-    private TextView mOfferPromoText,mHowToRedeemText;
-    private ProgressBar mLogoProgressBar;
+    private ImageView mBusinessLogo,mOfferImage;
+    private TextView mOfferPromoText,mPointsNeededText,mBusinessTitleText,mBusinessAddressText,mWebsiteText,mExpirationDateText,mDaysText,mHoursText,mMinutesText,mTermsAndConditionsText,mPhoneImage,mLocationImage;
+    private ProgressBar mLogoProgressBar,mOfferImageProgressBar;
     private Button mRedeemButton;
     private Bundle mExtra;
-    private int mBusinesId;
+    private int mBusinesId,mPhoneNumber;
+    private String mAddress;
     private PreferencesManager mPreferenceManager;
 
     @Override
@@ -67,38 +67,96 @@ public class OfferDetailActivity extends AppCompatActivity implements AppBarLayo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offer_detail);
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_container);
-        toolbarHeaderView = (HeaderView) findViewById(R.id.toolbar_header_view);
-        floatHeaderView = (HeaderView) findViewById(R.id.float_header_view);
-        mHeaderTitle = (TextView) toolbarHeaderView.findViewById(R.id.header_view_title);
-        mHeaderSubTitle = (TextView) toolbarHeaderView.findViewById(R.id.header_view_sub_title);
-        mBusinessLogo = (ImageView) findViewById(R.id.img_business_logo);
-        mOfferPromoText = (TextView) findViewById(R.id.txt_offer_promo);
-        mHowToRedeemText = (TextView) findViewById(R.id.txt_how_to_redeem);
-        mLogoProgressBar = (ProgressBar) findViewById(R.id.logo_progress_bar);
-        mRedeemButton = (Button) findViewById(R.id.btn_redeem_now);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        collapsingToolbarLayout.setTitle(" ");
-        mAppBarLayout.addOnOffsetChangedListener(this);
+        mBusinessLogo = (ImageView) findViewById(R.id.img_business_logo);
+        mOfferImage = (ImageView) findViewById(R.id.img_offer_image);
+        mOfferPromoText = (TextView) findViewById(R.id.txt_offer_promo);
+        mPointsNeededText = (TextView) findViewById(R.id.txt_points_needed);
+        mBusinessTitleText = (TextView) findViewById(R.id.txt_business_title);
+        mBusinessAddressText = (TextView) findViewById(R.id.txt_business_address);
+        mWebsiteText = (TextView) findViewById(R.id.txt_business_website);
+        mExpirationDateText = (TextView) findViewById(R.id.txt_valid_till);
+        mPhoneImage = (TextView) findViewById(R.id.img_phone);
+        mLocationImage = (TextView) findViewById(R.id.img_location);
+        mDaysText = (TextView) findViewById(R.id.txt_days);
+        mHoursText = (TextView) findViewById(R.id.txt_hours);
+        mMinutesText = (TextView) findViewById(R.id.txt_minutes);
+        mTermsAndConditionsText = (TextView) findViewById(R.id.txt_terms_and_conditions);
+        mLogoProgressBar = (ProgressBar) findViewById(R.id.logo_progress_bar);
+        mOfferImageProgressBar = (ProgressBar) findViewById(R.id.offer_image_progress_bar);
+        mRedeemButton = (Button) findViewById(R.id.btn_redeem);
         mPreferenceManager = new PreferencesManager(this);
         mExtra = getIntent().getExtras();
         new PicassoImageLoaderHelper(this,mBusinessLogo,mLogoProgressBar).loadImage(mExtra.getString(getString(R.string.logo_url), ""));
+        new PicassoImageLoaderHelper(this,mOfferImage,mOfferImageProgressBar).loadImage(mExtra.getString(getString(R.string.offer_image_url), ""));
         mBusinesId = mExtra.getInt(getString(R.string.business_id));
-        toolbarHeaderView.bindTo(mExtra.getString(getString(R.string.business_name), ""), mExtra.getString(getString(R.string.offer_name), ""));
-        floatHeaderView.bindTo(mExtra.getString(getString(R.string.business_name), ""), mExtra.getString(getString(R.string.offer_name), ""));
-        mOfferPromoText.setText(mExtra.getString(getString(R.string.offer_promo), ""));
-        mHowToRedeemText.setText(mExtra.getString(getString(R.string.how_to_redeem), ""));
+        mBusinessTitleText.setText(mExtra.getString(getString(R.string.business_name), ""));
+        mOfferPromoText.setText(mExtra.getString(getString(R.string.offer_name), ""));
+        mPointsNeededText.setText(String.valueOf(mExtra.getInt(getString(R.string.points_needed), 0)));
+        mAddress = mExtra.getString(getString(R.string.address), "");
+        mBusinessAddressText.setText(mAddress);
+        mWebsiteText.setText(mExtra.getString(getString(R.string.website,"")));
+        String expiration_date = mExtra.getString(getString(R.string.expire_date), "");
+        LocalDateTime expirationDateTime = new LocalDateTime(expiration_date);
+        mExpirationDateText.setText(expirationDateTime.toString("MMM dd,YYYY"));
+        mPhoneNumber = mExtra.getInt(getString(R.string.phone_number));
+        mTermsAndConditionsText.setText(mExtra.getString(getString(R.string.terms_and_conditions)));
+        long date_difference = expirationDateTime.plusDays(1).toDateTime().getMillis() - new LocalDateTime().toDateTime().getMillis();
+        new CustomCountDownTimer(mDaysText,mHoursText,mMinutesText,date_difference,1000).start();
 
-        mRedeemButton.setOnClickListener(new View.OnClickListener() {
+        mPhoneImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addMyOffer();
+                try {
+                    String uri = "tel:" + mPhoneNumber;
+                    Intent mCallIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(uri));
+                    startActivity(mCallIntent);
+                } catch (Exception e) {
+                    Toast.makeText(OfferDetailActivity.this, "Your call has failed...", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        mLocationImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Uri locationUri = Uri.parse("geo:0,0?q=" +mAddress);
+                    Intent mMapIntent = new Intent(Intent.ACTION_VIEW, locationUri);
+                    mMapIntent.setPackage("com.google.android.apps.maps");
+                    startActivity(mMapIntent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(OfferDetailActivity.this, "Maps not available...", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
 
+        mRedeemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //addMyOffer();
+                AlertDialog.Builder mConfirmDialog = new AlertDialog.Builder(OfferDetailActivity.this,R.style.AlertDialogStyle);
+                mConfirmDialog.setMessage(getString(R.string.confirm_redeem_dialog_content)+" '"+mOfferPromoText.getText().toString() +"' at" + mBusinessTitleText.getText().toString());
+                mConfirmDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                       dialog.dismiss();
+                    }
+                });
+                mConfirmDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                mConfirmDialog.show();
+
+            }
+        });
     }
 
     private void showCouponDialog() {
@@ -141,28 +199,11 @@ public class OfferDetailActivity extends AppCompatActivity implements AppBarLayo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
-            finish();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
 
-    }
-
-    @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-        int maxScroll = appBarLayout.getTotalScrollRange();
-        float percentage = (float) Math.abs(offset) / (float) maxScroll;
-
-        if (percentage == 1f && isHideToolbarView) {
-            toolbarHeaderView.setVisibility(View.VISIBLE);
-            mHeaderTitle.setTextColor(Color.WHITE);
-            mHeaderSubTitle.setTextColor(Color.WHITE);
-            isHideToolbarView = !isHideToolbarView;
-
-        } else if (percentage < 1f && !isHideToolbarView) {
-            toolbarHeaderView.setVisibility(View.GONE);
-            isHideToolbarView = !isHideToolbarView;
-        }
     }
 
     private void addMyOffer(){
