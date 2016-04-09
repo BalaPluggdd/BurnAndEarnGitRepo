@@ -929,7 +929,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
             if(new NetworkCheck().ConnectivityCheck(mContext)){
-                getPointsList();
+                if(mFitnessHistoryList != null && mFitnessHistoryList.size() >0){
+                    getPointsList();
+                }else{
+                    updateUI();
+                    Snackbar.make(mView,getString(R.string.no_google_fit_data),Snackbar.LENGTH_SHORT).show();
+                }
             }else{
                 updateUI();
                 Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
@@ -1392,8 +1397,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private void getPointsList() {
         if (isAdded()) {
             mWeeklyPointsList = new ArrayList<>();
-            RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-            mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.POINTS_LIST, new Response.Listener<String>() {
+            VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+            RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+            Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.POINTS_LIST, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("response", response);
@@ -1446,8 +1452,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                                 }
 
                             }
-
-
                         } catch (JSONException e) {
                             if (!isDetached()) {
                                 updateUI();
@@ -1506,7 +1510,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     params.put("jsonrequest", json_request);
                     return params;
                 }
-            }));
+            });
+            volleyrequest.setRequestPolicy(request);
+            mRequestQueue.add(request);
         }
 
     }

@@ -81,7 +81,7 @@ public class GoogleFitHelper {
                 FitnessHistory history = getTodayFitnessDetails();
                 if(history != null)
                      fitnessHistoryList.add(history);
-            } else { // Send fitness data from last synced date to current time
+            } else if(last_calories_updated_time != -1){ // Send fitness data from last synced date to current time
                 List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
                 LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
                 LocalDateTime currentDateTime = new LocalDateTime();

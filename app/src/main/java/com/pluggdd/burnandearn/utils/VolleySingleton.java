@@ -3,7 +3,10 @@ package com.pluggdd.burnandearn.utils;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
@@ -19,7 +22,8 @@ public class VolleySingleton {
 
     private VolleySingleton(){
        mVolleyRequestQueque = Volley.newRequestQueue(BurnAndEarnApplication.getAppcontext());
-        mVolleyImageLoader = new ImageLoader(mVolleyRequestQueque, new ImageLoader.ImageCache() {
+
+       mVolleyImageLoader = new ImageLoader(mVolleyRequestQueque, new ImageLoader.ImageCache() {
 
             LruCache<String,Bitmap> cache = new LruCache<>((int)Runtime.getRuntime().maxMemory()/1024/8);
 
@@ -39,6 +43,12 @@ public class VolleySingleton {
         if(mVolleySingleTon == null)
                 mVolleySingleTon = new VolleySingleton();
         return  mVolleySingleTon;
+    }
+
+    public void setRequestPolicy(Request request){
+        int socketTimeout = 30000;//30 seconds
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        request.setRetryPolicy(policy);
     }
 
     public RequestQueue getRequestQueue(){

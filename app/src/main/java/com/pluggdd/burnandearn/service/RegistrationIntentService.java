@@ -72,8 +72,9 @@ public class RegistrationIntentService extends IntentService {
 
 
     private void updateGCMRegToken() {
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.UPDATE_GCM_REG_TOKEN, new Response.Listener<String>() {
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.UPDATE_GCM_REG_TOKEN, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("update gcm response", response);
@@ -105,7 +106,8 @@ public class RegistrationIntentService extends IntentService {
                 params.put("deviceType", String.valueOf(0));
                 return params;
             }
-        }));
-
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 }

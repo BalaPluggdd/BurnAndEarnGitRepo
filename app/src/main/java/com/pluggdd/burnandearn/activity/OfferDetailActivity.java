@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +19,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +36,7 @@ import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.utils.CustomCountDownTimer;
 import com.pluggdd.burnandearn.utils.HeaderView;
+import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
@@ -54,6 +58,7 @@ public class OfferDetailActivity extends AppCompatActivity{
 
     private Toolbar mToolBar;
     private ImageView mBusinessLogo,mOfferImage;
+    private LinearLayout mBurnAndLogoContainer,mPointsNeededContainer,mDaysEndsInContainer;
     private TextView mOfferPromoText,mPointsNeededText,mBusinessTitleText,mBusinessAddressText,mWebsiteText,mExpirationDateText,mDaysText,mHoursText,mMinutesText,mTermsAndConditionsText,mPhoneImage,mLocationImage;
     private ProgressBar mLogoProgressBar,mOfferImageProgressBar;
     private Button mRedeemButton;
@@ -72,6 +77,8 @@ public class OfferDetailActivity extends AppCompatActivity{
         mBusinessLogo = (ImageView) findViewById(R.id.img_business_logo);
         mOfferImage = (ImageView) findViewById(R.id.img_offer_image);
         mOfferPromoText = (TextView) findViewById(R.id.txt_offer_promo);
+        mBurnAndLogoContainer = (LinearLayout) findViewById(R.id.burn_and_logo_container);
+        mPointsNeededContainer = (LinearLayout) findViewById(R.id.points_needed_container);
         mPointsNeededText = (TextView) findViewById(R.id.txt_points_needed);
         mBusinessTitleText = (TextView) findViewById(R.id.txt_business_title);
         mBusinessAddressText = (TextView) findViewById(R.id.txt_business_address);
@@ -79,6 +86,7 @@ public class OfferDetailActivity extends AppCompatActivity{
         mExpirationDateText = (TextView) findViewById(R.id.txt_valid_till);
         mPhoneImage = (TextView) findViewById(R.id.img_phone);
         mLocationImage = (TextView) findViewById(R.id.img_location);
+        mDaysEndsInContainer = (LinearLayout) findViewById(R.id.txt_countdown_container);
         mDaysText = (TextView) findViewById(R.id.txt_days);
         mHoursText = (TextView) findViewById(R.id.txt_hours);
         mMinutesText = (TextView) findViewById(R.id.txt_minutes);
@@ -91,6 +99,7 @@ public class OfferDetailActivity extends AppCompatActivity{
         new PicassoImageLoaderHelper(this,mBusinessLogo,mLogoProgressBar).loadImage(mExtra.getString(getString(R.string.logo_url), ""));
         new PicassoImageLoaderHelper(this,mOfferImage,mOfferImageProgressBar).loadImage(mExtra.getString(getString(R.string.offer_image_url), ""));
         mBusinesId = mExtra.getInt(getString(R.string.business_id));
+        getSupportActionBar().setTitle(mExtra.getString(getString(R.string.offer_name), "Burn And Offer"));
         mBusinessTitleText.setText(mExtra.getString(getString(R.string.business_name), ""));
         mOfferPromoText.setText(mExtra.getString(getString(R.string.offer_name), ""));
         mPointsNeededText.setText(String.valueOf(mExtra.getInt(getString(R.string.points_needed), 0)));
@@ -103,7 +112,8 @@ public class OfferDetailActivity extends AppCompatActivity{
         mPhoneNumber = mExtra.getInt(getString(R.string.phone_number));
         mTermsAndConditionsText.setText(mExtra.getString(getString(R.string.terms_and_conditions)));
         long date_difference = expirationDateTime.plusDays(1).toDateTime().getMillis() - new LocalDateTime().toDateTime().getMillis();
-        new CustomCountDownTimer(mDaysText,mHoursText,mMinutesText,date_difference,1000).start();
+        //date_difference = new LocalDateTime().plusMinutes(1).toDateTime().getMillis() - new LocalDateTime().toDateTime().getMillis();
+        new CustomCountDownTimer(OfferDetailActivity.this,mDaysEndsInContainer,mDaysText,mHoursText,mMinutesText,null,mRedeemButton,null,expiration_date,"offer_detail",date_difference,1000).start();
 
         mPhoneImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,21 +149,32 @@ public class OfferDetailActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 //addMyOffer();
-                AlertDialog.Builder mConfirmDialog = new AlertDialog.Builder(OfferDetailActivity.this,R.style.AlertDialogStyle);
-                mConfirmDialog.setMessage(getString(R.string.confirm_redeem_dialog_content)+" '"+mOfferPromoText.getText().toString() +"' at" + mBusinessTitleText.getText().toString());
-                mConfirmDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                       dialog.dismiss();
-                    }
-                });
-                mConfirmDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                mConfirmDialog.show();
+                if(mRedeemButton.getText().toString().equalsIgnoreCase(getString(R.string.redeem))){
+                    AlertDialog.Builder mConfirmDialog = new AlertDialog.Builder(OfferDetailActivity.this,R.style.AlertDialogStyle);
+                    String message = getString(R.string.confirm_redeem_dialog_content)+" '"+mOfferPromoText.getText().toString().toUpperCase() +"' AT " + mBusinessTitleText.getText().toString().toUpperCase();
+                    message += "\n\n YOUR ACCOUNT SHALL BE DEDUCTED OF "+mPointsNeededText.getText().toString()+" SWEAT POINTS";
+                    mConfirmDialog.setMessage((message));
+                    mConfirmDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            if(new NetworkCheck().ConnectivityCheck(OfferDetailActivity.this)){
+                                addMyOffer();
+                            }else {
+                                Toast.makeText(OfferDetailActivity.this, getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
+                    mConfirmDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    mConfirmDialog.show();
+
+                }
 
             }
         });
@@ -211,23 +232,26 @@ public class OfferDetailActivity extends AppCompatActivity{
         progressDialog.setMessage("Adding offer please wait !!!");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.ADD_MY_OFFER, new Response.Listener<String>() {
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.ADD_MY_OFFER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
                 if (response != null) {
                     try {
-                      progressDialog.dismiss();
+                        progressDialog.dismiss();
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
-                           showCouponDialog();
+                                mBurnAndLogoContainer.setVisibility(View.VISIBLE);
+                                mPointsNeededContainer.setVisibility(View.GONE);
+                                mRedeemButton.setText("Coupon code : " + mExtra.getString(getString(R.string.coupon)));
+                            //showCouponDialog();
                         }else{
-                           Toast.makeText(OfferDetailActivity.this,responseJson.optString("msg"),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(OfferDetailActivity.this,responseJson.optString("msg"),Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-
                     }
                 }
             }
@@ -248,6 +272,8 @@ public class OfferDetailActivity extends AppCompatActivity{
                 params.put("businessid",String.valueOf(mBusinesId));
                 return params;
             }
-        }));
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 }

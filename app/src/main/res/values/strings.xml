@@ -160,5 +160,8 @@
     <string name="website">website</string>
     <string name="phone_number">phone_number</string>
     <string name="confirm_redeem_dialog_content">YOU HAVE CHOOSEN TO AVAIL THE OFFER</string>
+    <string name="no_google_fit_data">Google fit data not available please try after sometime</string>
+    <string name="show_coupon_text">SHOW THE CODE BELOW TO AVAIL</string>
+    <string name="coupon_code">COUPON CODE</string>
 
 </resources>

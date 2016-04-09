@@ -27,7 +27,7 @@ import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.view.fragment.PointsFragment;
 import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
-import com.pluggdd.burnandearn.view.fragment.TrendsFragment;
+import com.pluggdd.burnandearn.view.fragment.EarnedFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +112,7 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
         // To add Tabs
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new PointsFragment(), "BURNT");
-        adapter.addFragment(new TrendsFragment(), "EARNED");
+        adapter.addFragment(new EarnedFragment(), "EARNED");
         mTabViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mTabViewPager);
     }

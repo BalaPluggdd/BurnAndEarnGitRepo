@@ -127,8 +127,9 @@ public class ShareFragment extends Fragment {
 
     private void socialShare(final String social_flag){
         mProgressDialog.show();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.SOCIAL_SHARE, new Response.Listener<String>() {
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.SOCIAL_SHARE, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
@@ -162,6 +163,8 @@ public class ShareFragment extends Fragment {
                 params.put("social_share", social_flag);
                 return params;
             }
-        }));
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 }

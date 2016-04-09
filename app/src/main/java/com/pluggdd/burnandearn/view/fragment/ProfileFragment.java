@@ -41,9 +41,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.BuildConfig;
@@ -460,8 +462,9 @@ public class ProfileFragment extends Fragment {
 
     private void updateProfile(final ProgressDialog mLoadingProgress) {
         mLoadingProgress.show();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.LOGIN_AND_REGISTER, new Response.Listener<String>() {
+        VolleySingleton volleyRequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyRequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.LOGIN_AND_REGISTER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i(" login response", response);
@@ -532,14 +535,17 @@ public class ProfileFragment extends Fragment {
                 params.put("deviceType", String.valueOf(0));
                 return params;
             }
-        }));
+        });
+        volleyRequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 
     private void getcityList(final ProgressDialog mLoadingProgress) {
         mLoadingProgress.setMessage("Loading city please wait!!!");
         mLoadingProgress.show();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.GET, WebserviceAPI.CITY_LIST, new Response.Listener<String>() {
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.GET, WebserviceAPI.CITY_LIST, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i(" login response", response);
@@ -581,7 +587,9 @@ public class ProfileFragment extends Fragment {
                 mLoadingProgress.dismiss();
                 Snackbar.make(mView, "Unable to connect to server", Snackbar.LENGTH_SHORT).show();
             }
-        })));
+        }));
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 
     private int getSelectedUserGoal() {

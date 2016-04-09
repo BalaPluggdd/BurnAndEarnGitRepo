@@ -24,4 +24,5 @@
     <color name="walking_color">#53B6CD</color>
     <color name="running_color">#F8C900</color>
     <color name="biking_color">#B0C53C</color>
+    <color name="orange_transparent">#99FFC107</color>
 </resources>

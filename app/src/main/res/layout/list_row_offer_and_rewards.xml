@@ -11,7 +11,9 @@
     app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="1dp"
     app:cardElevation="5dp"
-    app:contentPadding="10dp">
+    app:contentPaddingRight="10dp"
+    app:contentPaddingLeft="10dp"
+    app:contentPaddingTop="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +30,6 @@
                 android:layout_height="@dimen/offer_image_height"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/restaurant"
                 android:transitionName="@string/activity_image_transition"
                 android:contentDescription="@string/no_image"/>
 
@@ -117,7 +118,8 @@
             android:id="@+id/bottom_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp">
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp">
 
             <com.pluggdd.burnandearn.font.FontelloTextView
                 android:id="@+id/img_clock"
@@ -129,6 +131,7 @@
                 android:textSize="36sp" />
 
             <LinearLayout
+                android:id="@+id/days_ends_in_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -239,12 +242,41 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_redeem"
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_coupon_expired"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/img_clock"
+                android:textColor="@color/secondary_text"
+                android:textSize="18sp"
+                android:visibility="gone"/>
+
+
+           <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_coupon_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/coupon_code"
+                android:textColor="@color/secondary_text"
+                android:textSize="10sp"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/btn_redeem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:background="@color/orange"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:minHeight="30dp"
@@ -254,6 +286,7 @@
                 android:paddingTop="5dp"
                 android:text="@string/redeem"
                 android:textSize="18sp" />
+            </LinearLayout>
 
         </RelativeLayout>
     </LinearLayout>

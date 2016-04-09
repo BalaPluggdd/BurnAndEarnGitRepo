@@ -36,11 +36,13 @@ public class BusinessOfferAdapter extends RecyclerView.Adapter<BusinessOfferAdap
     private ArrayList<BusinessDetails> mBusinessOfferList;
 
 
+/*
     public BusinessOfferAdapter(Context context, ArrayList<BusinessDetails> mBusinessList) {
         mContext = context;
         mBusinessOfferList = mBusinessList;
 
     }
+*/
 
     @Override
     public BusinessOfferViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

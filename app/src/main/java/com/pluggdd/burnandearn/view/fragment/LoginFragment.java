@@ -436,8 +436,9 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
 
     private void signUp(final ProgressDialog mLoadingProgress, final String social_login, final String firstName, final String lastName, final String email, final String facebook_id/*, final String image_data*/) {
         mLoadingProgress.show();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.USER_CREATE, new Response.Listener<String>() {
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.USER_CREATE, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
@@ -477,7 +478,9 @@ public class LoginFragment extends Fragment implements GoogleApiClient.Connectio
                 //params.put("image", image_data);
                 return params;
             }
-        }));
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 
     private boolean isPackageInstalled(String packagename) {

@@ -85,7 +85,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TrendsFragment extends Fragment {
+public class EarnedFragment extends Fragment {
 
     public static final int REQUEST_CODE_RESOLUTION = 1000, REQUEST_BOTH_PERMISSION_CODE = 1001;
     private Context mContext;
@@ -101,7 +101,7 @@ public class TrendsFragment extends Fragment {
     private ArrayList<BusinessDetails> mBusinesOfferList;
 
 
-    public TrendsFragment() {
+    public EarnedFragment() {
         // Required empty public constructor
     }
 
@@ -437,8 +437,9 @@ public class TrendsFragment extends Fragment {
 
     private void getBusinessList() {
         mBusinesOfferList = new ArrayList<>();
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
-        mRequestQueue.add((new StringRequest(Request.Method.POST, WebserviceAPI.BUSINESS_OFFER_LIST, new Response.Listener<String>() {
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.BUSINESS_OFFER_LIST, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
@@ -473,13 +474,13 @@ public class TrendsFragment extends Fragment {
                                     businessDetails.setAddress(business_object.optString("Address"));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
-                                    businessDetails.setOffer_name(business_object.optString("offerimage"));
+                                    businessDetails.setOfferLogo(business_object.optString("offerimage"));
                                     mBusinesOfferList.add(businessDetails);
                                 }
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mBusinessOfferRecyclerView.setVisibility(View.VISIBLE);
-                                mBusinessOfferRecyclerView.setAdapter(new BusinessOfferAdapter(getActivity(), mBusinesOfferList));
+                                mBusinessOfferRecyclerView.setAdapter(new OfferRewardsAdapter(mContext,mBusinesOfferList,"offer_earned"));
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.VISIBLE);
@@ -554,8 +555,8 @@ public class TrendsFragment extends Fragment {
                 params.put("jsonrequest", json_request);
                 return params;
             }
-        }));
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
-
-
 }

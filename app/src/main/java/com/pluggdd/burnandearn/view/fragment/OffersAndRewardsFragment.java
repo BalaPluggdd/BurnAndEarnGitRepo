@@ -114,14 +114,14 @@ public class OffersAndRewardsFragment extends Fragment {
     }
 
     private void getBusinessOfferList(){
-        RequestQueue mRequestQueue = VolleySingleton.getSingletonInstance().getRequestQueue();
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
          String url;
          if(mPageFlag.equalsIgnoreCase(getString(R.string.my_offers)) || mPageFlag.equalsIgnoreCase(getString(R.string.my_offers_inactive)))
              url = WebserviceAPI.MY_OFFERS;
          else
              url = WebserviceAPI.ALL_BUSINESS_OFFER_LIST;
-
-        mRequestQueue.add((new StringRequest(Request.Method.POST,url, new Response.Listener<String>() {
+        Request request = (new StringRequest(Request.Method.POST,url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("response", response);
@@ -205,7 +205,9 @@ public class OffersAndRewardsFragment extends Fragment {
                 params.put("flag", String.valueOf(mFlag));
                 return params;
             }
-        }));
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 
 }
