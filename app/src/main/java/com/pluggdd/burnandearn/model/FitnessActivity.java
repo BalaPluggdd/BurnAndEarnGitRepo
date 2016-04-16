@@ -5,7 +5,7 @@ package com.pluggdd.burnandearn.model;
  */
 public class FitnessActivity {
 
-    private String name;
+    private String name,source,startDate,endDate;
     private int step_count=-1;
     private double distance=-1,calories_expended=-1,calories_percentage,distance_percentage,steps_percentage;
 
@@ -66,5 +66,29 @@ public class FitnessActivity {
 
     public void setSteps_percentage(double steps_percentage) {
         this.steps_percentage = steps_percentage;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 }

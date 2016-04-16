@@ -79,7 +79,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
         </activity>
-
         <activity
             android:name=".activity.MyOffersActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -90,8 +89,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
         </activity>
-
-
         <activity
             android:name=".activity.ShareActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -131,6 +128,21 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity" />
+        </activity>
+
+        <activity android:name=".activity.FitBitActivity"
+            android:label="@string/action_fitbit"
+            android:parentActivityName=".activity.BurnAndEarnMainActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="burnandearn" />
+            </intent-filter>
+
         </activity>
 
         <receiver

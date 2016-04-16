@@ -2,6 +2,7 @@ package com.pluggdd.burnandearn.view.fragment;
 
 import android.Manifest;
 
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -63,11 +64,15 @@ import com.hookedonplay.decoviewlib.charts.SeriesItem;
 import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.activity.FitBitActivity;
 import com.pluggdd.burnandearn.activity.OfferDetailActivity;
 import com.pluggdd.burnandearn.activity.ShareActivity;
 import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
+import com.pluggdd.burnandearn.utils.FitBitApi;
+import com.pluggdd.burnandearn.utils.FitBitHelper;
+import com.pluggdd.burnandearn.utils.FitnessSource;
 import com.pluggdd.burnandearn.utils.GoogleFitHelper;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
@@ -81,6 +86,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.model.Token;
+import org.scribe.model.Verifier;
+import org.scribe.oauth.OAuthService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,7 +101,7 @@ import java.util.Map;
  */
 public class PointsFragment extends Fragment implements View.OnClickListener {
     // Initialization of views and variables
-    private final int REQUEST_CODE_RESOLUTION = 100, REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE = 101, REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE = 102, REQUEST_BOTH_PERMISSION_CODE = 103;
+    private final int REQUEST_CODE_RESOLUTION = 100, REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE = 101, REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE = 102, REQUEST_BOTH_PERMISSION_CODE = 103, REQUEST_FITBIT_API = 104;
     private View mView;
     private DecoView mCircularProgressDecoView;
     private ViewPager mActivitiesViewPager;
@@ -103,6 +112,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private BarChart mBarChart;
     private Context mContext;
     private GoogleApiClient mGoogleAPIClient;
+    private OAuthService mOAuthSevice;
     private int mTotalStepCount = 0, mStepsAverage = 0, mPointsAverage = 0;
     private double mTotalCaloriesExpended = 0, mCaloriesAverage = 0, mTotalDistanceTravelled = 0, mDistanceAverage = 0;
     private int mBackIndex, mWalkingActivityIndex, mRunningActivityIndex, mBikingActivityIndex, mTotalPointEarned;
@@ -112,6 +122,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private String mFitnessEmail = "", mCurrentFitnessActivity;
     private CustomPagerAdapter mActivitiesPagerAdapter;
     private GoogleFitHelper mGoogleFitHelper;
+    private FitBitHelper mFitBitHelper;
     private ArrayList<FitnessHistory> mFitnessHistoryList = new ArrayList<>();
     private ArrayList<FitnessHistory> mWeekFitnessHistoryList = new ArrayList<>();
     private ArrayList<Integer> mWeeklyPointsList = new ArrayList<>();
@@ -140,7 +151,8 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         mBarChart = (BarChart) mView.findViewById(R.id.bar_chart);
         mPreferenceManager = new PreferencesManager(mContext);
         mActivitiesViewPager.setOffscreenPageLimit(1);
-        checkAndBuildGoogleApiClient();
+        // Check and set selected fitness source ( Google Fit or FitBit)
+        setFitnessSource();
         initializeActivitiesBarChart();
         // Initial set up for circular decoview
         createBackgroundSeries();
@@ -198,6 +210,57 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             }
         });
         return mView;
+    }
+
+    private void setFitnessSource() {
+        int selected_fitness_source = mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source));
+        switch (selected_fitness_source){
+            case 0: // Not selected
+                showSelectFitnessSourceDialog();
+                break;
+            case 1: // Google Fit
+                checkAndBuildGoogleApiClient();
+                break;
+            case 2: // Fit Bit
+                if(mPreferenceManager.getBooleanValue(getString(R.string.is_fitbit_authenticated))){
+                    checkAndBuildFitBitApiClient();
+                    new FitnessDataAsync().execute();
+                }else{
+                    startActivityForResult(new Intent(mContext, FitBitActivity.class),REQUEST_FITBIT_API);
+                }
+                break;
+        }
+    }
+
+
+    private void showSelectFitnessSourceDialog() {
+        final Dialog dialog = new Dialog(mContext);
+        dialog.setContentView(R.layout.dialog_select_fitness_source);
+        ImageView googleFit = (ImageView) dialog.findViewById(R.id.img_google_fit);
+        ImageView fitbit = (ImageView) dialog.findViewById(R.id.img_fitbit);
+
+        googleFit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              dialog.dismiss();
+              mPreferenceManager.setIntValue(getString(R.string.selected_fitness_source), FitnessSource.GOOGLE_FIT.getId());
+              checkAndBuildGoogleApiClient();
+                if(mGoogleAPIClient != null)
+                    mGoogleAPIClient.connect();
+                else
+                    Snackbar.make(mView,getString(R.string.no_google_fit_data),Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        fitbit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                mPreferenceManager.setIntValue(getString(R.string.selected_fitness_source), FitnessSource.FITBIT.getId());
+                startActivityForResult(new Intent(mContext, FitBitActivity.class),REQUEST_FITBIT_API);
+            }
+        });
+        dialog.show();
     }
 
     private void initializeActivitiesBarChart() {
@@ -621,8 +684,22 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == getActivity().RESULT_OK && requestCode == REQUEST_CODE_RESOLUTION) {
-            mGoogleAPIClient.connect();
+        if (resultCode == getActivity().RESULT_OK) {
+            switch (requestCode){
+                case REQUEST_CODE_RESOLUTION :
+                    mGoogleAPIClient.connect();
+                    break;
+                case REQUEST_FITBIT_API :
+                    if(new NetworkCheck().ConnectivityCheck(mContext)){
+                        checkAndBuildFitBitApiClient();
+                        String auth_token = data.getExtras().getString(getString(R.string.auth_token));
+                        new FitBitAPIAsync().execute(auth_token);
+                    }else{
+                        // Hide progress bar
+                        Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
         }
     }
 
@@ -635,7 +712,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (mGoogleAPIClient == null) {
+        if (mGoogleAPIClient == null && (mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId())) {
             if (checkLocationPermissions() && checkGetAccountsPermissions()) {
                 buildGoogleFitnessClient();
             } else if (mIsPermissionRequestRaised) {
@@ -824,7 +901,11 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
         @Override
         protected String doInBackground(Long... params) {
-            mWeekFitnessHistoryList = mGoogleFitHelper.getLastWeekData();
+            if(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                mWeekFitnessHistoryList = mGoogleFitHelper.getLastWeekData();
+            }else{
+                mWeekFitnessHistoryList = mFitBitHelper.getLastWeekData();
+            }
             /*List<LocalDateTime> dates = new ArrayList<>();
             LocalDateTime StartDate = new LocalDateTime().minusDays(7).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             int days = Days.daysBetween(StartDate, new LocalDateTime()).getDays();
@@ -844,7 +925,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            new BusinessListAsync().execute();
+             new BusinessListAsync().execute();
             //new FitnessHistoryAsync().execute();
         }
     }
@@ -859,7 +940,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected Void doInBackground(Long... params) {
             try {
-                mFitnessHistoryList = mGoogleFitHelper.getFitnessHistoryData();
+                if(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                    mFitnessHistoryList = mGoogleFitHelper.getFitnessHistoryData();
+                }else{
+                    mFitnessHistoryList = mFitBitHelper.getFitnessHistoryData();
+                }
+
                 /*long last_calories_updated_time = mPreferenceManager.getLongValue(getString(R.string.last_updated_calories_time));
                 //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
                 //last_calories_updated_time = 1459098422000L;
@@ -1384,6 +1470,19 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    private void checkAndBuildFitBitApiClient() {
+        mOAuthSevice =  new ServiceBuilder()
+                .provider(FitBitApi.class)
+                .apiKey(getString(R.string.fit_bit_secret_key))
+                .apiSecret(getString(R.string.fit_bit_api_key))
+                .callback(getString(R.string.fit_bit_call_back_url))
+                .scope("profile activity")
+                .debug()
+                .build();
+        mFitBitHelper = new FitBitHelper(mContext,mOAuthSevice);
+
+    }
+
     private boolean addPermission(List<String> permissionsList, String permission) {
         if (ActivityCompat.checkSelfPermission(getActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
             permissionsList.add(permission);
@@ -1820,4 +1919,41 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
         return colors;
     }
+
+    class FitBitAPIAsync extends AsyncTask<String,Void,String>{
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Verifier verifier = new Verifier(params[0]);
+                Token accessToken = mOAuthSevice.getAccessToken(null,verifier);
+                if(accessToken != null){
+                    mPreferenceManager.setBooleanValue(getString(R.string.is_fitbit_authenticated),true);
+                    mPreferenceManager.setStringValue(getString(R.string.access_token),accessToken.getToken());
+                    JSONObject accessTokenObject = new JSONObject(accessToken.getRawResponse());
+                    mPreferenceManager.setStringValue(getString(R.string.refresh_token),accessTokenObject.optString("refresh_token"));
+                    Log.i("access_token"," Response :" + accessToken.getRawResponse());
+                    return "success";
+                }else
+                    return "failure";
+
+            }catch (Exception e){
+                e.printStackTrace();
+                return "failure";
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(String status) {
+            super.onPostExecute(status);
+            if(status.equalsIgnoreCase("success")){
+                new FitnessDataAsync().execute();
+            }else{
+                // Failure
+                // Hide Progress Bar
+            }
+        }
+    }
+
 }

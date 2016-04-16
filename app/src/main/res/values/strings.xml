@@ -163,5 +163,16 @@
     <string name="no_google_fit_data">Google fit data not available please try after sometime</string>
     <string name="show_coupon_text">SHOW THE CODE BELOW TO AVAIL</string>
     <string name="coupon_code">COUPON CODE</string>
+    <string name="access_token">access token</string>
+    <string name="refresh_token">refresh token</string>
+    <string name="selected_fitness_source">selected Fitness Source</string>
+    <string name="fit_bit_api_key">227QCZ</string>
+    <string name="fit_bit_secret_key">f7a522acc8f59b3548575112ad2825b1</string>
+    <string name="fit_bit_call_back_url">burnandearn://login_callback</string>
+    <string name="login_callback">fitbit_login_callback</string>
+    <string name="is_fitbit_authenticated">fitbit authentication</string>
+    <string name="action_fitbit">FitBit</string>
+    <string name="auth_token">auth token</string>
+    <string name="last_updated_fitbit_calories_time">last fitbit updated time</string>
 
 </resources>

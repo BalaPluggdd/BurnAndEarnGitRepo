@@ -1,8 +1,10 @@
 package com.pluggdd.burnandearn.utils;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 
+import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
@@ -14,13 +16,22 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.fitness.service.FitnessSensorService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.data.SqliteDatabaseHelper;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
 
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDateTime;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +45,19 @@ public class GoogleFitHelper {
     private PreferencesManager mPreferenceManager;
     private Context mContext;
     private GoogleApiClient mGoogleApiClient;
+    private SqliteDatabaseHelper mDatabaseHelper;
+    private Gson mGson;
 
     public GoogleFitHelper(Context context, GoogleApiClient googleApiClient) {
         mPreferenceManager = new PreferencesManager(context);
         mContext = context;
         mGoogleApiClient = googleApiClient;
+        mDatabaseHelper = SqliteDatabaseHelper.getInstance(context);
+        mDatabaseHelper.deleteLastWeekData(FitnessSource.GOOGLE_FIT.getId());
+        mGson = Converters.registerLocalDateTime(new GsonBuilder()).create();
     }
 
-    public ArrayList<FitnessHistory> getLastWeekData() {
+    /*public ArrayList<FitnessHistory> getLastWeekData() {
         ArrayList<FitnessHistory> fitnessHistories = new ArrayList<>();
         try {
             List<LocalDateTime> dates = new ArrayList<>();
@@ -63,6 +79,85 @@ public class GoogleFitHelper {
             FitnessHistory history = getTodayFitnessDetails();
             if(history != null)
                 fitnessHistories.add(history);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.i("Fitness History",fitnessHistories.size() + " ");
+        return fitnessHistories;
+    }*/
+
+    public ArrayList<FitnessHistory> getLastWeekData() {
+        ArrayList<FitnessHistory> fitnessHistories = new ArrayList<>();
+        try {
+            List<LocalDateTime> dates = new ArrayList<>();
+            LocalDateTime StartDate = new LocalDateTime().minusDays(6).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            int days = Days.daysBetween(StartDate, new LocalDateTime()).getDays();
+            Log.i("Days",days + " ");
+            for (int i = 0; i < days; i++) {
+                LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
+                dates.add(d);
+            }
+            dates.add(new LocalDateTime());
+            for(int i=0 ; i < dates.size() ; i++){
+                LocalDateTime date = dates.get(i);
+                LocalDateTime startDateTime = date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                String start_date = startDateTime.toString("yyyy-MM-dd'T'hh:mm:ss");
+                String endDate;
+                FitnessHistory history;
+                if(i==dates.size()-1){ // Current date
+                    endDate = date.toString("yyyy-MM-dd'T'hh:mm:ss");
+                    history = getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startDateTime.toDateTime().getMillis(), date.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDateTime, date);
+                    if(history != null){
+
+                        if(mDatabaseHelper.checkifCurrentDateActivityLogAvailable(FitnessSource.GOOGLE_FIT.getId(),start_date)){
+                            Log.i("status","update");
+                            mDatabaseHelper.updateActivityLog(FitnessSource.GOOGLE_FIT.getId(),mGson.toJson(history,FitnessHistory.class),start_date,endDate);
+                        }else{
+                            Log.i("status","insert");
+                            mDatabaseHelper.insertFitnessActivity(FitnessSource.GOOGLE_FIT.getId(),mGson.toJson(history,FitnessHistory.class),start_date,endDate);
+                        }
+                    }
+                }else{ // Previous date
+                    LocalDateTime endDateTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                    endDate = endDateTime.toString("yyyy-MM-dd'T'hh:mm:ss");
+                    if(mDatabaseHelper.checkifPreviousDateActivityLogAvailable(FitnessSource.GOOGLE_FIT.getId(),endDate)){
+                        Log.i("Date: " + endDate,"Available already");
+                    }else{
+                        Log.i("date", date.toString());
+                        history = getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(startDateTime.toDateTime().getMillis(), endDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDateTime, endDateTime);
+                        if(history != null){
+                            if(mDatabaseHelper.checkifCurrentDateActivityLogAvailable(FitnessSource.GOOGLE_FIT.getId(),start_date)){
+                                Log.i("status","update");
+                                mDatabaseHelper.updateActivityLog(FitnessSource.GOOGLE_FIT.getId(),mGson.toJson(history,FitnessHistory.class),start_date,endDate);
+                            }else{
+                                Log.i("status","insert");
+                                mDatabaseHelper.insertFitnessActivity(FitnessSource.GOOGLE_FIT.getId(),mGson.toJson(history,FitnessHistory.class),start_date,endDate);
+                            }
+                        }
+                    }
+                }
+            }
+            fitnessHistories = mDatabaseHelper.getFitnessData();
+            for(FitnessHistory activity : fitnessHistories){
+                Log.i("inserted data",activity.toString());
+            }
+
+            /////////////////////////////
+
+              //previous edited one
+           /*
+            for (LocalDateTime date : dates) {
+                LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+                Log.i("date", date.toString());
+                FitnessHistory history = getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleApiClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
+                if(history != null)
+                    fitnessHistories.add(history);
+            }
+            Log.i("Fitness History",fitnessHistories.size() + " ");
+            FitnessHistory history = getTodayFitnessDetails();
+            if(history != null)
+                fitnessHistories.add(history);*/
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -204,31 +299,7 @@ public class GoogleFitHelper {
                     fitnessActivitiesListofDay.add(activity);
                 }
             }
-            // To add not existing activity
-            if(!isWalkingDone){
-                FitnessActivity activity = new FitnessActivity();
-                activity.setName(FitnessActivities.WALKING);
-                activity.setCalories_expended(0);
-                activity.setDistance(0);
-                activity.setStep_count(0);
-                fitnessActivitiesListofDay.add(activity);
-            }
-            if(!isRunningDone){
-                FitnessActivity activity = new FitnessActivity();
-                activity.setName(FitnessActivities.RUNNING);
-                activity.setCalories_expended(0);
-                activity.setDistance(0);
-                activity.setStep_count(0);
-                fitnessActivitiesListofDay.add(activity);
-            }
-            if(!isCyclingDone){
-                FitnessActivity activity = new FitnessActivity();
-                activity.setName(FitnessActivities.BIKING);
-                activity.setCalories_expended(0);
-                activity.setDistance(0);
-                activity.setStep_count(0);
-                fitnessActivitiesListofDay.add(activity);
-            }
+            addNonWorkoutActivities(isWalkingDone,isRunningDone,isCyclingDone,fitnessActivitiesListofDay);
             history.setStartDateTime(startDateTime);
             history.setEndDateTime(endDateTime);
             history.setWalkingCaloriesBurnt(total_walking_calories_of_day);
@@ -245,4 +316,31 @@ public class GoogleFitHelper {
         return  history;
     }
 
+    private void addNonWorkoutActivities(boolean isWalkingDone, boolean isRunningDone, boolean isCyclingDone,ArrayList<FitnessActivity> fitnessActivitiesListofDay) {
+        // To add not existing activity
+        if(!isWalkingDone){
+            FitnessActivity activity = new FitnessActivity();
+            activity.setName(FitnessActivities.WALKING);
+            activity.setCalories_expended(0);
+            activity.setDistance(0);
+            activity.setStep_count(0);
+            fitnessActivitiesListofDay.add(activity);
+        }
+        if(!isRunningDone){
+            FitnessActivity activity = new FitnessActivity();
+            activity.setName(FitnessActivities.RUNNING);
+            activity.setCalories_expended(0);
+            activity.setDistance(0);
+            activity.setStep_count(0);
+            fitnessActivitiesListofDay.add(activity);
+        }
+        if(!isCyclingDone){
+            FitnessActivity activity = new FitnessActivity();
+            activity.setName(FitnessActivities.BIKING);
+            activity.setCalories_expended(0);
+            activity.setDistance(0);
+            activity.setStep_count(0);
+            fitnessActivitiesListofDay.add(activity);
+        }
+    }
 }

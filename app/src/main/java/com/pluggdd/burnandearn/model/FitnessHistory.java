@@ -17,6 +17,8 @@ public class FitnessHistory {
 
     private int walkingSteps,cyclingSteps,runningSteps;
 
+    private String source;
+
     public LocalDateTime getStartDateTime() {
         return startDateTime;
     }
@@ -119,5 +121,13 @@ public class FitnessHistory {
 
     public void setWalkingDistance(double walkingDistance) {
         this.walkingDistance = walkingDistance;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }
