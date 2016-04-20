@@ -138,7 +138,7 @@ public class SqliteDatabaseHelper extends SQLiteOpenHelper {
     public long deleteLastWeekData(int fitness_source_id){
         long delete_status;
         SQLiteDatabase database = getWritableDatabase();
-        delete_status = database.delete(TABLE_FITNESS_ACTIVITY,COLUMN_SOURCE +" = ? AND " + COLUMN_START_DATETIME +" < datetime('now', '-7 days')",new String[]{String.valueOf(fitness_source_id)});
+        delete_status = database.delete(TABLE_FITNESS_ACTIVITY,COLUMN_SOURCE +" = ? AND " + COLUMN_START_DATETIME +" < datetime('now', 'localtime','-6 days')",new String[]{String.valueOf(fitness_source_id)});
         Log.i("delete status",delete_status+"");
         return  delete_status;
     }

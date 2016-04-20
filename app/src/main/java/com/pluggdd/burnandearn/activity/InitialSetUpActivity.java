@@ -14,7 +14,9 @@ import com.pluggdd.burnandearn.view.fragment.AppIntroductionFragment;
 import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
 import com.pluggdd.burnandearn.view.fragment.LoginFragment;
 import com.pluggdd.burnandearn.view.fragment.PointsFragment;
+import com.pluggdd.burnandearn.view.fragment.RegistrationFragment;
 import com.pluggdd.burnandearn.view.fragment.ShareFragment;
+import com.pluggdd.burnandearn.view.fragment.StudentFragment;
 
 public class InitialSetUpActivity extends AppCompatActivity implements FragmentInteraction {
 
@@ -35,13 +37,13 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
         } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_goal_set))) { // If goal does n't set
             // To set translucent status bar
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            mFragmentHelper.addFragment(R.id.fragment_container, ProfileFragment.getInstance("login"));
+            mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"));
         } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_how_its_works_learned)) || getIntent().hasExtra(getString(R.string.page_flag))) { // If user logged in and does n't learned how it will work
             // To set translucent status bar
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             mFragmentHelper.addFragment(R.id.fragment_container, new AppIntroductionFragment());
         } else {
-            Intent intent = new Intent(InitialSetUpActivity.this,BurnAndEarnMainActivity.class);
+            Intent intent = new Intent(InitialSetUpActivity.this, BurnAndEarnMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
@@ -54,9 +56,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
         super.onActivityResult(requestCode, resultCode, data);
         // If received from Dashboard fragment , bypasss the callback to Dashboard Fragment's onActivityResult
         Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (mCurrentFragment instanceof LoginFragment || mCurrentFragment instanceof PointsFragment || mCurrentFragment instanceof ShareFragment) {
-            mCurrentFragment.onActivityResult(requestCode, resultCode, data);
-        }
+        mCurrentFragment.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -64,9 +64,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // If received from Dashboard fragment , bypasss the callback to Dashboard Fragment's onRequestPermissionResult
         Fragment mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (mCurrentFragment instanceof PointsFragment) {
-            mCurrentFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+        mCurrentFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -74,17 +72,16 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
         switch (extras.getString(getString(R.string.page_flag))) {
             case "LoginFragment":
                 if (extras.getString(getString(R.string.button_pressed)).equalsIgnoreCase(getString(R.string.social_login))) {
-                    mFragmentHelper.replaceFragment(R.id.fragment_container,ProfileFragment.getInstance("login"), false);
+                    mFragmentHelper.replaceFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"), false);
                 } else {
                     finish();
                 }
                 break;
-            case "ProfileFragment":
-                //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            case "RegistrationFragment":
                 mFragmentHelper.replaceFragment(R.id.fragment_container, new AppIntroductionFragment(), false);
                 break;
             case "AppIntroductionFragment":
-                Intent intent = new Intent(InitialSetUpActivity.this,BurnAndEarnMainActivity.class);
+                Intent intent = new Intent(InitialSetUpActivity.this, BurnAndEarnMainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
@@ -93,7 +90,6 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
 
         }
     }
-
 
 
 }

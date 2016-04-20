@@ -12,6 +12,29 @@
         <item> 40 - 60 </item>
         <item> Above 60 </item>
     </string-array>
+
+    <string-array name="blood_group">
+        <item>O+ve</item>
+        <item>O-ve</item>
+        <item>A+ve</item>
+        <item>A-ve</item>
+        <item>B+ve</item>
+        <item>B-ve</item>
+        <item>AB+ve</item>
+        <item>AB-ve</item>
+    </string-array>
+
+
+    <string-array name="occupation">
+        <item>Student</item>
+        <item>Homemaker</item>
+        <item>Self-Employed</item>
+        <item>Private Company</item>
+        <item>Government Service</item>
+        <item>Retired</item>
+        <item>Not Working</item>
+    </string-array>
+
     <string-array name="goal_setup">
         <item> Burn 1000 Calories</item>
         <item> Burn 2000 Calories</item>
@@ -19,4 +42,20 @@
         <item> Burn 4000 Calories</item>
         <item> Burn 5000 Calories</item>
     </string-array>
+
+    <string-array name="height_dimens">
+        <item>feet</item>
+        <item>cm</item>
+    </string-array>
+
+    <string-array name="weight_dimens">
+        <item>kg</item>
+        <item>lbs</item>
+    </string-array>
+
+    <string-array name="instution_group">
+        <item>School</item>
+        <item>College</item>
+    </string-array>
+
 </resources>

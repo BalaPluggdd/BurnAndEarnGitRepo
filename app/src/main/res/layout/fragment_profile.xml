@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:background="@drawable/ic_app_background"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
+    <!--<android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="24dp"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -21,73 +24,54 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
-                android:fitsSystemWindows="true"
-                android:orientation="vertical"
-                android:padding="10dp">
 
-                <FrameLayout
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center">
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/img_profile"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        app:layout_collapseMode="parallax" />
-
-                    <ProgressBar
-                        android:id="@+id/loading_progress_bar"
-                        style="@style/Widget.AppCompat.ProgressBar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:visibility="visible" />
-
-                </FrameLayout>
-
-                <EditText
-                    android:id="@+id/edt_first_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/colorAccent"
-                    android:gravity="center"
-                    android:hint="@string/hint_first_name"
-                    android:minWidth="200dp"
-                    android:singleLine="true"
-                    android:textColor="@android:color/white" />
-
-                <EditText
-                    android:id="@+id/edt_last_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/colorAccent"
-                    android:gravity="center"
-                    android:hint="@string/hint_last_name"
-                    android:minWidth="200dp"
-                    android:singleLine="true"
-                    android:textColor="@android:color/white" />
-
-
-            </LinearLayout>
 
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
 
-    </android.support.design.widget.AppBarLayout>
+    </android.support.design.widget.AppBarLayout>-->
+
+
+
+
+    <!--<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+
+        <EditText
+            android:id="@+id/edt_first_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/colorAccent"
+            android:gravity="center"
+            android:hint="@string/hint_first_name"
+            android:minWidth="200dp"
+            android:singleLine="true"
+            android:textColor="@android:color/white" />
+
+        <EditText
+            android:id="@+id/edt_last_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/colorAccent"
+            android:gravity="center"
+            android:hint="@string/hint_last_name"
+            android:minWidth="200dp"
+            android:singleLine="true"
+            android:textColor="@android:color/white" />
+    </LinearLayout>-->
+
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/ic_app_background"
         android:fitsSystemWindows="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -99,169 +83,394 @@
             android:paddingRight="5dp"
             tools:context="com.pluggdd.burnandearn.view.fragment.ContactUsFragment">
 
-            <!--<com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/goal_set_up_header"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />-->
+            <FrameLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/ic_grey_circle_border"
+                android:layout_gravity="center">
 
-            <com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/email"
-                android:layout_marginTop="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/img_profile"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:layout_collapseMode="parallax" />
 
+                <ProgressBar
+                    android:id="@+id/loading_progress_bar"
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:visibility="visible" />
 
-            <EditText
-                android:id="@+id/edt_email"
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:id="@+id/txt_change_profile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fontello_camera"
+                    android:layout_gravity="bottom|right"
+                    android:gravity="center"
+                    android:textSize="22sp"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/ic_green_circle"
+                    />
+
+            </FrameLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:backgroundTint="@color/colorAccent"
-                android:hint="@string/hint_email"
-                android:inputType="textEmailAddress"
-                android:textColorHint="@android:color/darker_gray"
-                android:textColor="@android:color/black" />
+                android:orientation="horizontal">
 
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:minWidth="30dp"
+                    android:text="@string/fontello_name"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="28sp" />
 
-            <com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/dob"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                <EditText
+                    android:id="@+id/edt_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:hint="@string/hint_name"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray" />
 
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/edt_dob"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:backgroundTint="@color/colorAccent"
-                android:hint="@string/hint_dob"
-                android:textColorHint="@android:color/darker_gray"
-                android:singleLine="true"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:textColor="@android:color/black" />
+                android:orientation="horizontal">
 
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:minWidth="30dp"
+                    android:text="@string/fontello_envelope"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="28sp" />
 
-            <com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/edt_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:hint="@string/hint_email"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="@string/sex"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+                android:orientation="horizontal">
 
-            <RadioGroup
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:minWidth="30dp"
+                    android:text="@string/fontello_calendar"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="28sp" />
+
+
+                <EditText
+                    android:id="@+id/edt_dob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="@string/hint_dob"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
-                android:orientation="horizontal"
-                android:theme="@style/AppTheme.PopupOverlay">
+                android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/rbtn_male"
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1">
+
+                    <com.pluggdd.burnandearn.font.FontelloTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:minWidth="30dp"
+                        android:text="@string/fontello_sex"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="28sp" />
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="horizontal"
+                        android:theme="@style/AppTheme.PopupOverlay">
+
+                        <com.pluggdd.burnandearn.utils.FontelloRadioButton
+                            android:id="@+id/rbtn_male"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fontello_male"
+                            android:buttonTint="@android:color/black"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="24sp" />
+
+                        <com.pluggdd.burnandearn.utils.FontelloRadioButton
+                            android:id="@+id/rbtn_female"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:buttonTint="@android:color/black"
+                            android:text="@string/fontello_female"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="24sp" />
+
+                        <!-- <com.pluggdd.burnandearn.utils.FontelloRadioButton
+                             android:id="@+id/rbtn_other"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:text="@string/other"
+                             android:visibility="gone"
+                             android:textColor="@android:color/black" />
+         -->
+                    </RadioGroup>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.pluggdd.burnandearn.font.FontelloTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:text="@string/fontello_blood"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="28sp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_blood_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:entries="@array/blood_group"
+                        android:theme="@style/AppTheme.PopupOverlay">
+
+                    </Spinner>
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:minWidth="30dp"
+                    android:text="@string/fontello_height"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="28sp" />
+
+                <EditText
+                    android:id="@+id/edt_height_feet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="@string/male"
-                    android:textColor="@android:color/black" />
+                    android:backgroundTint="@color/colorAccent"
+                    android:ems="5"
+                    android:hint="@string/hint_height_feet"
+                    android:maxLength="1"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray" />
 
-                <RadioButton
-                    android:id="@+id/rbtn_female"
+                <EditText
+                    android:id="@+id/edt_height_inches"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorAccent"
+                    android:ems="5"
+                    android:hint="@string/hint_height_inches"
+                    android:maxLength="1"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray" />
+
+                <Spinner
+                    android:id="@+id/spinner_height_dimens"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/height_dimens"
+                    android:theme="@style/AppTheme.PopupOverlay">
+
+                </Spinner>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:minWidth="30dp"
+                    android:text="@string/fontello_weight"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="28sp" />
+
+                <EditText
+                    android:id="@+id/edt_weight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="@string/female"
-                    android:textColor="@android:color/black" />
+                    android:backgroundTint="@color/colorAccent"
+                    android:ems="5"
+                    android:hint="@string/hint_weight"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray" />
 
-                <RadioButton
-                    android:id="@+id/rbtn_other"
+                <Spinner
+                    android:id="@+id/spinner_weight_dimens"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:entries="@array/weight_dimens"
+                    android:theme="@style/AppTheme.PopupOverlay">
+
+                </Spinner>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp">
+
+                <com.pluggdd.burnandearn.font.FontelloTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:minWidth="30dp"
+                    android:text="@string/fontello_occupation"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="28sp" />
+
+                <Spinner
+                    android:id="@+id/spinner_occupation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="@string/other"
-                    android:textColor="@android:color/black" />
+                    android:entries="@array/occupation"
+                    android:theme="@style/AppTheme.PopupOverlay">
 
-            </RadioGroup>
-
-            <com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/city"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
-
-            <Spinner
-                android:id="@+id/spinner_city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:entries="@array/goal_setup"
-                android:theme="@style/AppTheme.PopupOverlay">
-
-            </Spinner>
-
-            <com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/company"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
-
-            <EditText
-                android:id="@+id/edt_company"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:backgroundTint="@color/colorAccent"
-                android:hint="@string/hint_company"
-                android:singleLine="true"
-                android:textColorHint="@android:color/darker_gray"
-                android:textColor="@android:color/black" />
+                </Spinner>
 
 
-            <com.pluggdd.burnandearn.font.RobotoTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/choose_your_goal"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+            </LinearLayout>
 
-            <Spinner
-                android:id="@+id/spinner_goal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:entries="@array/goal_setup"
-                android:theme="@style/AppTheme.PopupOverlay">
+            <!-- <com.pluggdd.burnandearn.font.RobotoTextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="5dp"
+                 android:text="@string/company"
+                 android:textColor="@android:color/black"
+                 android:textSize="18sp" />
 
-            </Spinner>
+             <EditText
+                 android:id="@+id/edt_company"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="5dp"
+                 android:backgroundTint="@color/colorAccent"
+                 android:hint="@string/hint_company"
+                 android:singleLine="true"
+                 android:textColor="@android:color/black"
+                 android:textColorHint="@android:color/darker_gray" />
 
+
+             <com.pluggdd.burnandearn.font.RobotoTextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="5dp"
+                 android:text="@string/choose_your_goal"
+                 android:textColor="@android:color/black"
+                 android:textSize="18sp" />
+
+             <Spinner
+                 android:id="@+id/spinner_goal"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="10dp"
+                 android:entries="@array/goal_setup"
+                 android:theme="@style/AppTheme.PopupOverlay">
+
+             </Spinner>
+ -->
 
             <Button
                 android:id="@+id/btn_submit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="5dp"
                 android:background="@color/orange"
                 android:minHeight="30dp"
                 android:paddingBottom="5dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:paddingTop="5dp"
-                android:text="@string/submit"
+                android:text="@string/next"
                 android:textSize="18sp" />
 
 
@@ -270,7 +479,7 @@
     </android.support.v4.widget.NestedScrollView>
 
 
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>
 
 
 

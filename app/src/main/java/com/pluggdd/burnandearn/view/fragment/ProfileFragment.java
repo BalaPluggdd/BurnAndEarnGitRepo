@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -38,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -51,6 +53,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.model.City;
+import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
@@ -85,27 +88,31 @@ public class ProfileFragment extends Fragment {
     private static final String SOURCE_PAGE_FLAG = "source_flag";
     public static final int IMAGE_CAPTURE_REQUEST_CODE = 1, PICK_IMAGE_REQUEST = 2, REQUEST_BOTH_PERMISSION_CODE = 3;
     private Context mContext;
-    private FragmentInteraction mFragmentInteraction;
-    private Button mSubmitButton;
+    private ChildFragmentInteraction mChildFragmentInteraction;
+    private Button mNextButton;
     private PreferencesManager mPreferenceManager;
-    private String mEmail, mFirstName, mLastName, mFacebookId, mProfileImageUrl, mDateofBirth,mCompany;
+    private String mEmail, mName,/* mLastName,*/
+            mFacebookId, mProfileImageUrl, mDateofBirth, mHeight, mHeightInch, mWeight;
     private int mGender = -1, mSelectedCityId; // 0 - male , 1 - Female , 2 - Other
     private ImageView mProfileImage;
-    private EditText mFirstNameEdt, mLastNameEdt, mEmailEdt, mDateOfBirthEdt,mCompanyEdt;
-    private RadioButton mMaleOption, mFemaleOption, mOtherOption;
+    private TextView mChangeProfileImageText;
+    private EditText mNameEdt, /*mLastNameEdt,*/
+            mEmailEdt, mDateOfBirthEdt, mHeightEdt, mInchEdt, mWeightEdt;
+    private RadioButton mMaleOption, mFemaleOption /*mOtherOption*/;
     private ProgressBar mProfileLoadingProgress;
-    private Spinner mGoalSetUpSpinner,mCitySpinner;
+    private Spinner mBloodGroupSpinner, mOccupationSpinner, mHeightDimenSpinner, mWeightSpinner;
     private DatePickerDialog mDatePickerDialog;
     private String mSourcePageFlag, mCapturedImagePath, mImageBase64;
     private boolean mIsPermissionRequestRaised;
     private ArrayList<City> mCityList = new ArrayList<>();
     private View mView;
     private ProgressDialog mLoadingProgressDialog;
+
     public ProfileFragment() {
         // Required empty public constructor
     }
 
-    public static ProfileFragment getInstance(String source_flag) {
+    /*public static ProfileFragment getInstance(String source_flag) {
         ProfileFragment profileFragment = new ProfileFragment();
         Bundle bundle = new Bundle();
         bundle.putString(SOURCE_PAGE_FLAG, source_flag);
@@ -119,30 +126,34 @@ public class ProfileFragment extends Fragment {
         if (getArguments() != null) {
             mSourcePageFlag = getArguments().getString(SOURCE_PAGE_FLAG);
         }
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_profile, container, false);
         mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
-        mFirstNameEdt = (EditText) mView.findViewById(R.id.edt_first_name);
-        mLastNameEdt = (EditText) mView.findViewById(R.id.edt_last_name);
+        mChangeProfileImageText = (TextView) mView.findViewById(R.id.txt_change_profile);
+        mNameEdt = (EditText) mView.findViewById(R.id.edt_name);
         mEmailEdt = (EditText) mView.findViewById(R.id.edt_email);
         mDateOfBirthEdt = (EditText) mView.findViewById(R.id.edt_dob);
-        mCitySpinner = (Spinner) mView.findViewById(R.id.spinner_city);
-        mCompanyEdt = (EditText) mView.findViewById(R.id.edt_company);
-        mSubmitButton = (Button) mView.findViewById(R.id.btn_submit);
+        mBloodGroupSpinner = (Spinner) mView.findViewById(R.id.spinner_blood_group);
+        mHeightEdt = (EditText) mView.findViewById(R.id.edt_height_feet);
+        mInchEdt = (EditText) mView.findViewById(R.id.edt_height_inches);
+        mHeightDimenSpinner = (Spinner) mView.findViewById(R.id.spinner_height_dimens);
+        mWeightEdt = (EditText) mView.findViewById(R.id.edt_weight);
+        mWeightSpinner = (Spinner) mView.findViewById(R.id.spinner_weight_dimens);
+        mOccupationSpinner = (Spinner) mView.findViewById(R.id.spinner_occupation);
+        mNextButton = (Button) mView.findViewById(R.id.btn_submit);
         mMaleOption = (RadioButton) mView.findViewById(R.id.rbtn_male);
         mFemaleOption = (RadioButton) mView.findViewById(R.id.rbtn_female);
-        mOtherOption = (RadioButton) mView.findViewById(R.id.rbtn_other);
-        mGoalSetUpSpinner = (Spinner) mView.findViewById(R.id.spinner_goal);
+        /*mOtherOption = (RadioButton) mView.findViewById(R.id.rbtn_other);*/
         mProfileLoadingProgress = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
         mPreferenceManager = new PreferencesManager(getContext());
         // To populate values
         new PicassoImageLoaderHelper(getContext(), mProfileImage, mProfileLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
-        mFirstNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)));
-        mLastNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.last_name)));
+        mNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)) + " " + mPreferenceManager.getStringValue(getString(R.string.last_name)));
+        /*mLastNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.last_name)));*/
         mEmailEdt.setText(mPreferenceManager.getStringValue(getString(R.string.email)));
         mFacebookId = mPreferenceManager.getStringValue(getString(R.string.facebookId));
         mProfileImageUrl = mPreferenceManager.getStringValue(getString(R.string.profile_image_url));
@@ -152,30 +163,32 @@ public class ProfileFragment extends Fragment {
         } else if (mGender == 1) {
             mFemaleOption.setChecked(true);
         } else if (mGender == 2) {
-            mOtherOption.setChecked(true);
+            //mOtherOption.setChecked(true);
         }
         mDateOfBirthEdt.setText(mPreferenceManager.getStringValue(getString(R.string.dob)));
-        mCompanyEdt.setText(mPreferenceManager.getStringValue(getString(R.string.company)));
-        mFirstNameEdt.setSelection(mFirstNameEdt.getText().toString().length());
-        mGoalSetUpSpinner.setSelection(mPreferenceManager.getIntValue(getString(R.string.user_goal)), true);
+        mNameEdt.setSelection(mNameEdt.getText().toString().length());
         mSelectedCityId = mPreferenceManager.getIntValue(getString(R.string.city_id));
+        registerForContextMenu(mProfileImage);
+        registerForContextMenu(mChangeProfileImageText);
+
         mProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().openContextMenu(mProfileImage);
             }
         });
+        mChangeProfileImageText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().openContextMenu(mChangeProfileImageText);
+            }
+        });
 
-        registerForContextMenu(mProfileImage);
-        // Loading Progress
-        mLoadingProgressDialog = new ProgressDialog(getActivity());
-        mLoadingProgressDialog.setCancelable(false);
-        mLoadingProgressDialog.show();
-        if(new NetworkCheck().ConnectivityCheck(getActivity())){
+        /*if(new NetworkCheck().ConnectivityCheck(getActivity())){
             getcityList(mLoadingProgressDialog);
         }else{
             Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
-        }
+        }*/
 
         mDateOfBirthEdt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,12 +205,54 @@ public class ProfileFragment extends Fragment {
 
         });
 
-        mCitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mHeightEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (mHeightDimenSpinner.getSelectedItemPosition() == 0) {
+                    if (hasFocus) {
+                        setEditTextMaxLength(mHeightEdt,1);
+                        if (!TextUtils.isEmpty(mHeightEdt.getText().toString())) {
+                            mHeightEdt.setText(mHeightEdt.getText().toString().replace(" ft", "").trim());
+                        }
+                    } else {
+                        setEditTextMaxLength(mHeightEdt,4);
+                        if (!TextUtils.isEmpty(mHeightEdt.getText().toString())) {
+                            mHeightEdt.setText(mHeightEdt.getText().toString() + " ft");
+                        }
+                    }
+                }
+            }
+        });
+
+        mInchEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    setEditTextMaxLength(mInchEdt,1);
+                    if (!TextUtils.isEmpty(mInchEdt.getText().toString())) {
+                        mInchEdt.setText(mInchEdt.getText().toString().replace(" in", "").trim());
+                    }
+                } else {
+                    setEditTextMaxLength(mInchEdt,4);
+                    if (!TextUtils.isEmpty(mInchEdt.getText().toString())) {
+                        mInchEdt.setText(mInchEdt.getText().toString() + " in");
+                    }
+                }
+            }
+        });
+
+        mHeightDimenSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(mCityList != null && mCityList.size() >0){
-                    City selectedCity = mCityList.get(position);
-                    mSelectedCityId = selectedCity.getId();
+                if (position == 0) {
+                    mInchEdt.setVisibility(View.VISIBLE);
+                    setEditTextMaxLength(mHeightEdt,1);
+                    mHeightEdt.setHint(getString(R.string.hint_height_feet));
+                    mInchEdt.setHint(getString(R.string.hint_height_inches));
+                } else {
+                    mInchEdt.setVisibility(View.GONE);
+                    mHeightEdt.getText().clear();
+                    mHeightEdt.setHint(getString(R.string.hint_height_cm));
                 }
             }
 
@@ -207,14 +262,17 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        mSubmitButton.setOnClickListener(new View.OnClickListener() {
+        mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFirstName = mFirstNameEdt.getText().toString();
-                mLastName = mLastNameEdt.getText().toString();
+                mName = mNameEdt.getText().toString();
+                //mLastName = mLastNameEdt.getText().toString();
                 mEmail = mEmailEdt.getText().toString();
                 mDateofBirth = mDateOfBirthEdt.getText().toString();
-                mCompany = mCompanyEdt.getText().toString();
+                mHeight = mHeightEdt.getText().toString();
+                mHeightInch = mInchEdt.getText().toString();
+                mWeight = mWeightEdt.getText().toString();
+
                 if (mMaleOption.isChecked())
                     mGender = 0;
                 else if (mFemaleOption.isChecked())
@@ -222,25 +280,38 @@ public class ProfileFragment extends Fragment {
                 else
                     mGender = 2;
 
-                if (TextUtils.isEmpty(mFirstName)) {
-                    Snackbar.make(mView, "Enter first name", Snackbar.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(mLastName)) {
+                if (TextUtils.isEmpty(mName)) {
+                    Snackbar.make(mView, "Enter name", Snackbar.LENGTH_SHORT).show();
+                }/* else if (TextUtils.isEmpty(mLastName)) {
                     Snackbar.make(mView, "Enter last name", Snackbar.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(mEmail)) {
+                }*/ else if (TextUtils.isEmpty(mEmail)) {
                     Snackbar.make(mView, "Enter email address", Snackbar.LENGTH_SHORT).show();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(mEmailEdt.getText().toString()).matches()) {
                     Snackbar.make(mView, "Enter valid email address", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mDateofBirth)) {
                     Snackbar.make(mView, "Choose date of birth", Snackbar.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(mCompany)) {
-                    Snackbar.make(mView, "Enter company name", Snackbar.LENGTH_SHORT).show();
                 } else if (mGender == -1) {
                     Snackbar.make(mView, "Choose any gender", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mHeight)) {
+                    Snackbar.make(mView, "Enter your height", Snackbar.LENGTH_SHORT).show();
+                } else if (mHeightDimenSpinner.getSelectedItemPosition() == 0 && TextUtils.isEmpty(mHeightInch)) {
+                    Snackbar.make(mView, "Enter your height in inches", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mWeight)) {
+                    Snackbar.make(mView, "Enter your weight", Snackbar.LENGTH_SHORT).show();
                 } else {
                     if (new NetworkCheck().ConnectivityCheck(getActivity())) {
-                        new UpdateProfileTask().execute();
+                        // Loading Progress
+                        /*mLoadingProgressDialog = new ProgressDialog(getActivity());
+                        mLoadingProgressDialog.setCancelable(false);
+                        mLoadingProgressDialog.show();
+                        new UpdateProfileTask().execute();*/
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
+                        bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
+                        mChildFragmentInteraction.changeChildFragment(bundle);
                     } else {
-                        Snackbar.make(mView,getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -433,6 +504,7 @@ public class ProfileFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             mLoadingProgressDialog.setMessage("Updating please wait !!!");
         }
 
@@ -483,7 +555,7 @@ public class ProfileFragment extends Fragment {
                             mPreferenceManager.setIntValue(getString(R.string.gender), responseJson.optInt("gender"));
                             mPreferenceManager.setStringValue(getString(R.string.dob), responseJson.optString("dob").split("-")[2] + "-" + responseJson.optString("dob").split("-")[1] + "-" + responseJson.optString("dob").split("-")[0]);
                             mPreferenceManager.setStringValue(getString(R.string.email), responseJson.optString("emailid"));
-                            mPreferenceManager.setIntValue(getString(R.string.user_goal), mGoalSetUpSpinner.getSelectedItemPosition());
+                            //mPreferenceManager.setIntValue(getString(R.string.user_goal), mGoalSetUpSpinner.getSelectedItemPosition());
                             mPreferenceManager.setIntValue(getString(R.string.city_id), mSelectedCityId);
                             mPreferenceManager.setStringValue(getString(R.string.company), responseJson.optString("companyname"));
                             if (responseJson.optString("lastcaloriesupdate") != null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
@@ -492,14 +564,20 @@ public class ProfileFragment extends Fragment {
                             } else
                                 mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), 0);
 
-                            if (mSourcePageFlag.equalsIgnoreCase("login")) { // From login fragment
+                            /*if (mSourcePageFlag.equalsIgnoreCase("login")) { // From login fragment
                                 mPreferenceManager.setBooleanValue(getString(R.string.is_goal_set), true);
                                 Bundle bundle = new Bundle();
                                 bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
-                                mFragmentInteraction.changeFragment(bundle);
+                                bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
+                                mChildFragmentInteraction.changeFragment(bundle);
                             } else {
                                 Snackbar.make(mView, "Profile Updated Successfully", Snackbar.LENGTH_SHORT).show();
-                            }
+                            }*/
+                            Bundle bundle = new Bundle();
+                            bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
+                            bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
+                            mChildFragmentInteraction.changeChildFragment(bundle);
+
                         } else {
                             Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
                         }
@@ -520,17 +598,17 @@ public class ProfileFragment extends Fragment {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("fbId", mFacebookId);
-                params.put("firstName", mFirstName);
-                params.put("lastName", mLastName);
+                params.put("firstName", mName);
+                params.put("lastName", "");
                 params.put("emailId", mEmail);
                 params.put("image", mImageBase64);
                 params.put("dob", mDateofBirth.split("-")[2] + "-" + mDateofBirth.split("-")[1] + "-" + mDateofBirth.split("-")[0]);
                 // To add Selected goal to preference
-                mPreferenceManager.setIntValue(getString(R.string.calories_goal), getSelectedUserGoal());
-                params.put("usergoal", String.valueOf(getSelectedUserGoal()));
+                mPreferenceManager.setIntValue(getString(R.string.calories_goal), 0);
+                params.put("usergoal", String.valueOf(0));
                 params.put("gender", String.valueOf(mGender));
                 params.put("city", String.valueOf(mSelectedCityId));
-                params.put("companyname", mCompany);
+                params.put("companyname", "Test");
                 params.put("deviceId", mPreferenceManager.getStringValue(getString(R.string.gcm_reg_id)));
                 params.put("deviceType", String.valueOf(0));
                 return params;
@@ -540,7 +618,13 @@ public class ProfileFragment extends Fragment {
         mRequestQueue.add(request);
     }
 
-    private void getcityList(final ProgressDialog mLoadingProgress) {
+    public void setEditTextMaxLength(EditText editText,int length) {
+        InputFilter[] FilterArray = new InputFilter[1];
+        FilterArray[0] = new InputFilter.LengthFilter(length);
+        editText.setFilters(FilterArray);
+    }
+
+    /*private void getcityList(final ProgressDialog mLoadingProgress) {
         mLoadingProgress.setMessage("Loading city please wait!!!");
         mLoadingProgress.show();
         VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
@@ -590,9 +674,9 @@ public class ProfileFragment extends Fragment {
         }));
         volleyrequest.setRequestPolicy(request);
         mRequestQueue.add(request);
-    }
+    }*/
 
-    private int getSelectedUserGoal() {
+    /*private int getSelectedUserGoal() {
 
         switch (mGoalSetUpSpinner.getSelectedItemPosition()) {
             case 0:
@@ -610,25 +694,26 @@ public class ProfileFragment extends Fragment {
             default:
                 return 1000;
         }
-    }
+    }*/
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        if (context instanceof FragmentInteraction) {
-            mFragmentInteraction = (FragmentInteraction) context;
+        mChildFragmentInteraction = (ChildFragmentInteraction) getParentFragment();
+       /* if (context instanceof ChildFragmentInteraction) {
+            mChildFragmentInteraction = (ChildFragmentInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
-        }
+        }*/
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mFragmentInteraction = null;
+        mChildFragmentInteraction = null;
         mImageBase64 = null;
     }
 

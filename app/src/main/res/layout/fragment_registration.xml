@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_app_background"
+    android:fitsSystemWindows="true"
+    android:paddingTop="30dp"
+    android:orientation="vertical">
+
+    <!--<android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="24dp"
+        android:fitsSystemWindows="true">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+
+    </android.support.design.widget.AppBarLayout>-->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:id="@+id/step2_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_step2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_orange_stepper_inactive"
+                android:gravity="center"
+                android:text="@string/step2"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                app:typeface="robotoCondensed" />
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_step2_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/occupation"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/divider"
+                android:textSize="18sp"
+                app:typeface="robotoCondensed" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/step1_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:orientation="vertical">
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_step1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_orange_stepper_active"
+                android:gravity="center"
+                android:text="@string/step1"
+                android:textColor="@android:color/white"
+                android:textSize="22sp" />
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_step1_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="5dp"
+                android:text="@string/action_profile"
+                android:textColor="@color/secondary_text"
+                android:textSize="18sp"
+                app:typeface="robotoCondensed" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/step2_container"
+            android:layout_toRightOf="@id/step1_container"
+            android:background="@color/divider" />
+
+        <LinearLayout
+            android:id="@+id/step3_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
+            android:orientation="vertical">
+
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_step3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_orange_stepper_inactive"
+                android:gravity="center"
+                android:text="@string/step3"
+                android:textColor="@android:color/white"
+                android:textSize="22sp" />
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:id="@+id/txt_step3_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/goal"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/divider"
+                android:textSize="18sp"
+                app:typeface="robotoCondensed" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/step3_container"
+            android:layout_toRightOf="@id/step2_container"
+            android:background="@color/divider" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/registration_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+
+
+</LinearLayout>
+
+
+

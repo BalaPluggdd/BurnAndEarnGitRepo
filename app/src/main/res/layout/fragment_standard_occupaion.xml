@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/ic_app_background"
+    android:padding="5dp"
+    tools:context="com.pluggdd.burnandearn.view.fragment.StandardOccupaionFragment">
+
+    <include layout="@layout/content_society"/>
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:background="@color/orange"
+        android:minHeight="30dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingTop="5dp"
+        android:text="@string/next"
+        android:textSize="18sp" />
+
+
+</LinearLayout>
+
+

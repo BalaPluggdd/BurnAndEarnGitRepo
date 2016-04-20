@@ -14,6 +14,7 @@ import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
+import com.pluggdd.burnandearn.view.fragment.RegistrationFragment;
 
 public class ProfileActivity extends BaseActivity implements FragmentInteraction {
 
@@ -28,7 +29,7 @@ public class ProfileActivity extends BaseActivity implements FragmentInteraction
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
-        mFragmentHelper.addFragment(R.id.fragment_container,ProfileFragment.getInstance("ProfileMenu"));
+        mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance("ProfileMenu"));
 
     }
 

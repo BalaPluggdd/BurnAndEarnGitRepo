@@ -270,6 +270,7 @@ public class OfferDetailActivity extends AppCompatActivity{
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("userid",mPreferenceManager.getStringValue(getString(R.string.user_id)));
                 params.put("businessid",String.valueOf(mBusinesId));
+                params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
                 return params;
             }
         });

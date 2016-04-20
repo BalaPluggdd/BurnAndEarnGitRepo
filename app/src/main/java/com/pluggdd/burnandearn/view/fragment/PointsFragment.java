@@ -236,6 +236,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private void showSelectFitnessSourceDialog() {
         final Dialog dialog = new Dialog(mContext);
         dialog.setContentView(R.layout.dialog_select_fitness_source);
+        dialog.setCancelable(false);
         ImageView googleFit = (ImageView) dialog.findViewById(R.id.img_google_fit);
         ImageView fitbit = (ImageView) dialog.findViewById(R.id.img_fitbit);
 
@@ -245,10 +246,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
               dialog.dismiss();
               mPreferenceManager.setIntValue(getString(R.string.selected_fitness_source), FitnessSource.GOOGLE_FIT.getId());
               checkAndBuildGoogleApiClient();
-                if(mGoogleAPIClient != null)
+              if(mGoogleAPIClient != null)
                     mGoogleAPIClient.connect();
-                else
-                    Snackbar.make(mView,getString(R.string.no_google_fit_data),Snackbar.LENGTH_SHORT).show();
+
             }
         });
 
@@ -945,65 +945,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }else{
                     mFitnessHistoryList = mFitBitHelper.getFitnessHistoryData();
                 }
-
-                /*long last_calories_updated_time = mPreferenceManager.getLongValue(getString(R.string.last_updated_calories_time));
-                //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
-                //last_calories_updated_time = 1459098422000L;
-                if (last_calories_updated_time == 0) { // App installed today only,so send today fitnessDetails only
-                    mFitnessHistoryList = new ArrayList<>();
-                    getTodayFitnessDetails("business_offer");
-                } else { // Send fitness data from last synced date to current time
-                    List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
-                    LocalDateTime startDate = new LocalDateTime(last_calories_updated_time);
-                    LocalDateTime currentDateTime = new LocalDateTime();
-                    int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
-                    if(days == 0){
-                        Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
-                        getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
-                    }else{
-                        for (int i = 0; i < days; i++) {
-                            LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
-                            dates.add(d);
-                        }
-                        for(int i=0 ; i< dates.size() ; i++){
-                            LocalDateTime date = dates.get(i);
-                            LocalDateTime startDateTime,endDateTime;
-                            if(i == 0 ){// First position as start date
-                                startDateTime = date;
-                            }else{
-                                startDateTime = date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                            }
-                            endDateTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                            Log.i("start date : ", date.toString() + " " + " end date :" + endDateTime.toString());
-                            getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDateTime.toDateTime().getMillis(), endDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDateTime, endDateTime);
-                        }
-                        getTodayFitnessDetails("business_offer"); // To add today fitness details as last one
-                    }
-
-                    *//*if (days == 0) {
-                        Log.i("start date : ", startDate.toString() + " " + " end date :" + currentDateTime.toString());
-                        mFitnessHistoryList = new ArrayList<>();
-                        if (startDate.get(DateTimeFieldType.dayOfMonth()) == currentDateTime.get(DateTimeFieldType.dayOfMonth())) { //// Calories already sent  for current date
-                            getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), currentDateTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, currentDateTime);
-                        } else { // Calories already sent yesterday but date difference is not 1...
-                            LocalDateTime startDateMidnight = startDate.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                            getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startDate.toDateTime().getMillis(), startDateMidnight.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), startDate, startDateMidnight);
-                            getTodayFitnessDetails("business_offer");
-                        }
-                    } else {
-                        for (int i = 0; i < days; i++) {
-                            LocalDateTime d = startDate.withFieldAdded(DurationFieldType.days(), i);
-                            dates.add(d);
-                        }
-                        mFitnessHistoryList = new ArrayList<>();
-                        for (LocalDateTime date : dates) {
-                            LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                            Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
-                            //getFitnessActivityDetails("business_offer", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
-                        }
-                        getTodayFitnessDetails("business_offer"); // To add today fitness details as last one
-                    }*//*
-                }*/
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1467,7 +1408,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         } else {
             buildGoogleFitnessClient();
         }
-
     }
 
     private void checkAndBuildFitBitApiClient() {
@@ -1476,7 +1416,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 .apiKey(getString(R.string.fit_bit_secret_key))
                 .apiSecret(getString(R.string.fit_bit_api_key))
                 .callback(getString(R.string.fit_bit_call_back_url))
-                .scope("profile activity")
+                .scope("activity")
                 .debug()
                 .build();
         mFitBitHelper = new FitBitHelper(mContext,mOAuthSevice);
@@ -1607,6 +1547,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     Log.i("json request", json_request);
                     params.put("jsonrequest", json_request);
+                    params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
                     return params;
                 }
             });

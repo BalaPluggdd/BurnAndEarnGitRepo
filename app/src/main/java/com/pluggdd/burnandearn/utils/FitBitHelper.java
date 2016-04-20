@@ -60,7 +60,7 @@ public class FitBitHelper {
             dates.add(d);
         }
         dates.add(new LocalDateTime());
-
+        Log.i("Days", dates.size() + " ");
         for (int i = 0; i < dates.size(); i++) {
             LocalDateTime date = dates.get(i);
             LocalDateTime startDateTime = date.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
@@ -110,7 +110,7 @@ public class FitBitHelper {
     public ArrayList<FitnessHistory> getFitnessHistoryData() {
         ArrayList<FitnessHistory> fitnessHistoryList = new ArrayList<>();
         try {
-            long last_calories_updated_time = mPreferenceManager.getLongValue(mContext.getString(R.string.last_updated_fitbit_calories_time));
+            long last_calories_updated_time = mPreferenceManager.getLongValue(mContext.getString(R.string.last_updated_calories_time));
             LocalDateTime currentDateTime = new LocalDateTime();
             LocalDateTime startDateTime = currentDateTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             //last_calories_updated_time = new LocalDateTime().minusHours(20).toDateTime().getMillis();
@@ -147,6 +147,7 @@ public class FitBitHelper {
                         if(history != null)
                             fitnessHistoryList.add(history);
                     }
+                    startDateTime = currentDateTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0); // Current date
                     FitnessHistory history = getFitBitActivityData(currentDateTime.toString("yyyy-MM-dd"),startDateTime,currentDateTime);
                     if(history != null)
                         fitnessHistoryList.add(history); // To add today fitness details as last one
@@ -162,7 +163,7 @@ public class FitBitHelper {
         FitnessHistory history;
         String accessToken = mPreferenceManager.getStringValue(mContext.getString(R.string.access_token));
         Response response = callFitBitAPI(accessToken, start_date);
-        Log.i("response_activity", response.getBody());
+        Log.i("response_activity","Response : " +response.getBody());
         if (response != null) {
             try {
                 JSONObject responseObject = new JSONObject(response.getBody());
@@ -247,9 +248,12 @@ public class FitBitHelper {
     }
 
     private Response callFitBitAPI(String accessToken, String date) {
+        Log.i("date",date);
         Token token = new Token(accessToken, accessToken);
         //OAuthRequest request = new OAuthRequest(Verb.GET,"https://api.fitbit.com/1/user/-/profile.json");
-        OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + date + ".json");
+       // OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/date/" + date + ".json");
+        //OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.fitbit.com/1/user/-/activities/tracker/activityCalories/date/today/7d.json");
+         OAuthRequest request = new OAuthRequest(Verb.GET,"https://api.fitbit.com/1/user/-/activities/list.json?afterDate=2016-04-14&sort=asc&offset=0&limit=20");
         //OAuthRequest request = new OAuthRequest(Verb.GET,"https://api.fitbit.com/1/activities.json");
         request.addHeader("Authorization", "Bearer " + accessToken);
         mOAuthSevice.signRequest(token, request); // the access token from step

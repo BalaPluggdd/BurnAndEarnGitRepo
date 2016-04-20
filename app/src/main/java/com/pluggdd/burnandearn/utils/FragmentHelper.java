@@ -38,6 +38,16 @@ public class FragmentHelper {
         fragmentTransaction.commitAllowingStateLoss();
     }
 
+    public void replaceFragmentWithAlterAnim(int container, Fragment fragment, boolean shouldAddToBackStack) {
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,R.anim.exit_to_right,R.anim.enter_from_right,R.anim.exit_to_left);
+        fragmentTransaction.replace(container, fragment);
+        if (shouldAddToBackStack)
+            fragmentTransaction.addToBackStack(fragment.getClass().getSimpleName());
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+        fragmentTransaction.commitAllowingStateLoss();
+    }
+
     public void removeFromBackStack() {
         mFragmentManager.popBackStack();
     }

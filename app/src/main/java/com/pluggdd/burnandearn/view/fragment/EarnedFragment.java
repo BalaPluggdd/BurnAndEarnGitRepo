@@ -56,9 +56,13 @@ import com.google.android.gms.plus.Plus;
 import com.pluggdd.burnandearn.BuildConfig;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity;
+import com.pluggdd.burnandearn.activity.FitBitActivity;
 import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.model.FitnessActivity;
 import com.pluggdd.burnandearn.model.FitnessHistory;
+import com.pluggdd.burnandearn.utils.FitBitApi;
+import com.pluggdd.burnandearn.utils.FitBitHelper;
+import com.pluggdd.burnandearn.utils.FitnessSource;
 import com.pluggdd.burnandearn.utils.GoogleFitHelper;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
@@ -74,6 +78,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.model.Token;
+import org.scribe.model.Verifier;
+import org.scribe.oauth.OAuthService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -87,7 +95,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class EarnedFragment extends Fragment {
 
-    public static final int REQUEST_CODE_RESOLUTION = 1000, REQUEST_BOTH_PERMISSION_CODE = 1001;
+    public static final int REQUEST_CODE_RESOLUTION = 1000, REQUEST_BOTH_PERMISSION_CODE = 1001 , REQUEST_FITBIT_API = 104;
     private Context mContext;
     private View mView;
     private ProgressBar mLoadingProgressBar;
@@ -99,7 +107,8 @@ public class EarnedFragment extends Fragment {
     private ArrayList<FitnessHistory> mFitnessHistoryList = new ArrayList<>();
     private RecyclerView mBusinessOfferRecyclerView;
     private ArrayList<BusinessDetails> mBusinesOfferList;
-
+    private OAuthService mOAuthSevice;
+    private FitBitHelper mFitBitHelper;
 
     public EarnedFragment() {
         // Required empty public constructor
@@ -116,43 +125,69 @@ public class EarnedFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mBusinessOfferRecyclerView.setLayoutManager(layoutManager);
         mPreferenceManager = new PreferencesManager(getActivity());
+
         return mView;
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && !mIsFitnessOfferListLoaded) {
-            if (checkLocationPermissions() && checkGetAccountsPermissions()) {
-                checkAndBuildGoogleApiClient();
-                mIsFitnessOfferListLoaded = true;
-            } else {
-                Snackbar.make(
-                        mView,
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
+        if(isVisibleToUser && !mIsFitnessOfferListLoaded){
+            int fitness_source = mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source));
+            if(fitness_source == 1){
+                if (checkLocationPermissions() && checkGetAccountsPermissions()) {
+                    checkAndBuildGoogleApiClient();
+                    mIsFitnessOfferListLoaded = true;
+                } else {
+                    Snackbar.make(
+                            mView,
+                            R.string.permission_denied_explanation,
+                            Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.settings, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    // Build intent that displays the App settings screen.
+                                    Intent intent = new Intent();
+                                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
+                                    intent.setData(uri);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                }
+                            })
+                            .show();
+                }
+            }else{
+                if(mPreferenceManager.getBooleanValue(getString(R.string.is_fitbit_authenticated))){
+                    checkAndBuildFitBitApiClient();
+                    new FitnessHistoryAsync().execute();
+                }else{
+                    startActivityForResult(new Intent(mContext, FitBitActivity.class),REQUEST_FITBIT_API);
+                }
             }
         }
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == getActivity().RESULT_OK && requestCode == REQUEST_CODE_RESOLUTION) {
-            mGoogleAPIClient.connect();
+        if(resultCode == getActivity().RESULT_OK){
+            switch (requestCode){
+                case REQUEST_CODE_RESOLUTION:
+                    mGoogleAPIClient.connect();
+                    break;
+                case REQUEST_FITBIT_API :
+                    if(new NetworkCheck().ConnectivityCheck(mContext)){
+                        checkAndBuildFitBitApiClient();
+                        String auth_token = data.getExtras().getString(getString(R.string.auth_token));
+                        new FitBitAPIAsync().execute(auth_token);
+                    }else{
+                        // Hide progress bar
+                        Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
         }
     }
     @Override
@@ -283,7 +318,7 @@ public class EarnedFragment extends Fragment {
 
     }
 
-    private void checkAndBuildGoogleApiClient() {
+   private void checkAndBuildGoogleApiClient() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             List<String> permissionsNeeded = new ArrayList<String>();
@@ -300,6 +335,18 @@ public class EarnedFragment extends Fragment {
         } else {
             buildGoogleFitnessClient();
         }
+    }
+
+    private void checkAndBuildFitBitApiClient() {
+        mOAuthSevice =  new ServiceBuilder()
+                .provider(FitBitApi.class)
+                .apiKey(getString(R.string.fit_bit_secret_key))
+                .apiSecret(getString(R.string.fit_bit_api_key))
+                .callback(getString(R.string.fit_bit_call_back_url))
+                .scope("activity")
+                .debug()
+                .build();
+        mFitBitHelper = new FitBitHelper(mContext,mOAuthSevice);
 
     }
 
@@ -319,30 +366,15 @@ public class EarnedFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             mLoadingProgressBar.setVisibility(View.VISIBLE);
-
         }
 
         @Override
         protected Void doInBackground(Long... params) {
-            mFitnessHistoryList = new GoogleFitHelper(getActivity(), mGoogleAPIClient).getFitnessHistoryData();
-            /*List<LocalDateTime> dates = new ArrayList<>();
-            LocalDateTime StartDate = new LocalDateTime().minusDays(15).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            int days = Days.daysBetween(StartDate, new LocalDateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0)).getDays();
-            for (int i = 0; i < days; i++) {
-                LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
-                dates.add(d);
+            if(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                mFitnessHistoryList = new GoogleFitHelper(getActivity(), mGoogleAPIClient).getFitnessHistoryData();
+            }else{
+                mFitnessHistoryList = mFitBitHelper.getFitnessHistoryData();
             }
-            mFitnessHistoryList = new ArrayList<>();
-            for (LocalDateTime date : dates) {
-                LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                //Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
-                getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
-            }*/
-            /*if (mGoogleAPIClient != null) {
-                return getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
-
-            } else
-                return null;*/
             return null;
         }
 
@@ -354,17 +386,6 @@ public class EarnedFragment extends Fragment {
             }else{
                 Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
             }
-
-            /*for (FitnessHistory history : mFitnessHistoryList) {
-                Log.i("Time", history.getStartDateTime() + " " + history.getEndDateTime() + " " + history.getTotalCaloriesBurnt());
-                for (FitnessActivity activity : history.getFitnessActivitiesList()) {
-                    Log.i("Name", activity.getName());
-                    Log.i("calories", activity.getCalories_expended() + "");
-                    Log.i("distance", activity.getDistance() + "");
-                    Log.i("stepcount", activity.getStep_count() + "");
-                }
-            }*/
-
         }
     }
 
@@ -553,10 +574,47 @@ public class EarnedFragment extends Fragment {
                 }
                 Log.i("json request", json_request);
                 params.put("jsonrequest", json_request);
+                params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
                 return params;
             }
         });
         volleyrequest.setRequestPolicy(request);
         mRequestQueue.add(request);
+    }
+
+    class FitBitAPIAsync extends AsyncTask<String,Void,String>{
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Verifier verifier = new Verifier(params[0]);
+                Token accessToken = mOAuthSevice.getAccessToken(null,verifier);
+                if(accessToken != null){
+                    mPreferenceManager.setBooleanValue(getString(R.string.is_fitbit_authenticated),true);
+                    mPreferenceManager.setStringValue(getString(R.string.access_token),accessToken.getToken());
+                    JSONObject accessTokenObject = new JSONObject(accessToken.getRawResponse());
+                    mPreferenceManager.setStringValue(getString(R.string.refresh_token),accessTokenObject.optString("refresh_token"));
+                    Log.i("access_token"," Response :" + accessToken.getRawResponse());
+                    return "success";
+                }else
+                    return "failure";
+
+            }catch (Exception e){
+                e.printStackTrace();
+                return "failure";
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(String status) {
+            super.onPostExecute(status);
+            if(status.equalsIgnoreCase("success")){
+                new FitnessHistoryAsync().execute();
+            }else{
+                // Failure
+                // Hide Progress Bar
+            }
+        }
     }
 }
