@@ -122,7 +122,7 @@ public class RegistrationFragment extends Fragment implements ChildFragmentInter
                 String selected_occupation = extras.getString(getString(R.string.occupation));
                 switch (selected_occupation) {
                     case "Student":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new StudentFragment(), false);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StudentFragment.getInstance(extras), false);
                         break;
                     case "Homemaker":
                         mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new StandardOccupaionFragment(), false);

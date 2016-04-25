@@ -14,10 +14,13 @@ import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
 
 public class BaseActivity extends AppCompatActivity {
 
+    String mPageFlag;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        /*if(getIntent().hasExtra(getString(R.string.page_flag)))
+            mPageFlag = getIntent().getExtras().getString(getString(R.string.page_flag));*/
     }
 
     @Override
@@ -25,6 +28,12 @@ public class BaseActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
+        /*if(mPageFlag != null && mPageFlag.equalsIgnoreCase("login")){
+            return false;
+        }else{
+
+        }*/
+
     }
 
     @Override
@@ -49,7 +58,9 @@ public class BaseActivity extends AppCompatActivity {
                 overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
                 break;
             case R.id.action_profile:
-                startActivity(new Intent(BaseActivity.this,ProfileActivity.class));
+                Intent profile_intent = new Intent(BaseActivity.this,ProfileActivity.class);
+                profile_intent.putExtra(getString(R.string.page_flag),"profile_menu");
+                startActivity(profile_intent);
                 overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
                 break;
             case R.id.action_how_it_works:

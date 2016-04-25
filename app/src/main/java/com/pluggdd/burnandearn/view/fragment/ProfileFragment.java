@@ -236,6 +236,8 @@ public class ProfileFragment extends Fragment {
                     setEditTextMaxLength(mInchEdt,4);
                     if (!TextUtils.isEmpty(mInchEdt.getText().toString())) {
                         mInchEdt.setText(mInchEdt.getText().toString() + " in");
+                    }else{
+                        mInchEdt.setText("0 in");
                     }
                 }
             }
@@ -251,6 +253,7 @@ public class ProfileFragment extends Fragment {
                     mInchEdt.setHint(getString(R.string.hint_height_inches));
                 } else {
                     mInchEdt.setVisibility(View.GONE);
+                    setEditTextMaxLength(mHeightEdt,6);
                     mHeightEdt.getText().clear();
                     mHeightEdt.setHint(getString(R.string.hint_height_cm));
                 }
@@ -290,8 +293,6 @@ public class ProfileFragment extends Fragment {
                     Snackbar.make(mView, "Enter valid email address", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mDateofBirth)) {
                     Snackbar.make(mView, "Choose date of birth", Snackbar.LENGTH_SHORT).show();
-                } else if (mGender == -1) {
-                    Snackbar.make(mView, "Choose any gender", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mHeight)) {
                     Snackbar.make(mView, "Enter your height", Snackbar.LENGTH_SHORT).show();
                 } else if (mHeightDimenSpinner.getSelectedItemPosition() == 0 && TextUtils.isEmpty(mHeightInch)) {
@@ -300,16 +301,15 @@ public class ProfileFragment extends Fragment {
                     Snackbar.make(mView, "Enter your weight", Snackbar.LENGTH_SHORT).show();
                 } else {
                     if (new NetworkCheck().ConnectivityCheck(getActivity())) {
-                        // Loading Progress
-                        /*mLoadingProgressDialog = new ProgressDialog(getActivity());
-                        mLoadingProgressDialog.setCancelable(false);
-                        mLoadingProgressDialog.show();
-                        new UpdateProfileTask().execute();*/
+                        if(mImageBase64 == null){ // If profile image not converted to Base64
+                            mLoadingProgressDialog = new ProgressDialog(getActivity());
+                            mLoadingProgressDialog.setCancelable(false);
+                            mLoadingProgressDialog.show();
+                            new ConvertImageToBase64Task().execute();
+                        }else{ // If already converted
+                            navigateToStep2();
+                        }
 
-                        Bundle bundle = new Bundle();
-                        bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
-                        bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
-                        mChildFragmentInteraction.changeChildFragment(bundle);
                     } else {
                         Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
@@ -499,13 +499,12 @@ public class ProfileFragment extends Fragment {
         mImageBase64 = Base64.encodeToString(byteArray, Base64.NO_WRAP);
     }
 
-    private class UpdateProfileTask extends AsyncTask<String, Void, Void> {
+    private class ConvertImageToBase64Task extends AsyncTask<String, Void, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            mLoadingProgressDialog.setMessage("Updating please wait !!!");
+            mLoadingProgressDialog.setMessage("Please wait !!!");
         }
 
         @Override
@@ -528,8 +527,32 @@ public class ProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            updateProfile(mLoadingProgressDialog);
+            mLoadingProgressDialog.dismiss();
+            navigateToStep2();
+            //updateProfile(mLoadingProgressDialog);
         }
+    }
+
+    private void navigateToStep2() {
+        Bundle bundle = new Bundle();
+        bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
+        bundle.putString(getString(R.string.profile_base64),mImageBase64);
+        bundle.putString(getString(R.string.name), mName);
+        bundle.putString(getString(R.string.email), mEmail);
+        bundle.putString(getString(R.string.dob), mDateofBirth.split("-")[2] + "-" + mDateofBirth.split("-")[1] + "-" + mDateofBirth.split("-")[0]);
+        bundle.putInt(getString(R.string.gender), mGender);
+        bundle.putString(getString(R.string.blood_group), mBloodGroupSpinner.getSelectedItem().toString());
+        bundle.putString(getString(R.string.height_dimen), mHeightDimenSpinner.getSelectedItem().toString());
+        String height;
+        if(mHeightDimenSpinner.getSelectedItemPosition() == 0)
+            height = mHeightEdt.getText().toString().replace(" ft", "").trim()+"."+mInchEdt.getText().toString().replace(" in", "").trim();
+        else
+            height = mHeightEdt.getText().toString();
+        bundle.putString(getString(R.string.height), height);
+        bundle.putString(getString(R.string.weight_unit), mWeightSpinner.getSelectedItem().toString());
+        bundle.putDouble(getString(R.string.weight), Double.valueOf(mWeightEdt.getText().toString()));
+        bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
+        mChildFragmentInteraction.changeChildFragment(bundle);
     }
 
     private void updateProfile(final ProgressDialog mLoadingProgress) {

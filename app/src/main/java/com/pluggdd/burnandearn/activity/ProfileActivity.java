@@ -1,5 +1,6 @@
 package com.pluggdd.burnandearn.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,23 +20,29 @@ import com.pluggdd.burnandearn.view.fragment.RegistrationFragment;
 public class ProfileActivity extends BaseActivity implements FragmentInteraction {
 
     private FragmentHelper mFragmentHelper;
+    private String mPageFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.getBackground().setAlpha(0);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
-        mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance("ProfileMenu"));
-
+        mPageFlag = getIntent().getExtras().getString(getString(R.string.page_flag));
+        if (mPageFlag.equalsIgnoreCase("profile_menu"))
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance(mPageFlag));
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.removeItem(R.id.action_profile);
+        if (mPageFlag.equalsIgnoreCase("profile_menu"))
+            menu.removeItem(R.id.action_profile);
+        else {
+            menu.clear();
+
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -58,6 +65,10 @@ public class ProfileActivity extends BaseActivity implements FragmentInteraction
 
     @Override
     public void changeFragment(Bundle extras) {
-
+        Intent intent = new Intent(ProfileActivity.this, BurnAndEarnMainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+        finish();
     }
 }

@@ -13,6 +13,7 @@
     <color name="facebook_selected_color">#703B5998</color>
     <color name="selected_google_plus_red">#95dd4b39</color>
     <color name="grey">#bababa</color>
+    <color name="installation_screen_white">#FAFAFA</color>
     <color name="light_grey">#d3d3d3</color>
     <color name="app_text_color">#343434</color>
     <color name="blue">#00BBD3</color>
@@ -25,4 +26,5 @@
     <color name="running_color">#F8C900</color>
     <color name="biking_color">#B0C53C</color>
     <color name="orange_transparent">#99FFC107</color>
+    <color name="green">#3CB371</color>
 </resources>

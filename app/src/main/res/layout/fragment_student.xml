@@ -31,7 +31,8 @@
             android:hint="@string/hint_instution"
             android:inputType="text"
             android:textColor="@android:color/black"
-            android:textColorHint="@android:color/darker_gray" />
+            android:textColorHint="@android:color/darker_gray"
+            android:theme="@style/AppTheme.PopupOverlay"/>
 
     </LinearLayout>
 

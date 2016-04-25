@@ -1,6 +1,7 @@
 <resources>>
 
     <style name="AppTheme" parent="MaterialThemeBase">
-        <!-- Customize your theme here. -->
+        <item name="android:colorControlHighlight">@android:color/darker_gray</item>
+
     </style>
 </resources>

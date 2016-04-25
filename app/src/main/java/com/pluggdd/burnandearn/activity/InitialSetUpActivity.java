@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.pluggdd.burnandearn.R;
@@ -11,6 +13,7 @@ import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.view.fragment.AppIntroductionFragment;
+import com.pluggdd.burnandearn.view.fragment.CitySelectionFragment;
 import com.pluggdd.burnandearn.view.fragment.ProfileFragment;
 import com.pluggdd.burnandearn.view.fragment.LoginFragment;
 import com.pluggdd.burnandearn.view.fragment.PointsFragment;
@@ -22,33 +25,49 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
 
     private PreferencesManager mPreferenceManager;
     private FragmentHelper mFragmentHelper;
+    private Toolbar mToolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_initial_set_up);
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolBar);
         mPreferenceManager = new PreferencesManager(this);
         mFragmentHelper = new FragmentHelper(getSupportFragmentManager());
         // To add Login fragment as first fragment in transaction
         if (!mPreferenceManager.getBooleanValue(getString(R.string.is_user_logged_in))) { // If user does n't logged in
             // To set translucent status bar
+            mToolBar.setVisibility(View.GONE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             mFragmentHelper.addFragment(R.id.fragment_container, new LoginFragment());
-        } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_goal_set))) { // If goal does n't set
+        }else if (mPreferenceManager.getIntValue(getString(R.string.selected_city)) == 0) { // If user does n't selected city
             // To set translucent status bar
+            mToolBar.setVisibility(View.GONE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"));
+            mFragmentHelper.addFragment(R.id.fragment_container, new CitySelectionFragment());
         } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_how_its_works_learned)) || getIntent().hasExtra(getString(R.string.page_flag))) { // If user logged in and does n't learned how it will work
             // To set translucent status bar
+            mToolBar.setVisibility(View.GONE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             mFragmentHelper.addFragment(R.id.fragment_container, new AppIntroductionFragment());
+        } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_goal_set))) { // If goal does n't set
+            // To set translucent status bar
+            /*mToolBar.setVisibility(View.VISIBLE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+            mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"));*/
+            Intent intent1 = new Intent(InitialSetUpActivity.this, ProfileActivity.class);
+            intent1.putExtra(getString(R.string.page_flag),"Login");
+            startActivity(intent1);
+            overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+            finish();
         } else {
             Intent intent = new Intent(InitialSetUpActivity.this, BurnAndEarnMainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         }
-
     }
 
     @Override
@@ -71,16 +90,30 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
     public void changeFragment(Bundle extras) {
         switch (extras.getString(getString(R.string.page_flag))) {
             case "LoginFragment":
+                mToolBar.setVisibility(View.GONE);
                 if (extras.getString(getString(R.string.button_pressed)).equalsIgnoreCase(getString(R.string.social_login))) {
-                    mFragmentHelper.replaceFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"), false);
+                    //mFragmentHelper.replaceFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"), false);
+                    mFragmentHelper.replaceFragment(R.id.fragment_container, new CitySelectionFragment(), false);
                 } else {
                     finish();
                 }
                 break;
-            case "RegistrationFragment":
+            case "CitySelectionFragment":
+                mToolBar.setVisibility(View.GONE);
                 mFragmentHelper.replaceFragment(R.id.fragment_container, new AppIntroductionFragment(), false);
                 break;
             case "AppIntroductionFragment":
+                Intent intent1 = new Intent(InitialSetUpActivity.this, ProfileActivity.class);
+                intent1.putExtra(getString(R.string.page_flag),"Login");
+                startActivity(intent1);
+                overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+                finish();
+                /*getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+                mFragmentHelper.replaceFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"), false);
+                mToolBar.setVisibility(View.VISIBLE);*/
+                break;
+            case "RegistrationFragment":
                 Intent intent = new Intent(InitialSetUpActivity.this, BurnAndEarnMainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

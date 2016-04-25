@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/app_tour_container"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:clipChildren="false"
-    android:background="@color/dark_green"
+    android:background="@color/installation_screen_white"
     android:paddingTop="28dp"
+    android:orientation="vertical"
+    android:gravity="center"
     android:paddingBottom="48dp">
 
     <ImageView
@@ -14,21 +16,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_circle_logo"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"/>
+        android:layout_gravity="center"/>
 
-
-    <com.pluggdd.burnandearn.font.RobotoTextView
-        android:id="@+id/txt_app_tour_content"
-        android:text="@string/app_tour3_content_text"
-        android:layout_width="fill_parent"
+    <ImageView
+        android:id="@+id/img_app_tour1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:textAppearance="@style/AppTourContentAppearance"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="15dp"
-        app:typeface="robotoCondensed"/>
+        android:layout_gravity="center"
+        android:src="@drawable/ic_app_tour3"
+        android:layout_marginTop="20dp"
+        />
 
     <com.pluggdd.burnandearn.font.RobotoTextView
         android:id="@+id/txt_app_tour_header"
@@ -37,25 +34,32 @@
         android:layout_above="@id/txt_app_tour_content"
         android:layout_centerInParent="true"
         android:gravity="center"
+        android:layout_marginTop="10dp"
         android:text="@string/app_tour3_text_header"
         android:textAppearance="@style/AppTourHeadingAppearance"
         app:typeface="robotoBoldCondensed"/>
 
-    <RelativeLayout
+
+    <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_app_tour_content"
+        android:text="@string/app_tour3_content_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="@style/AppTourContentAppearance"
+        android:layout_marginTop="10dp"
+        app:typeface="robotoCondensed"/>
+
+
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/img_app_tour_logo"
         android:layout_above="@id/txt_app_tour_header">
 
-        <ImageView
-            android:id="@+id/img_app_tour1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_app_tour3"
-            android:layout_alignParentBottom="true" />
 
 
-        <LinearLayout
+        &lt;!&ndash;<LinearLayout
             android:id="@+id/percentage_image_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,9 +89,9 @@
             </ImageView>
 
 
-        </LinearLayout>
+        </LinearLayout>&ndash;&gt;
 
-        <LinearLayout
+        &lt;!&ndash;<LinearLayout
             android:id="@+id/rupee_image_container"
             android:layout_width="match_parent"
             android:layout_below="@id/percentage_image_container"
@@ -152,14 +156,14 @@
 
 
         </LinearLayout>
-
+&ndash;&gt;
 
 
 
     </RelativeLayout>
+-->
 
 
 
 
-
-</RelativeLayout>
+</LinearLayout>

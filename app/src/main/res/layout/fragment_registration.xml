@@ -7,37 +7,13 @@
     android:layout_height="match_parent"
     android:background="@drawable/ic_app_background"
     android:fitsSystemWindows="true"
-    android:paddingTop="30dp"
+    android:padding="5dp"
     android:orientation="vertical">
-
-    <!--<android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="24dp"
-        android:fitsSystemWindows="true">
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-
-
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-
-    </android.support.design.widget.AppBarLayout>-->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp">
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/step2_container"
@@ -72,6 +48,7 @@
 
         </LinearLayout>
 
+
         <LinearLayout
             android:id="@+id/step1_container"
             android:layout_width="wrap_content"
@@ -103,6 +80,7 @@
                 app:typeface="robotoCondensed" />
 
         </LinearLayout>
+
 
         <View
             android:layout_width="match_parent"

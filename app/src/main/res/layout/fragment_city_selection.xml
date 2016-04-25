@@ -24,50 +24,38 @@
         android:gravity="center"
         android:layout_below="@id/img_logo"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:lineSpacingExtra="5dp"
         android:layout_marginTop="40dp"
         android:layout_marginBottom="40dp"
         app:typeface="robotoCondensed"/>
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/fb_login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:paddingBottom="13dp"
-        android:paddingTop="13dp"
-        android:layout_gravity="center"
-        android:drawableLeft="@drawable/ic_facebook_edited"
-        android:drawablePadding="15dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:textSize="16sp"
-        facebook:com_facebook_login_text="@string/facebook_login"/>
-
-
-
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_below="@id/img_logo"
-        android:layout_marginTop="70dp"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:background="@android:color/white"
+        android:padding="5dp">
 
+        <Spinner
+            android:id="@+id/spinner_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:theme="@style/AppTheme.PopupOverlay">
 
+        </Spinner>
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
+        <View
             android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:visibility="gone"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_below="@id/spinner_city"
+            android:layout_height="1dp"
+            android:layout_alignLeft="@id/spinner_city"
+            android:background="@android:color/black"
+            android:layout_alignRight="@id/spinner_city">
 
+        </View>
+
+
+    </RelativeLayout>
 
 </LinearLayout>

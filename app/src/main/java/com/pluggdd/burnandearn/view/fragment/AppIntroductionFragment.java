@@ -1,6 +1,8 @@
 package com.pluggdd.burnandearn.view.fragment;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,10 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nineoldandroids.view.ViewHelper;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.activity.FitBitActivity;
+import com.pluggdd.burnandearn.utils.FitnessSource;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 
@@ -30,6 +35,7 @@ public class AppIntroductionFragment extends Fragment {
     private TextView mSkipText,mDoneText;
     private ImageView mViewPagerIndicator1Image,mViewPagerIndicator2Image,mViewPagerIndicator3Image,mViewPagerIndicator4Image,mViewPagerForwardCloseImage;
     private PreferencesManager mPreferenceManager;
+    private Context mContext;
 
     public AppIntroductionFragment() {
         // Required empty public constructor
@@ -41,8 +47,7 @@ public class AppIntroductionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_app_introduction, container, false);
         mAppIntroViewPager = (ViewPager) view.findViewById(R.id.intro_viewpager);
@@ -86,11 +91,11 @@ public class AppIntroductionFragment extends Fragment {
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_selected);
                         mViewPagerIndicator4Image.setImageResource(R.drawable.viewpager_indicator_unselected);
-                        mSkipText.setVisibility(View.VISIBLE);
-                        mDoneText.setVisibility(View.GONE);
-                        mViewPagerForwardCloseImage.setVisibility(View.VISIBLE);
+                        mSkipText.setVisibility(View.INVISIBLE);
+                        mDoneText.setVisibility(View.VISIBLE);
+                        mViewPagerForwardCloseImage.setVisibility(View.GONE);
                         break;
-                    case 3:
+                   /* case 3:
                         mViewPagerIndicator1Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator2Image.setImageResource(R.drawable.viewpager_indicator_unselected);
                         mViewPagerIndicator3Image.setImageResource(R.drawable.viewpager_indicator_unselected);
@@ -98,7 +103,7 @@ public class AppIntroductionFragment extends Fragment {
                         mSkipText.setVisibility(View.GONE);
                         mDoneText.setVisibility(View.VISIBLE);
                         mViewPagerForwardCloseImage.setVisibility(View.GONE);
-                        break;
+                        break;*/
                 }
             }
 
@@ -118,29 +123,65 @@ public class AppIntroductionFragment extends Fragment {
         mSkipText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
+                showFitnessSourceSelectionDialog();
+                /*mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
-                mFragmentInteraction.changeFragment(bundle);
+                mFragmentInteraction.changeFragment(bundle);*/
             }
         });
 
         mDoneText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
+                showFitnessSourceSelectionDialog();
+                /*mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
-                mFragmentInteraction.changeFragment(bundle);
+                mFragmentInteraction.changeFragment(bundle);*/
             }
         });
 
         return  view;
     }
 
+    private void showFitnessSourceSelectionDialog() {
+        final Dialog dialog = new Dialog(mContext,R.style.Theme_Dialog_Translucent);
+        dialog.setContentView(R.layout.dialog_select_fitness_source);
+        dialog.setCancelable(false);
+        LinearLayout googleFit = (LinearLayout) dialog.findViewById(R.id.google_fit_container);
+        LinearLayout fitbit = (LinearLayout) dialog.findViewById(R.id.fibit_container);
+
+        googleFit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                mPreferenceManager.setIntValue(getString(R.string.selected_fitness_source), FitnessSource.GOOGLE_FIT.getId());
+                mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
+                Bundle bundle = new Bundle();
+                bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
+                mFragmentInteraction.changeFragment(bundle);
+                  }
+        });
+
+        fitbit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                mPreferenceManager.setIntValue(getString(R.string.selected_fitness_source), FitnessSource.FITBIT.getId());
+                mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
+                Bundle bundle = new Bundle();
+                bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
+                mFragmentInteraction.changeFragment(bundle);
+            }
+        });
+        dialog.show();
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
         if (context instanceof FragmentInteraction) {
             mFragmentInteraction = (FragmentInteraction) context;
         } else {
@@ -170,8 +211,8 @@ public class AppIntroductionFragment extends Fragment {
                     return new AppIntroduction2Fragment();
                 case 2:
                     return new AppIntroduction3Fragment();
-                case 3:
-                    return new AppIntroduction4Fragment();
+                /*case 3:
+                    return new AppIntroduction4Fragment();*/
 
             }
             return null;
@@ -179,7 +220,7 @@ public class AppIntroductionFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
     }
 

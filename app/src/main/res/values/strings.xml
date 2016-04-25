@@ -18,7 +18,7 @@
     <string name="user_id">user_id</string>
     <string name="burn_and_earn">EARN WHEN YOU BURN!</string>
     <string name="google_plus_login">Login with Google</string>
-    <string name="facebook_login">Login with Facebook</string>
+    <string name="facebook_login">Sign in with Facebook</string>
     <string name="page_flag">page_flag</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -52,12 +52,12 @@
     <string name="distance_dimension">km</string>
     <string name="steps">steps</string>
     <string name="steps_text">Steps</string>
-    <string name="app_tour1_text_header">Burn and Earn works \n with Google Fit</string>
-    <string name="app_tour1_content_text">Connect the app with Google fit and switch it on!</string>
-    <string name="app_tour2_text_header">Burn Calories</string>
-    <string name="app_tour2_content_text">Our app automatically detects the calories burnt and gives you reward points</string>
-    <string name="app_tour3_text_header">Unlock and Redeem</string>
-    <string name="app_tour3_content_text">Redeem your points for offers from our partners</string>
+    <string name="app_tour1_text_header">GET REWARDED TO BE ACTIVE</string>
+    <string name="app_tour1_content_text">Earn SweatPoints for every calorie that you burn while being active.Get rewarded for the points you accumulate.</string>
+    <string name="app_tour2_text_header">AUTOMATED ACTIVITY DETECTION</string>
+    <string name="app_tour2_content_text">Burn&amp;Earn works with Google Fit and FitBit to automatically track your activities and determine the amount of calories burnt.</string>
+    <string name="app_tour3_text_header">GET REWARDS THAT SUIT YOU</string>
+    <string name="app_tour3_content_text">Choose from long list of places where you can redeem your reward points,ranging from Apparel,Fitness Product,Wine and Dine,Travel and many more.</string>
     <string name="is_how_its_works_learned">how_it_works_learned</string>
     <string name="congratulations">Congratulations!</string>
     <string name="your_total_points">Your total earned points are now</string>
@@ -216,5 +216,21 @@
     <string name="hint_function">Function</string>
     <string name="hint_department">Department</string>
     <string name="hint_goal">Goal</string>
+    <string name="app_promo">AN ECOSYTEM FOR A HEALTHIER \n LIFESTYLE</string>
+    <string name="selected_city">selected city</string>
+    <string name="google_fit">GOOGLE FIT</string>
+    <string name="google_fit_info">Free Application - Android Users</string>
+    <string name="fitbit">FITBIT</string>
+    <string name="fitbit_info">Device is needed for detection</string>
+    <string name="name">name</string>
+    <string name="blood_group">blood group</string>
+    <string name="height_dimen">Height Dimen</string>
+    <string name="height">height</string>
+    <string name="weight">weight</string>
+    <string name="profile_base64">image_base64</string>
+    <string name="paramter1">parameter1</string>
+    <string name="paramter2">parameter2</string>
+    <string name="paramter3">parameter3</string>
+    <string name="paramter4">parameter4</string>
 
 </resources>

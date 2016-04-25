@@ -17,4 +17,5 @@ public class WebserviceAPI {
     public static final String MY_OFFERS = HOST_URL + "view_added_offer.php";
     public static final String CITY_LIST = HOST_URL + "get_city.php";
     public static final String SEND_FEEDBACK = HOST_URL + "feedback.php";
+    public static final String OCCUPATION_LIST = HOST_URL + "occupationlist.php";
 }

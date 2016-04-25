@@ -1554,7 +1554,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             volleyrequest.setRequestPolicy(request);
             mRequestQueue.add(request);
         }
-
     }
 
     private void showNotification() {

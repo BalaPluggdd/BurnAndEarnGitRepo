@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,8 +12,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent" >
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/intro_viewpager"
@@ -25,7 +25,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/light_grey"
+                android:background="@color/secondary_text"
                 android:layout_above="@+id/viewpager_indicator">
 
             </View>
@@ -35,9 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                >
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
                     android:id="@+id/txt_skip"
@@ -47,9 +46,15 @@
                     android:layout_alignParentLeft="true"
                     android:layout_centerInParent="true"
                     android:layout_alignBaseline="@+id/viewpager_indicator1_image"
-                    android:textColor="@android:color/white"
-                    android:layout_marginLeft="30dp"
-                    android:textSize="24sp"/>
+                    android:textColor="@color/secondary_text"
+                    android:layout_marginLeft="10dp"
+                    android:textSize="14sp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:typeface="robotoCondensed"/>
 
                 <ImageView
                     android:id="@+id/viewpager_indicator1_image"
@@ -85,6 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_centerInParent="true"
+                    android:visibility="gone"
                     android:layout_toRightOf="@id/viewpager_indicator3_image"
                     android:src="@drawable/viewpager_indicator_unselected" />
 
@@ -100,6 +106,7 @@
                     android:layout_marginRight="20dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
+                    android:background="?attr/selectableItemBackground"
                     android:src="@drawable/ic_next"/>
 
                 <com.pluggdd.burnandearn.font.RobotoTextView
@@ -109,10 +116,16 @@
                     android:text="@string/done"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="30dp"
-                    android:textColor="@android:color/white"
+                    android:layout_marginRight="5dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:paddingRight="20dp"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="@color/secondary_text"
                     android:visibility="gone"
-                    android:textSize="24sp"/>
+                    android:textSize="14sp"
+                    app:typeface="robotoCondensed"/>
 
 
 
