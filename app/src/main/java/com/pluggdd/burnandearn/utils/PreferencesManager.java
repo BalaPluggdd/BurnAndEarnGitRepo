@@ -40,7 +40,7 @@ public class PreferencesManager {
     }
  
     public float getFloatValue(String keyName) {
-        return myPref.getFloat(keyName, 12);
+        return myPref.getFloat(keyName, 0);
     }
     
     public void setStringValue(String keyName , String value) {

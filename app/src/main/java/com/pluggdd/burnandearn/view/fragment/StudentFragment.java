@@ -32,6 +32,7 @@ import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
+import com.pluggdd.burnandearn.utils.WebserviceHelper;
 import com.pluggdd.burnandearn.view.adapter.CityAdapter;
 
 import org.json.JSONArray;
@@ -109,7 +110,6 @@ public class StudentFragment extends Fragment {
             }
         });
 
-
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,10 +118,15 @@ public class StudentFragment extends Fragment {
                 } else if (TextUtils.isEmpty(mSociety.getText().toString())) {
                     Snackbar.make(mView, "Enter society", Snackbar.LENGTH_SHORT).show();
                 } else {
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.page_flag), StudentFragment.class.getSimpleName());
-                    mChildFragmentInteraction.changeChildFragment(bundle);
+                    if(new NetworkCheck().ConnectivityCheck(mContext)){
+                        mExtrasBundle.putString(getString(R.string.paramter1),mInstutionName.getText().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter2),mSchoolCollegeSpinner.getSelectedItem().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter3),mSociety.getText().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter4),"");
+                        new WebserviceHelper(mContext,mView,StudentFragment.class.getSimpleName(),mExtrasBundle,mChildFragmentInteraction).updateProfile();
+                    }else {
+                        Snackbar.make(mView,getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

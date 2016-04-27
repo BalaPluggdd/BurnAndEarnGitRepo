@@ -21,6 +21,7 @@
     <dimen name="business_logo">59dp</dimen>
     <dimen name="points_circle_dimen">60dp</dimen>
     <dimen name="stepper_circle_dimen">30dp</dimen>
+    <dimen name="stepper_line_padding">15dp</dimen>
     <dimen name="detail_offer_image_height">200dp</dimen>
     <dimen name="business_detail_logo">70dp</dimen>
     <dimen name="login_margin">80dp</dimen>

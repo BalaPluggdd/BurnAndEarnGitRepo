@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.pluggdd.burnandearn.R;
-import com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity;
 import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.FragmentHelper;
 import com.pluggdd.burnandearn.utils.FragmentInteraction;
@@ -77,7 +78,7 @@ public class RegistrationFragment extends Fragment implements ChildFragmentInter
         //mSteps1Container.setOnClickListener(this);
         //mSteps2Container.setOnClickListener(this);
         //mSteps3Container.setOnClickListener(this);
-        return mView;
+         return mView;
     }
 
     @Override
@@ -122,25 +123,28 @@ public class RegistrationFragment extends Fragment implements ChildFragmentInter
                 String selected_occupation = extras.getString(getString(R.string.occupation));
                 switch (selected_occupation) {
                     case "Student":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StudentFragment.getInstance(extras), false);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StudentFragment.getInstance(extras), true);
                         break;
                     case "Homemaker":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new StandardOccupaionFragment(), false);
+                        extras.putInt(getString(R.string.standard_occupation),2);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StandardOccupaionFragment.getInstance(extras), false);
                         break;
                     case "Self-Employed":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new SelfEmployeedFragment(), false);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, SelfEmploymentFragment.getInstance(extras), false);
                         break;
                     case "Private Company":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new PrivateFirmFragment(), false);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, PrivateFirmFragment.getInstance(extras), false);
                         break;
                     case "Government Service":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new GovernmentFragment(), false);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, GovernmentFragment.getInstance(extras), false);
                         break;
                     case "Retired":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new StandardOccupaionFragment(), false);
+                        extras.putInt(getString(R.string.standard_occupation),6);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StandardOccupaionFragment.getInstance(extras), false);
                         break;
                     case "Not Working":
-                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new StandardOccupaionFragment(), false);
+                        extras.putInt(getString(R.string.standard_occupation),7);
+                        mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StandardOccupaionFragment.getInstance(extras), false);
                         break;
                 }
 
@@ -149,14 +153,14 @@ public class RegistrationFragment extends Fragment implements ChildFragmentInter
 
             case "StandardOccupaionFragment":
 
-            case "SelfEmployeedFragment":
+            case "SelfEmploymentFragment":
 
             case "PrivateFirmFragment":
 
             case "GovernmentFragment":
                 setHeaderStepsActive(3);
                 mIsOccupationSet = true;
-                mFragmentHelper.replaceFragment(R.id.registration_fragment_container, new GoalFragment(), false);
+                mFragmentHelper.replaceFragment(R.id.registration_fragment_container, GoalFragment.getInstance(extras.getInt(getString(R.string.user_goal))), false);
                 break;
             case "GoalFragment":
                 if (mSourcePageFlag.equalsIgnoreCase("login")) { // From login fragment

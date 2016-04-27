@@ -29,7 +29,8 @@
             android:layout_marginLeft="10dp"
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_company_name"
-            android:inputType="text"
+            android:inputType="textCapWords"
+            android:imeOptions="actionNext"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray" />
 
@@ -57,7 +58,8 @@
             android:layout_marginLeft="10dp"
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_business_unit"
-            android:inputType="text"
+            android:inputType="textCapWords"
+            android:imeOptions="actionNext"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray" />
 
@@ -86,7 +88,8 @@
             android:layout_marginLeft="10dp"
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_function"
-            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray" />
 

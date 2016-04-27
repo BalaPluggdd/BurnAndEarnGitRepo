@@ -40,9 +40,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/occupation"
-                android:layout_marginTop="5dp"
                 android:textColor="@color/divider"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 app:typeface="robotoCondensed" />
 
 
@@ -73,10 +72,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_marginTop="5dp"
                 android:text="@string/action_profile"
                 android:textColor="@color/secondary_text"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 app:typeface="robotoCondensed" />
 
         </LinearLayout>
@@ -85,11 +83,11 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/step2_container"
             android:layout_toRightOf="@id/step1_container"
+            android:layout_marginTop="@dimen/stepper_line_padding"
             android:background="@color/divider" />
 
         <LinearLayout
@@ -118,9 +116,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/goal"
-                android:layout_marginTop="5dp"
                 android:textColor="@color/divider"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 app:typeface="robotoCondensed" />
 
         </LinearLayout>
@@ -128,11 +125,11 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/step3_container"
             android:layout_toRightOf="@id/step2_container"
+            android:layout_marginTop="@dimen/stepper_line_padding"
             android:background="@color/divider" />
 
     </RelativeLayout>

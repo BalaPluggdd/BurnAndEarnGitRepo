@@ -74,6 +74,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -160,14 +161,37 @@ public class ProfileFragment extends Fragment {
         mGender = mPreferenceManager.getIntValue(getString(R.string.gender));
         if (mGender == 0) {
             mMaleOption.setChecked(true);
-        } else if (mGender == 1) {
+        }else {
             mFemaleOption.setChecked(true);
-        } else if (mGender == 2) {
-            //mOtherOption.setChecked(true);
         }
         mDateOfBirthEdt.setText(mPreferenceManager.getStringValue(getString(R.string.dob)));
-        mNameEdt.setSelection(mNameEdt.getText().toString().length());
+        mNameEdt.setSelection(mNameEdt.getText().toString().trim().length());
         mSelectedCityId = mPreferenceManager.getIntValue(getString(R.string.city_id));
+        mBloodGroupSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.blood_group)).indexOf(mPreferenceManager.getStringValue(getString(R.string.blood_group))),true);
+        String height_dimen = mPreferenceManager.getStringValue(getString(R.string.height_dimen));
+        String height = mPreferenceManager.getStringValue(getString(R.string.height));
+        float weight = mPreferenceManager.getFloatValue(getString(R.string.weight));
+        if(height_dimen.equalsIgnoreCase(getString(R.string.feet_text))){
+            setEditTextMaxLength(mHeightEdt,4);
+            setEditTextMaxLength(mInchEdt,4);
+            if(height.contains(".")){
+                mHeightEdt.setText(height.split("\\.")[0]+" ft");
+                mInchEdt.setText(height.split("\\.")[1]+ " in");
+            }else{
+                mHeightEdt.setText(height+" ft");
+                mInchEdt.setText("0 in");
+            }
+        }else if(height_dimen.equalsIgnoreCase(getString(R.string.cm))){
+            mInchEdt.setVisibility(View.GONE);
+            setEditTextMaxLength(mHeightEdt,6);
+            mHeightEdt.setNextFocusDownId(R.id.edt_weight);
+            mHeightEdt.setText(height);
+        }
+        if(weight > 0)
+            mWeightEdt.setText(String.valueOf(weight));
+        mHeightDimenSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.height_dimens)).indexOf(mPreferenceManager.getStringValue(getString(R.string.height_dimen))),true);
+        mWeightSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.weight_dimens)).indexOf(mPreferenceManager.getStringValue(getString(R.string.weight_dimen))),true);
+        mOccupationSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.occupation)).indexOf(mPreferenceManager.getStringValue(getString(R.string.occupation))),true);
         registerForContextMenu(mProfileImage);
         registerForContextMenu(mChangeProfileImageText);
 
@@ -249,13 +273,16 @@ public class ProfileFragment extends Fragment {
                 if (position == 0) {
                     mInchEdt.setVisibility(View.VISIBLE);
                     setEditTextMaxLength(mHeightEdt,1);
+                    mHeightEdt.getText().clear();
                     mHeightEdt.setHint(getString(R.string.hint_height_feet));
                     mInchEdt.setHint(getString(R.string.hint_height_inches));
+                    mHeightEdt.setNextFocusDownId(R.id.edt_height_inches);
                 } else {
                     mInchEdt.setVisibility(View.GONE);
                     setEditTextMaxLength(mHeightEdt,6);
                     mHeightEdt.getText().clear();
                     mHeightEdt.setHint(getString(R.string.hint_height_cm));
+                    mHeightEdt.setNextFocusDownId(R.id.edt_weight);
                 }
             }
 
@@ -284,20 +311,27 @@ public class ProfileFragment extends Fragment {
                     mGender = 2;
 
                 if (TextUtils.isEmpty(mName)) {
+                    mNameEdt.requestFocus();
                     Snackbar.make(mView, "Enter name", Snackbar.LENGTH_SHORT).show();
                 }/* else if (TextUtils.isEmpty(mLastName)) {
                     Snackbar.make(mView, "Enter last name", Snackbar.LENGTH_SHORT).show();
                 }*/ else if (TextUtils.isEmpty(mEmail)) {
+                    mEmailEdt.requestFocus();
                     Snackbar.make(mView, "Enter email address", Snackbar.LENGTH_SHORT).show();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(mEmailEdt.getText().toString()).matches()) {
+                    mEmailEdt.requestFocus();
                     Snackbar.make(mView, "Enter valid email address", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mDateofBirth)) {
+                    mDateOfBirthEdt.requestFocus();
                     Snackbar.make(mView, "Choose date of birth", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mHeight)) {
+                    mHeightEdt.requestFocus();
                     Snackbar.make(mView, "Enter your height", Snackbar.LENGTH_SHORT).show();
                 } else if (mHeightDimenSpinner.getSelectedItemPosition() == 0 && TextUtils.isEmpty(mHeightInch)) {
+                    mInchEdt.requestFocus();
                     Snackbar.make(mView, "Enter your height in inches", Snackbar.LENGTH_SHORT).show();
                 } else if (TextUtils.isEmpty(mWeight)) {
+                    mWeightEdt.requestFocus();
                     Snackbar.make(mView, "Enter your weight", Snackbar.LENGTH_SHORT).show();
                 } else {
                     if (new NetworkCheck().ConnectivityCheck(getActivity())) {
@@ -549,7 +583,7 @@ public class ProfileFragment extends Fragment {
         else
             height = mHeightEdt.getText().toString();
         bundle.putString(getString(R.string.height), height);
-        bundle.putString(getString(R.string.weight_unit), mWeightSpinner.getSelectedItem().toString());
+        bundle.putString(getString(R.string.weight_dimen), mWeightSpinner.getSelectedItem().toString());
         bundle.putDouble(getString(R.string.weight), Double.valueOf(mWeightEdt.getText().toString()));
         bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
         mChildFragmentInteraction.changeChildFragment(bundle);

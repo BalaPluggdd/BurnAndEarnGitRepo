@@ -45,20 +45,21 @@ public class WebserviceHelper {
         mPreferenceManager = new PreferencesManager(mContext);
     }
 
-    private void updateProfile(final ProgressDialog mLoadingProgress) {
-        mLoadingProgress.show();
+    public void updateProfile() {
+        final ProgressDialog progressDialog = new ProgressDialog(mContext);
+        progressDialog.setMessage("Updating profile please wait");
+        progressDialog.show();
         VolleySingleton volleyRequest = VolleySingleton.getSingletonInstance();
         RequestQueue mRequestQueue = volleyRequest.getRequestQueue();
         Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.LOGIN_AND_REGISTER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i(" login response", response);
-                mLoadingProgress.dismiss();
+                progressDialog.dismiss();
                 if (response != null) {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1 || responseJson.optInt("status") == 2) {
-
                             mPreferenceManager.setStringValue(mContext.getString(R.string.user_id), responseJson.optString("userid"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.facebook_share), responseJson.optString("facebook_share"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.first_name), responseJson.optString("firstname"));
@@ -68,8 +69,15 @@ public class WebserviceHelper {
                             mPreferenceManager.setIntValue(mContext.getString(R.string.gender), responseJson.optInt("gender"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.dob), responseJson.optString("dob").split("-")[2] + "-" + responseJson.optString("dob").split("-")[1] + "-" + responseJson.optString("dob").split("-")[0]);
                             mPreferenceManager.setStringValue(mContext.getString(R.string.email), responseJson.optString("emailid"));
-                            //mPreferenceManager.setIntValue(getString(R.string.user_goal), mGoalSetUpSpinner.getSelectedItemPosition());
+                            mPreferenceManager.setIntValue(mContext.getString(R.string.user_goal),responseJson.optInt("usergoal"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.company), responseJson.optString("companyname"));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.blood_group),mBundle.getString(mContext.getString(R.string.blood_group)));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.height_dimen),mBundle.getString(mContext.getString(R.string.height_dimen)));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.height),mBundle.getString(mContext.getString(R.string.height)));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.weight_dimen),mBundle.getString(mContext.getString(R.string.weight_dimen)));
+                            mPreferenceManager.setFloatValue(mContext.getString(R.string.weight),(float)mBundle.getDouble(mContext.getString(R.string.weight)));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.occupation),mBundle.getString(mContext.getString(R.string.occupation)));
+
                             if (responseJson.optString("lastcaloriesupdate") != null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
@@ -87,7 +95,7 @@ public class WebserviceHelper {
                             }*/
                             Bundle bundle = new Bundle();
                             bundle.putString(mContext.getString(R.string.page_flag), mPageFlag);
-                            bundle.putInt(mContext.getString(R.string.user_goal),0);
+                            bundle.putInt(mContext.getString(R.string.user_goal),responseJson.optInt("usergoal"));
                             mChildFragmentInteraction.changeChildFragment(bundle);
 
                         } else {
@@ -102,7 +110,7 @@ public class WebserviceHelper {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mLoadingProgress.dismiss();
+                progressDialog.dismiss();
                 Snackbar.make(mView, "Unable to connect to server", Snackbar.LENGTH_SHORT).show();
             }
         }) {
@@ -116,7 +124,7 @@ public class WebserviceHelper {
                 params.put("dob", mBundle.getString(mContext.getString(R.string.dob)));
                 params.put("gender", String.valueOf(mBundle.getInt(mContext.getString(R.string.gender))));
                 params.put("city", String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_city))));
-                params.put("occupation", String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.occupation))));
+                params.put("occupation", mBundle.getString(mContext.getString(R.string.occupation)));
                 params.put("parameter1",mBundle.getString(mContext.getString(R.string.paramter1)));
                 params.put("parameter2",mBundle.getString(mContext.getString(R.string.paramter2)));
                 params.put("parameter3",mBundle.getString(mContext.getString(R.string.paramter3)));
@@ -126,8 +134,8 @@ public class WebserviceHelper {
                 params.put("bloodgroup",mBundle.getString(mContext.getString(R.string.blood_group)));
                 params.put("heighttype",mBundle.getString(mContext.getString(R.string.height_dimen)));
                 params.put("height",mBundle.getString(mContext.getString(R.string.height)));
-                params.put("weighttype",mBundle.getString(mContext.getString(R.string.weight_unit)));
-                params.put("weight",mBundle.getString(mContext.getString(R.string.weight)));
+                params.put("weighttype",mBundle.getString(mContext.getString(R.string.weight_dimen)));
+                params.put("weight",String.valueOf(mBundle.getDouble(mContext.getString(R.string.weight))));
                 return params;
             }
         });

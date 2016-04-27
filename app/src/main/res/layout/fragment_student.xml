@@ -29,7 +29,8 @@
             android:layout_marginLeft="10dp"
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_instution"
-            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray"
             android:theme="@style/AppTheme.PopupOverlay"/>

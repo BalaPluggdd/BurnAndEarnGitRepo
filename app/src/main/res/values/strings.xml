@@ -195,6 +195,7 @@
     <string name="auth_token">auth token</string>
     <string name="last_updated_fitbit_calories_time">last fitbit updated time</string>
     <string name="feet">ft</string>
+    <string name="feet_text">feet</string>
     <string name="inches">in</string>
     <string name="weight_unit">kg</string>
     <string name="hint_height_feet">0 ft</string>
@@ -225,6 +226,7 @@
     <string name="name">name</string>
     <string name="blood_group">blood group</string>
     <string name="height_dimen">Height Dimen</string>
+    <string name="weight_dimen">weight Dimen</string>
     <string name="height">height</string>
     <string name="weight">weight</string>
     <string name="profile_base64">image_base64</string>
@@ -232,5 +234,7 @@
     <string name="paramter2">parameter2</string>
     <string name="paramter3">parameter3</string>
     <string name="paramter4">parameter4</string>
+    <string name="standard_occupation">Standard Occupation</string>
+    <string name="cm">cm</string>
 
 </resources>

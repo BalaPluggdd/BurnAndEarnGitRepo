@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -40,23 +41,27 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PrivateFirmFragment extends Fragment {
+public class SelfEmploymentFragment extends Fragment {
 
     public final static String BUNDLE_ARGS = "bundle";
     private ChildFragmentInteraction mChildFragmentInteraction;
-    private AutoCompleteTextView mCompanyName,mBusinessUnit,mFunction,mSociety;
+    private AutoCompleteTextView mCompanyName, mSociety;
+    private EditText mNoOfEmployeesEdt;
     private Button mNextButton;
     private View mView;
-    private Context mContext;
     private Bundle mExtrasBundle;
+    private Context mContext;
 
+    public SelfEmploymentFragment() {
+        // Required empty public constructor
+    }
 
-    public static PrivateFirmFragment getInstance(Bundle bundle) {
-        PrivateFirmFragment privateFirmFragment = new PrivateFirmFragment();
-        Bundle privateFirnBundle = new Bundle();
-        privateFirnBundle.putBundle(BUNDLE_ARGS, bundle);
-        privateFirmFragment.setArguments(privateFirnBundle);
-        return privateFirmFragment;
+    public static SelfEmploymentFragment getInstance(Bundle bundle) {
+        SelfEmploymentFragment selfEmploymentFragment = new SelfEmploymentFragment();
+        Bundle studentBundle = new Bundle();
+        studentBundle.putBundle(BUNDLE_ARGS, bundle);
+        selfEmploymentFragment.setArguments(studentBundle);
+        return selfEmploymentFragment;
     }
 
     @Override
@@ -69,15 +74,13 @@ public class PrivateFirmFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_private_firm, container, false);
+        mView = inflater.inflate(R.layout.fragment_self_employeed, container, false);
         mCompanyName = (AutoCompleteTextView) mView.findViewById(R.id.edt_company_name);
-        mBusinessUnit = (AutoCompleteTextView) mView.findViewById(R.id.edt_business_unit);
-        mFunction = (AutoCompleteTextView) mView.findViewById(R.id.edt_function);
+        mNoOfEmployeesEdt = (EditText) mView.findViewById(R.id.edt_company_employees);
         mSociety = (AutoCompleteTextView) mView.findViewById(R.id.edt_society);
         mNextButton = (Button) mView.findViewById(R.id.btn_next);
-
         if (new NetworkCheck().ConnectivityCheck(mContext)) {
-            getPrivateFirmOccupationList();
+            getSelfEmployeementOccupationList();
         } else {
             Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
         }
@@ -85,21 +88,17 @@ public class PrivateFirmFragment extends Fragment {
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TextUtils.isEmpty(mCompanyName.getText().toString())){
-                    Snackbar.make(mView,"Enter company name",Snackbar.LENGTH_SHORT).show();
-                }else if(TextUtils.isEmpty(mBusinessUnit.getText().toString())){
-                    Snackbar.make(mView,"Enter business unit",Snackbar.LENGTH_SHORT).show();
-                }else if(TextUtils.isEmpty(mFunction.getText().toString())){
-                    Snackbar.make(mView,"Enter company function",Snackbar.LENGTH_SHORT).show();
-                }else if(TextUtils.isEmpty(mSociety.getText().toString())){
-                    Snackbar.make(mView,"Enter society",Snackbar.LENGTH_SHORT).show();
-                }else{
+                if (TextUtils.isEmpty(mCompanyName.getText().toString())) {
+                    Snackbar.make(mView, "Enter company name", Snackbar.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(mSociety.getText().toString())) {
+                    Snackbar.make(mView, "Enter society", Snackbar.LENGTH_SHORT).show();
+                } else {
                     if (new NetworkCheck().ConnectivityCheck(mContext)) {
                         mExtrasBundle.putString(getString(R.string.paramter1), mCompanyName.getText().toString().trim());
-                        mExtrasBundle.putString(getString(R.string.paramter2), mBusinessUnit.getText().toString().trim());
-                        mExtrasBundle.putString(getString(R.string.paramter3), mFunction.getText().toString().trim());
-                        mExtrasBundle.putString(getString(R.string.paramter4), mSociety.getText().toString().trim());
-                        new WebserviceHelper(mContext, mView, PrivateFirmFragment.class.getSimpleName(), mExtrasBundle, mChildFragmentInteraction).updateProfile();
+                        mExtrasBundle.putString(getString(R.string.paramter2), mNoOfEmployeesEdt.getText().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter3), mSociety.getText().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter4), "");
+                        new WebserviceHelper(mContext, mView, SelfEmploymentFragment.class.getSimpleName(), mExtrasBundle, mChildFragmentInteraction).updateProfile();
                     } else {
                         Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
@@ -124,7 +123,7 @@ public class PrivateFirmFragment extends Fragment {
         mChildFragmentInteraction = null;
     }
 
-    private void getPrivateFirmOccupationList() {
+    private void getSelfEmployeementOccupationList() {
         final ProgressDialog mLoadingProgress = new ProgressDialog(mContext);
         mLoadingProgress.setMessage("Loading please wait!!!");
         mLoadingProgress.setCancelable(false);
@@ -134,13 +133,11 @@ public class PrivateFirmFragment extends Fragment {
         Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.OCCUPATION_LIST, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.i("private firm response", response);
+                Log.i("selfemp response", response);
                 if (response != null) {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         ArrayList<String> mCompanyList = new ArrayList<>();
-                        ArrayList<String> mBusinessUnitList = new ArrayList<>();
-                        ArrayList<String> mFuncitonList = new ArrayList<>();
                         ArrayList<String> mSocietyList = new ArrayList<>();
                         if (responseJson.optInt("status") == 1) {
                             JSONArray collegeArray = responseJson.optJSONArray("companylist");
@@ -148,20 +145,6 @@ public class PrivateFirmFragment extends Fragment {
                                 for (int i = 0; i < collegeArray.length(); i++) {
                                     JSONObject collegeObject = collegeArray.getJSONObject(i);
                                     mCompanyList.add(collegeObject.optString("companyname"));
-                                }
-                            }
-                            JSONArray businessUnitArray = responseJson.optJSONArray("businessunitlist");
-                            if (businessUnitArray != null && businessUnitArray.length() > 0) {
-                                for (int i = 0; i < businessUnitArray.length(); i++) {
-                                    JSONObject collegeObject = businessUnitArray.getJSONObject(i);
-                                    mBusinessUnitList.add(collegeObject.optString("businessunitname"));
-                                }
-                            }
-                            JSONArray functionArray = responseJson.optJSONArray("functionlist");
-                            if (functionArray != null && functionArray.length() > 0) {
-                                for (int i = 0; i < functionArray.length(); i++) {
-                                    JSONObject collegeObject = functionArray.getJSONObject(i);
-                                    mFuncitonList.add(collegeObject.optString("functionname"));
                                 }
                             }
                             JSONArray societyArray = responseJson.optJSONArray("societylist");
@@ -172,8 +155,6 @@ public class PrivateFirmFragment extends Fragment {
                                 }
                             }
                             mCompanyName.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mCompanyList));
-                            mBusinessUnit.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mBusinessUnitList));
-                            mFunction.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mFuncitonList));
                             mSociety.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mSocietyList));
                         } else {
                             Snackbar.make(mView, responseJson.optString("msg"), Snackbar.LENGTH_SHORT).show();
@@ -197,13 +178,12 @@ public class PrivateFirmFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("flag", "4"); // 4 - for private firm occupation
+                params.put("flag", "3"); // 3 - for self employeed occupation
                 return params;
             }
         });
         volleyrequest.setRequestPolicy(request);
         mRequestQueue.add(request);
     }
-
 
 }

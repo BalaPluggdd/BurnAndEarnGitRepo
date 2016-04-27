@@ -8,9 +8,9 @@
     tools:context="com.pluggdd.burnandearn.view.fragment.StandardOccupaionFragment">
 
     <com.pluggdd.burnandearn.font.RobotoTextView
+        android:id="@+id/txt_user_goal_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="We recommend **** calories as goal for your healthy life"
         android:textSize="22sp"
         android:textColor="@color/colorPrimary"
         android:layout_marginTop="10dp"
