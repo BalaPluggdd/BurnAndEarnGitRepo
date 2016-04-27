@@ -32,6 +32,7 @@ import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.view.adapter.OfferRewardsAdapter;
 
+import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -154,10 +155,11 @@ public class OffersAndRewardsFragment extends Fragment {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mOfferAndRewardsRecyclerView.setVisibility(View.VISIBLE);
-                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(getActivity(),mBusinessOfferList,mPageFlag));
+                                mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(mContext,mBusinessOfferList,mPageFlag));
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.VISIBLE);
+                                setNoOfferText();
                                 mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
                                 /*if(!isDetached())
                                     Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();*/
@@ -166,20 +168,20 @@ public class OffersAndRewardsFragment extends Fragment {
                         } else {
                             mLoadingProgressBar.setVisibility(View.GONE);
                             mNoOfferText.setVisibility(View.VISIBLE);
+                            setNoOfferText();
                             mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
                             /*if(!isDetached())
                                 Toast.makeText(getContext(), "Business Offer list not found", Toast.LENGTH_SHORT).show();*/
-
                         }
 
                     } catch (JSONException e) {
                         e.printStackTrace();
                         mLoadingProgressBar.setVisibility(View.GONE);
                         mNoOfferText.setVisibility(View.VISIBLE);
+                        setNoOfferText();
                         mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
                         /*if(!isDetached())
                             Toast.makeText(getContext(), "Failure response from server", Toast.LENGTH_SHORT).show();*/
-
                     }
                 }
             }
@@ -189,9 +191,10 @@ public class OffersAndRewardsFragment extends Fragment {
                 try {
                     mLoadingProgressBar.setVisibility(View.GONE);
                     mNoOfferText.setVisibility(View.VISIBLE);
+                    setNoOfferText();
                     mOfferAndRewardsRecyclerView.setVisibility(View.GONE);
                     /*if(isVisible())
-                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();*/
+                        Toast.makeText(mContext, "Unable to connect to server", Toast.LENGTH_SHORT).show();*/
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -208,6 +211,16 @@ public class OffersAndRewardsFragment extends Fragment {
         });
         volleyrequest.setRequestPolicy(request);
         mRequestQueue.add(request);
+    }
+
+    private void setNoOfferText(){
+        if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers))) { // Active My Offers
+            mNoOfferText.setText(mContext.getString(R.string.no_active_offer_text));
+        }else if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers_inactive))) { // InActive My Offers
+            mNoOfferText.setText(mContext.getString(R.string.no_inactive_offer_text));
+        }else{
+            mNoOfferText.setText(mContext.getString(R.string.no_offer));
+        }
     }
 
 }

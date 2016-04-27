@@ -94,7 +94,7 @@ public class TotalPointsEarnedFragment extends Fragment {
         mTotalPointsEarnedText.setText(getString(R.string.points_earned));
         mTotalPointsText.setText(String.valueOf(mPointsEarned));
         mPointsUnitText.setText(getString(R.string.points));
-        mPointsAverageText.setText("You avg is "+mPointsAverage + " points");
+        mPointsAverageText.setText("Your daily avg is "+mPointsAverage);
         return view;
     }
 

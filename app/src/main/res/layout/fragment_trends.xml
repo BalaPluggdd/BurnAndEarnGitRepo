@@ -29,11 +29,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:lineSpacingExtra="10dp"
-        android:text="@string/no_business_offer"
-        android:textSize="22sp"
+        android:lineSpacingExtra="8dp"
+        android:text="@string/no_offers"
+        android:textSize="20sp"
         android:textColor="@color/torqoise"
         app:typeface="robotoCondensed"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        />
 
 </FrameLayout>

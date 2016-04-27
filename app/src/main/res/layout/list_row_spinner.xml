@@ -2,17 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/transparent">
 
     <com.pluggdd.burnandearn.font.RobotoTextView
-        android:id="@+id/txt_autocomplete"
+        android:id="@+id/txt_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/secondary_text"
         android:textSize="16sp"
         android:padding="5dp"
         />
-
-
-
 </LinearLayout>

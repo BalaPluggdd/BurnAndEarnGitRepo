@@ -41,7 +41,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
             mToolBar.setVisibility(View.GONE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             mFragmentHelper.addFragment(R.id.fragment_container, new LoginFragment());
-        }else if (mPreferenceManager.getIntValue(getString(R.string.selected_city)) == 0) { // If user does n't selected city
+        } else if (mPreferenceManager.getIntValue(getString(R.string.selected_city)) == 0) { // If user does n't selected city
             // To set translucent status bar
             mToolBar.setVisibility(View.GONE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -50,7 +50,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
             // To set translucent status bar
             mToolBar.setVisibility(View.GONE);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            mFragmentHelper.addFragment(R.id.fragment_container, new AppIntroductionFragment());
+            mFragmentHelper.addFragment(R.id.fragment_container, AppIntroductionFragment.getInstance(!mPreferenceManager.getBooleanValue(getString(R.string.is_how_its_works_learned)) ? getString(R.string.registration) : getString(R.string.settings)));
         } else if (!mPreferenceManager.getBooleanValue(getString(R.string.is_goal_set))) { // If goal does n't set
             // To set translucent status bar
             /*mToolBar.setVisibility(View.VISIBLE);
@@ -58,7 +58,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
             mFragmentHelper.addFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"));*/
             Intent intent1 = new Intent(InitialSetUpActivity.this, ProfileActivity.class);
-            intent1.putExtra(getString(R.string.page_flag),"Login");
+            intent1.putExtra(getString(R.string.page_flag), "Login");
             startActivity(intent1);
             overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
             finish();
@@ -100,14 +100,23 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
                 break;
             case "CitySelectionFragment":
                 mToolBar.setVisibility(View.GONE);
-                mFragmentHelper.replaceFragment(R.id.fragment_container, new AppIntroductionFragment(), false);
+                mFragmentHelper.addFragment(R.id.fragment_container, AppIntroductionFragment.getInstance(getString(R.string.registration)));
                 break;
             case "AppIntroductionFragment":
-                Intent intent1 = new Intent(InitialSetUpActivity.this, ProfileActivity.class);
-                intent1.putExtra(getString(R.string.page_flag),"Login");
-                startActivity(intent1);
-                overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
-                finish();
+                if (extras.getString(getString(R.string.source_flag)).equalsIgnoreCase(getString(R.string.registration))) {
+                    Intent intent1 = new Intent(InitialSetUpActivity.this, ProfileActivity.class);
+                    intent1.putExtra(getString(R.string.page_flag), "Login");
+                    startActivity(intent1);
+                    overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+                    finish();
+                } else {
+                    Intent intent = new Intent(InitialSetUpActivity.this, BurnAndEarnMainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+                    finish();
+                }
+
                 /*getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
                 mFragmentHelper.replaceFragment(R.id.fragment_container, RegistrationFragment.getInstance("login"), false);

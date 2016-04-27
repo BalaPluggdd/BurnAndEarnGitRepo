@@ -69,7 +69,6 @@ public class WebserviceHelper {
                             mPreferenceManager.setIntValue(mContext.getString(R.string.gender), responseJson.optInt("gender"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.dob), responseJson.optString("dob").split("-")[2] + "-" + responseJson.optString("dob").split("-")[1] + "-" + responseJson.optString("dob").split("-")[0]);
                             mPreferenceManager.setStringValue(mContext.getString(R.string.email), responseJson.optString("emailid"));
-                            mPreferenceManager.setIntValue(mContext.getString(R.string.user_goal),responseJson.optInt("usergoal"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.company), responseJson.optString("companyname"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.blood_group),mBundle.getString(mContext.getString(R.string.blood_group)));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.height_dimen),mBundle.getString(mContext.getString(R.string.height_dimen)));
@@ -77,22 +76,15 @@ public class WebserviceHelper {
                             mPreferenceManager.setStringValue(mContext.getString(R.string.weight_dimen),mBundle.getString(mContext.getString(R.string.weight_dimen)));
                             mPreferenceManager.setFloatValue(mContext.getString(R.string.weight),(float)mBundle.getDouble(mContext.getString(R.string.weight)));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.occupation),mBundle.getString(mContext.getString(R.string.occupation)));
-
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.paramter1),responseJson.optString("parameter1"));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.paramter2),responseJson.optString("parameter2"));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.paramter3),responseJson.optString("parameter3"));
+                            mPreferenceManager.setStringValue(mContext.getString(R.string.paramter4),responseJson.optString("parameter4"));
                             if (responseJson.optString("lastcaloriesupdate") != null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
                             } else
                                 mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), 0);
-
-                            /*if (mSourcePageFlag.equalsIgnoreCase("login")) { // From login fragment
-                                mPreferenceManager.setBooleanValue(getString(R.string.is_goal_set), true);
-                                Bundle bundle = new Bundle();
-                                bundle.putString(getString(R.string.page_flag), ProfileFragment.class.getSimpleName());
-                                bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
-                                mChildFragmentInteraction.changeFragment(bundle);
-                            } else {
-                                Snackbar.make(mView, "Profile Updated Successfully", Snackbar.LENGTH_SHORT).show();
-                            }*/
                             Bundle bundle = new Bundle();
                             bundle.putString(mContext.getString(R.string.page_flag), mPageFlag);
                             bundle.putInt(mContext.getString(R.string.user_goal),responseJson.optInt("usergoal"));

@@ -12,7 +12,7 @@
     <!--<android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="24dp"
+        android:paddingTop="18dp"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -51,7 +51,7 @@
             android:backgroundTint="@color/colorAccent"
             android:gravity="center"
             android:hint="@string/hint_first_name"
-            android:minWidth="200dp"
+            android:minWidth="150dp"
             android:singleLine="true"
             android:textColor="@android:color/white" />
 
@@ -63,7 +63,7 @@
             android:backgroundTint="@color/colorAccent"
             android:gravity="center"
             android:hint="@string/hint_last_name"
-            android:minWidth="200dp"
+            android:minWidth="150dp"
             android:singleLine="true"
             android:textColor="@android:color/white" />
     </LinearLayout>-->
@@ -128,10 +128,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:minWidth="30dp"
+                    android:minWidth="15dp"
                     android:text="@string/fontello_name"
                     android:textColor="@color/colorAccent"
-                    android:textSize="28sp" />
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/edt_name"
@@ -141,7 +141,8 @@
                     android:backgroundTint="@color/colorAccent"
                     android:hint="@string/hint_name"
                     android:inputType="textPersonName"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="16sp"
                     android:textColorHint="@android:color/darker_gray" />
 
             </LinearLayout>
@@ -149,17 +150,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <com.pluggdd.burnandearn.font.FontelloTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:minWidth="30dp"
+                    android:minWidth="15dp"
                     android:text="@string/fontello_envelope"
                     android:textColor="@color/colorAccent"
-                    android:textSize="28sp" />
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/edt_email"
@@ -169,7 +169,8 @@
                     android:backgroundTint="@color/colorAccent"
                     android:hint="@string/hint_email"
                     android:inputType="textEmailAddress"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="16sp"
                     android:textColorHint="@android:color/darker_gray" />
 
             </LinearLayout>
@@ -177,7 +178,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+
                 android:orientation="horizontal">
 
 
@@ -185,10 +186,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:minWidth="30dp"
+                    android:minWidth="15dp"
                     android:text="@string/fontello_calendar"
                     android:textColor="@color/colorAccent"
-                    android:textSize="28sp" />
+                    android:textSize="18sp" />
 
 
                 <EditText
@@ -201,7 +202,8 @@
                     android:focusableInTouchMode="false"
                     android:hint="@string/hint_dob"
                     android:singleLine="true"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="16sp"
                     android:textColorHint="@android:color/darker_gray" />
 
             </LinearLayout>
@@ -209,7 +211,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="3dp"
                 android:orientation="horizontal">
 
 
@@ -223,10 +225,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:minWidth="30dp"
+                        android:minWidth="15dp"
                         android:text="@string/fontello_sex"
                         android:textColor="@color/colorAccent"
-                        android:textSize="28sp" />
+                        android:textSize="18sp" />
 
                     <RadioGroup
                         android:layout_width="wrap_content"
@@ -240,19 +242,19 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/fontello_male"
-                            android:buttonTint="@android:color/black"
+                            android:buttonTint="@color/secondary_text"
                             android:textColor="@color/colorPrimary"
-                            android:textSize="24sp" />
+                            android:textSize="18sp" />
 
                         <com.pluggdd.burnandearn.utils.FontelloRadioButton
                             android:id="@+id/rbtn_female"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:buttonTint="@android:color/black"
+                            android:buttonTint="@color/secondary_text"
                             android:text="@string/fontello_female"
                             android:textColor="@color/colorPrimary"
-                            android:textSize="24sp" />
+                            android:textSize="18sp" />
 
                         <!-- <com.pluggdd.burnandearn.utils.FontelloRadioButton
                              android:id="@+id/rbtn_other"
@@ -270,6 +272,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
                     android:layout_weight="1">
 
                     <com.pluggdd.burnandearn.font.FontelloTextView
@@ -279,15 +282,15 @@
                         android:layout_marginLeft="5dp"
                         android:text="@string/fontello_blood"
                         android:textColor="@color/colorAccent"
-                        android:textSize="28sp" />
+                        android:textSize="18sp" />
 
                     <Spinner
                         android:id="@+id/spinner_blood_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
-                        android:entries="@array/blood_group"
-                        android:theme="@style/AppTheme.PopupOverlay">
+                        android:theme="@style/AppTheme.PopupOverlay"
+                        android:layout_gravity="center">
 
                     </Spinner>
 
@@ -300,7 +303,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+
                 android:orientation="horizontal">
 
 
@@ -309,10 +312,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:minWidth="30dp"
+                    android:minWidth="15dp"
                     android:text="@string/fontello_height"
                     android:textColor="@color/colorAccent"
-                    android:textSize="28sp" />
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/edt_height_feet"
@@ -326,7 +329,8 @@
                     android:inputType="numberDecimal"
                     android:singleLine="true"
                     android:nextFocusDown="@+id/edt_height_inches"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="16sp"
                     android:textColorHint="@android:color/darker_gray" />
 
                 <EditText
@@ -337,16 +341,18 @@
                     android:ems="4"
                     android:hint="@string/hint_height_inches"
                     android:maxLength="1"
+                    android:textSize="16sp"
                     android:inputType="number"
                     android:singleLine="true"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/secondary_text"
                     android:textColorHint="@android:color/darker_gray" />
 
                 <Spinner
                     android:id="@+id/spinner_height_dimens"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:entries="@array/height_dimens"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="15dp"
                     android:theme="@style/AppTheme.PopupOverlay">
 
                 </Spinner>
@@ -357,17 +363,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+
                 android:orientation="horizontal">
 
                 <com.pluggdd.burnandearn.font.FontelloTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:minWidth="30dp"
+                    android:minWidth="15dp"
                     android:text="@string/fontello_weight"
                     android:textColor="@color/colorAccent"
-                    android:textSize="28sp" />
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/edt_weight"
@@ -379,14 +385,15 @@
                     android:hint="@string/hint_weight"
                     android:inputType="numberDecimal"
                     android:singleLine="true"
-                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textColor="@color/secondary_text"
                     android:textColorHint="@android:color/darker_gray" />
 
                 <Spinner
                     android:id="@+id/spinner_weight_dimens"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:entries="@array/weight_dimens"
+                    android:layout_gravity="center"
                     android:theme="@style/AppTheme.PopupOverlay">
 
                 </Spinner>
@@ -396,23 +403,22 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp">
+                >
 
                 <com.pluggdd.burnandearn.font.FontelloTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:minWidth="30dp"
+                    android:minWidth="15dp"
                     android:text="@string/fontello_occupation"
                     android:textColor="@color/colorAccent"
-                    android:textSize="28sp" />
+                    android:textSize="18sp" />
 
                 <Spinner
                     android:id="@+id/spinner_occupation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:entries="@array/occupation"
                     android:theme="@style/AppTheme.PopupOverlay">
 
                 </Spinner>
@@ -464,7 +470,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:background="@color/orange"
                 android:minHeight="30dp"
                 android:paddingBottom="5dp"

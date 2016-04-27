@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/ic_app_background"
     android:orientation="vertical"
     android:padding="5dp"
@@ -11,10 +12,11 @@
         android:id="@+id/txt_user_goal_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:textColor="@color/primary_text"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        app:typeface="robotoCondensed"/>
 
 
     <LinearLayout
@@ -26,10 +28,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:minWidth="30dp"
+            android:minWidth="15dp"
             android:text="@string/fontello_goal"
             android:textColor="@color/colorAccent"
-            android:textSize="28sp" />
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/edt_goal"
@@ -39,7 +41,8 @@
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_goal"
             android:inputType="number"
-            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textColor="@color/secondary_text"
             android:textColorHint="@android:color/darker_gray" />
 
     </LinearLayout>
@@ -58,7 +61,6 @@
         android:paddingTop="5dp"
         android:text="@string/submit"
         android:textSize="18sp" />
-
 
 </LinearLayout>
 

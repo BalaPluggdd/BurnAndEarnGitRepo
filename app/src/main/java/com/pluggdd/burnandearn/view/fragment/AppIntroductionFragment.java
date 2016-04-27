@@ -30,20 +30,31 @@ public class AppIntroductionFragment extends Fragment {
 
     // Iniitialization of views and variables
 
+    public static final String SOURCE_FLAG = "SOURCE";
     private FragmentInteraction mFragmentInteraction;
     private ViewPager mAppIntroViewPager;
     private TextView mSkipText,mDoneText;
     private ImageView mViewPagerIndicator1Image,mViewPagerIndicator2Image,mViewPagerIndicator3Image,mViewPagerIndicator4Image,mViewPagerForwardCloseImage;
     private PreferencesManager mPreferenceManager;
     private Context mContext;
+    private String mSourceFlag;
 
     public AppIntroductionFragment() {
         // Required empty public constructor
     }
 
+    public static AppIntroductionFragment getInstance(String sourceFlag){ // False  if from Registration Process // True from Settings menu
+        AppIntroductionFragment appIntroductionFragment = new AppIntroductionFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(SOURCE_FLAG,sourceFlag);
+        appIntroductionFragment.setArguments(bundle);
+        return appIntroductionFragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSourceFlag = getArguments().getString(SOURCE_FLAG);
     }
 
     @Override
@@ -123,22 +134,29 @@ public class AppIntroductionFragment extends Fragment {
         mSkipText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showFitnessSourceSelectionDialog();
-                /*mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
-                Bundle bundle = new Bundle();
-                bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
-                mFragmentInteraction.changeFragment(bundle);*/
+                if(mSourceFlag.equalsIgnoreCase(getString(R.string.registration)))
+                     showFitnessSourceSelectionDialog();
+                else{
+                    Bundle bundle = new Bundle();
+                    bundle.putString(getString(R.string.source_flag),mSourceFlag);
+                    bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
+                    mFragmentInteraction.changeFragment(bundle);
+                }
             }
         });
 
         mDoneText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showFitnessSourceSelectionDialog();
-                /*mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
-                Bundle bundle = new Bundle();
-                bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
-                mFragmentInteraction.changeFragment(bundle);*/
+                if(mSourceFlag.equalsIgnoreCase(getString(R.string.registration)))
+                    showFitnessSourceSelectionDialog();
+                else{
+                    Bundle bundle = new Bundle();
+                    bundle.putString(getString(R.string.source_flag),mSourceFlag);
+                    bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
+                    mFragmentInteraction.changeFragment(bundle);
+                }
+
             }
         });
 
@@ -160,6 +178,7 @@ public class AppIntroductionFragment extends Fragment {
                 mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
                 Bundle bundle = new Bundle();
                 bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
+                bundle.putString(getString(R.string.source_flag),mSourceFlag);
                 mFragmentInteraction.changeFragment(bundle);
                   }
         });
@@ -171,6 +190,7 @@ public class AppIntroductionFragment extends Fragment {
                 mPreferenceManager.setIntValue(getString(R.string.selected_fitness_source), FitnessSource.FITBIT.getId());
                 mPreferenceManager.setBooleanValue(getString(R.string.is_how_its_works_learned),true);
                 Bundle bundle = new Bundle();
+                bundle.putString(getString(R.string.source_flag),mSourceFlag);
                 bundle.putString(getString(R.string.page_flag), AppIntroductionFragment.class.getSimpleName());
                 mFragmentInteraction.changeFragment(bundle);
             }

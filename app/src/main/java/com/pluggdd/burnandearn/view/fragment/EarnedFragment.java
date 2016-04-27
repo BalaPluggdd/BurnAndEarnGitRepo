@@ -468,7 +468,6 @@ public class EarnedFragment extends Fragment {
                     try {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
-                            ((BurnAndEarnMainActivity) getActivity()).mBusinesOfferList = new ArrayList<BusinessDetails>();
                             int totalPointEarned = responseJson.optInt("yourpoint");
                             mPreferenceManager.setIntValue(getString(R.string.your_total_points),totalPointEarned);
                             //mPointsEarnedText.setText(responseJson.optInt("yourpoint") + "!");
@@ -507,8 +506,7 @@ public class EarnedFragment extends Fragment {
                                 mNoOfferText.setVisibility(View.VISIBLE);
                                 mBusinessOfferRecyclerView.setVisibility(View.GONE);
                                 if (!isDetached())
-                                    Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
-
+                                    Toast.makeText(mContext, "Burn More Calories To Avail Offers", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             mLoadingProgressBar.setVisibility(View.GONE);
@@ -523,7 +521,7 @@ public class EarnedFragment extends Fragment {
                         mNoOfferText.setVisibility(View.VISIBLE);
                         mBusinessOfferRecyclerView.setVisibility(View.GONE);
                         if (!isDetached())
-                            Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Burn More Calories To Avail Offers", Toast.LENGTH_SHORT).show();
 
                     }
                 }

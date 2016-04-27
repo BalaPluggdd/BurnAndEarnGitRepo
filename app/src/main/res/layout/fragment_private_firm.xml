@@ -17,10 +17,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:minWidth="30dp"
+            android:minWidth="15dp"
             android:text="@string/fontello_company"
             android:textColor="@color/colorAccent"
-            android:textSize="28sp" />
+            android:textSize="18sp" />
 
         <AutoCompleteTextView
             android:id="@+id/edt_company_name"
@@ -30,8 +30,9 @@
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_company_name"
             android:inputType="textCapWords"
+            android:textSize="16sp"
             android:imeOptions="actionNext"
-            android:textColor="@android:color/black"
+            android:textColor="@color/secondary_text"
             android:textColorHint="@android:color/darker_gray" />
 
     </LinearLayout>
@@ -39,17 +40,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <com.pluggdd.burnandearn.font.FontelloTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:minWidth="30dp"
+            android:minWidth="15dp"
             android:text="@string/fontello_business_unit"
             android:textColor="@color/colorAccent"
-            android:textSize="28sp" />
+            android:textSize="18sp" />
 
         <AutoCompleteTextView
             android:id="@+id/edt_business_unit"
@@ -59,8 +59,9 @@
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_business_unit"
             android:inputType="textCapWords"
+            android:textSize="16sp"
             android:imeOptions="actionNext"
-            android:textColor="@android:color/black"
+            android:textColor="@color/secondary_text"
             android:textColorHint="@android:color/darker_gray" />
 
 
@@ -69,17 +70,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <com.pluggdd.burnandearn.font.FontelloTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:minWidth="30dp"
+            android:minWidth="15dp"
             android:text="@string/fontello_department"
             android:textColor="@color/colorAccent"
-            android:textSize="28sp" />
+            android:textSize="18sp" />
 
         <AutoCompleteTextView
             android:id="@+id/edt_function"
@@ -90,7 +90,8 @@
             android:hint="@string/hint_function"
             android:imeOptions="actionNext"
             android:inputType="textCapWords"
-            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textColor="@color/secondary_text"
             android:textColorHint="@android:color/darker_gray" />
 
 

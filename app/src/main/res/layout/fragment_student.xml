@@ -17,10 +17,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:minWidth="30dp"
+            android:minWidth="15dp"
             android:text="@string/fontello_instution_name"
             android:textColor="@color/colorAccent"
-            android:textSize="28sp" />
+            android:textSize="18sp" />
 
         <AutoCompleteTextView
             android:id="@+id/edt_institution_name"
@@ -31,7 +31,8 @@
             android:hint="@string/hint_instution"
             android:imeOptions="actionNext"
             android:inputType="textCapWords"
-            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textColor="@color/secondary_text"
             android:textColorHint="@android:color/darker_gray"
             android:theme="@style/AppTheme.PopupOverlay"/>
 
@@ -40,24 +41,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <com.pluggdd.burnandearn.font.FontelloTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:minWidth="30dp"
+            android:minWidth="15dp"
             android:text="@string/fontello_school_college"
             android:textColor="@color/colorAccent"
-            android:textSize="28sp" />
+            android:textSize="18sp" />
 
         <Spinner
             android:id="@+id/spinner_school_college"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/instution_group"
-            android:layout_marginLeft="10dp"
+             android:layout_marginLeft="10dp"
             android:theme="@style/AppTheme.PopupOverlay">
 
         </Spinner>
@@ -74,7 +73,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
         android:background="@color/orange"
-        android:minHeight="30dp"
+        android:minHeight="15dp"
         android:paddingBottom="5dp"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"

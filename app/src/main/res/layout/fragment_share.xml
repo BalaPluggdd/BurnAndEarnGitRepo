@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/ic_app_background"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="5dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -14,11 +13,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/share_and_earn"
-        android:textColor="@android:color/black"
+        android:textColor="@color/primary_text"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-
-        android:textSize="18sp" />
+        android:layout_marginTop="20dp"
+        android:textSize="18sp"
+        app:typeface="robotoCondensed"/>
 
     <com.facebook.share.widget.ShareButton
         android:id="@+id/btn_fbshare"

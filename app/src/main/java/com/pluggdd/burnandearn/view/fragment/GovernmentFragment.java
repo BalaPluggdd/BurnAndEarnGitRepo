@@ -25,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.utils.WebserviceHelper;
@@ -32,6 +33,7 @@ import com.pluggdd.burnandearn.utils.WebserviceHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +51,7 @@ public class GovernmentFragment extends Fragment {
     private View mView;
     private Context mContext;
     private Bundle mExtrasBundle;
+    private PreferencesManager mPreferenceManager;
 
     public GovernmentFragment() {
         // Required empty public constructor
@@ -76,6 +79,15 @@ public class GovernmentFragment extends Fragment {
         mGovernmentDepartment = (AutoCompleteTextView) mView.findViewById(R.id.edt_gov_department_name);
         mSocietyName = (AutoCompleteTextView) mView.findViewById(R.id.edt_society);
         mNextButton = (Button) mView.findViewById(R.id.btn_next);
+
+        // Set default value if already entered
+        mPreferenceManager = new PreferencesManager(mContext);
+        String department = mPreferenceManager.getStringValue(getString(R.string.paramter1));
+        if(!TextUtils.isEmpty(department))
+             mGovernmentDepartment.setText(department);
+        String society = mPreferenceManager.getStringValue(getString(R.string.paramter2));
+        if(!TextUtils.isEmpty(society))
+            mSocietyName.setText(society);
 
         if (new NetworkCheck().ConnectivityCheck(mContext)) {
             getGovernmentOccupationList();
@@ -162,7 +174,6 @@ public class GovernmentFragment extends Fragment {
                     } finally {
                         mLoadingProgress.dismiss();
                     }
-
                 }
             }
         }, new Response.ErrorListener() {

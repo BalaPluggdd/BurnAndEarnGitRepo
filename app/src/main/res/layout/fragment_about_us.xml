@@ -17,46 +17,51 @@
         <com.pluggdd.burnandearn.font.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/philosopy_behind"
+            android:text="@string/motivation_and_objective"
             android:textSize="20sp"
-            android:textColor="@color/torqoise"/>
+            android:textColor="@color/primary_text"
+            app:typeface="robotoCondensed"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
-            android:background="@android:color/black"/>
+            android:background="@color/divider"/>
 
         <com.pluggdd.burnandearn.font.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/philosopy_behind_data"
-            android:textSize="18sp"
-            android:layout_marginTop="5dp"
-            android:textColor="@android:color/black"/>
+            android:text="@string/motivation_and_objective_data"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/secondary_text"
+            app:typeface="robotoCondensed"/>
 
         <com.pluggdd.burnandearn.font.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/why_how_it_helps"
+            android:text="@string/how_it_helps"
             android:textSize="20sp"
             android:layout_marginTop="10dp"
-            android:textColor="@color/torqoise"/>
+            android:textColor="@color/primary_text"
+            app:typeface="robotoCondensed"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
-            android:background="@android:color/black"/>
+            android:background="@color/divider"/>
 
         <com.pluggdd.burnandearn.font.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/why_how_it_helps_data"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"/>
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/secondary_text"
+            app:typeface="robotoCondensed"/>
 
-        <com.pluggdd.burnandearn.font.RobotoTextView
+     <!--    <com.pluggdd.burnandearn.font.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/why_how_it_helps_entries"
@@ -75,7 +80,7 @@
 
 
 
-        <!--<view
+        &lt;!&ndash;<view
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginTop="5dp"
@@ -129,7 +134,7 @@
             android:layout_marginTop="10dp"
             android:textColor="@color/torqoise"/>
 
--->
+&ndash;&gt;-->
 
     </LinearLayout>
 

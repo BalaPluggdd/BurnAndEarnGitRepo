@@ -30,6 +30,7 @@ import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.model.City;
 import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.utils.WebserviceHelper;
@@ -40,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,14 +58,17 @@ public class StudentFragment extends Fragment {
     private View mView;
     private Context mContext;
     private Bundle mExtrasBundle;
-    private ArrayList<String> mCollegeList,mSchoolList;
+    private ArrayList<String> mCollegeList, mSchoolList;
+    private PreferencesManager mPreferenceManager;
+    private boolean mIsInitialLoad;
+    private String mInstitutionType;
 
-    public static StudentFragment getInstance(Bundle bundle){
+    public static StudentFragment getInstance(Bundle bundle) {
         StudentFragment studentFragment = new StudentFragment();
         Bundle studentBundle = new Bundle();
-        studentBundle.putBundle(BUNDLE_ARGS,bundle);
+        studentBundle.putBundle(BUNDLE_ARGS, bundle);
         studentFragment.setArguments(studentBundle);
-        return  studentFragment;
+        return studentFragment;
     }
 
 
@@ -78,29 +83,41 @@ public class StudentFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView =  inflater.inflate(R.layout.fragment_student, container, false);
+        mView = inflater.inflate(R.layout.fragment_student, container, false);
         mInstutionName = (AutoCompleteTextView) mView.findViewById(R.id.edt_institution_name);
         mSchoolCollegeSpinner = (Spinner) mView.findViewById(R.id.spinner_school_college);
         mSociety = (AutoCompleteTextView) mView.findViewById(R.id.edt_society);
         mNextButton = (Button) mView.findViewById(R.id.btn_next);
-
-        if(new NetworkCheck().ConnectivityCheck(mContext)){
-           getStudentOccupationList();
-        }else{
-            Snackbar.make(mView,getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+        mSchoolCollegeSpinner.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_spinner, R.id.txt_spinner, mContext.getResources().getStringArray(R.array.instution_group)));
+        mIsInitialLoad = true;
+        if (new NetworkCheck().ConnectivityCheck(mContext)) {
+            getStudentOccupationList();
+        } else {
+            Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
         }
+
+        // Set default value if already entered
+        mPreferenceManager = new PreferencesManager(mContext);
+        String instutionName = mPreferenceManager.getStringValue(getString(R.string.paramter1));
+        if (!TextUtils.isEmpty(instutionName))
+            mInstutionName.setText(instutionName);
+        mInstitutionType = mPreferenceManager.getStringValue(getString(R.string.paramter2));
+        mSchoolCollegeSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.instution_group)).indexOf(mInstitutionType), true);
+        String society = mPreferenceManager.getStringValue(getString(R.string.paramter3));
+        if (!TextUtils.isEmpty(society))
+            mSociety.setText(society);
 
         mSchoolCollegeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0){ // School
+                if (position == 0) { // School
                     mInstutionName.getText().clear();
-                    mInstutionName.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_autocomplete_view,R.id.txt_autocomplete,mSchoolList));
-                }else{ // College
+                    mInstutionName.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mSchoolList));
+                } else { // College
                     mInstutionName.getText().clear();
-                    mInstutionName.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_autocomplete_view,R.id.txt_autocomplete,mCollegeList));
+                    mInstutionName.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mCollegeList));
                 }
             }
 
@@ -118,14 +135,14 @@ public class StudentFragment extends Fragment {
                 } else if (TextUtils.isEmpty(mSociety.getText().toString())) {
                     Snackbar.make(mView, "Enter society", Snackbar.LENGTH_SHORT).show();
                 } else {
-                    if(new NetworkCheck().ConnectivityCheck(mContext)){
-                        mExtrasBundle.putString(getString(R.string.paramter1),mInstutionName.getText().toString().trim());
-                        mExtrasBundle.putString(getString(R.string.paramter2),mSchoolCollegeSpinner.getSelectedItem().toString().trim());
-                        mExtrasBundle.putString(getString(R.string.paramter3),mSociety.getText().toString().trim());
-                        mExtrasBundle.putString(getString(R.string.paramter4),"");
-                        new WebserviceHelper(mContext,mView,StudentFragment.class.getSimpleName(),mExtrasBundle,mChildFragmentInteraction).updateProfile();
-                    }else {
-                        Snackbar.make(mView,getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                    if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                        mExtrasBundle.putString(getString(R.string.paramter1), mInstutionName.getText().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter2), mSchoolCollegeSpinner.getSelectedItem().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter3), mSociety.getText().toString().trim());
+                        mExtrasBundle.putString(getString(R.string.paramter4), "");
+                        new WebserviceHelper(mContext, mView, StudentFragment.class.getSimpleName(), mExtrasBundle, mChildFragmentInteraction).updateProfile();
+                    } else {
+                        Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -165,35 +182,39 @@ public class StudentFragment extends Fragment {
                         ArrayList<String> mSocietyList = new ArrayList<>();
                         if (responseJson.optInt("status") == 1) {
                             JSONArray collegeArray = responseJson.optJSONArray("collegelist");
-                            if(collegeArray != null && collegeArray.length() > 0){
-                                for(int i=0 ; i< collegeArray.length() ; i++){
+                            if (collegeArray != null && collegeArray.length() > 0) {
+                                for (int i = 0; i < collegeArray.length(); i++) {
                                     JSONObject collegeObject = collegeArray.getJSONObject(i);
                                     mCollegeList.add(collegeObject.optString("collegename"));
                                 }
                             }
                             JSONArray schoolArray = responseJson.optJSONArray("schoollist");
-                            if(schoolArray != null && schoolArray.length() > 0){
-                                for(int i=0 ; i< schoolArray.length() ; i++){
+                            if (schoolArray != null && schoolArray.length() > 0) {
+                                for (int i = 0; i < schoolArray.length(); i++) {
                                     JSONObject schoolObject = schoolArray.getJSONObject(i);
                                     mSchoolList.add(schoolObject.optString("schoolname"));
                                 }
                             }
                             JSONArray societyArray = responseJson.optJSONArray("societylist");
-                            if(societyArray != null && societyArray.length() > 0){
-                                for(int i=0 ; i< societyArray.length() ; i++){
+                            if (societyArray != null && societyArray.length() > 0) {
+                                for (int i = 0; i < societyArray.length(); i++) {
                                     JSONObject societyObject = societyArray.getJSONObject(i);
                                     mSocietyList.add(societyObject.optString("societyname"));
                                 }
                             }
-                            mInstutionName.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_autocomplete_view,R.id.txt_autocomplete,mSchoolList));
-                            mSociety.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_autocomplete_view,R.id.txt_autocomplete,mSocietyList));
+                            if (!mInstitutionType.equalsIgnoreCase("") && mInstitutionType.equalsIgnoreCase(mContext.getString(R.string.college)))
+                                mInstutionName.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mCollegeList));
+                            else
+                                mInstutionName.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mSchoolList));
+                            mSociety.setAdapter(new ArrayAdapter<String>(mContext, R.layout.list_row_autocomplete_view, R.id.txt_autocomplete, mSocietyList));
+
                         } else {
                             Snackbar.make(mView, responseJson.optString("msg"), Snackbar.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
-                    }finally {
+                    } finally {
                         mLoadingProgress.dismiss();
                     }
 
@@ -205,7 +226,7 @@ public class StudentFragment extends Fragment {
                 mLoadingProgress.dismiss();
                 Snackbar.make(mView, "Unable to connect to our server", Snackbar.LENGTH_SHORT).show();
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();

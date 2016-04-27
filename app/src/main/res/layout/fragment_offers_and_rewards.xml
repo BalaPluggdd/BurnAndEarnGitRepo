@@ -29,10 +29,9 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:lineSpacingExtra="10dp"
-        android:text="@string/no_offer"
         android:textSize="22sp"
         android:textColor="@color/torqoise"
         app:typeface="robotoCondensed"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
 </FrameLayout>

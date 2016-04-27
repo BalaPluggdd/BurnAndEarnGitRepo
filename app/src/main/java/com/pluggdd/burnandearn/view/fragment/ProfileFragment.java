@@ -32,6 +32,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -150,10 +151,15 @@ public class ProfileFragment extends Fragment {
         mFemaleOption = (RadioButton) mView.findViewById(R.id.rbtn_female);
         /*mOtherOption = (RadioButton) mView.findViewById(R.id.rbtn_other);*/
         mProfileLoadingProgress = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
+        // To set spinner custom adapter
+        mBloodGroupSpinner.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_spinner,R.id.txt_spinner,mContext.getResources().getStringArray(R.array.blood_group)));
+        mHeightDimenSpinner.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_spinner,R.id.txt_spinner,mContext.getResources().getStringArray(R.array.height_dimens)));
+        mWeightSpinner.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_spinner,R.id.txt_spinner,mContext.getResources().getStringArray(R.array.weight_dimens)));
+        mOccupationSpinner.setAdapter(new ArrayAdapter<String>(mContext,R.layout.list_row_spinner,R.id.txt_spinner,mContext.getResources().getStringArray(R.array.occupation)));
         mPreferenceManager = new PreferencesManager(getContext());
         // To populate values
         new PicassoImageLoaderHelper(getContext(), mProfileImage, mProfileLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
-        mNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)) + " " + mPreferenceManager.getStringValue(getString(R.string.last_name)));
+        mNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.first_name)).trim());
         /*mLastNameEdt.setText(mPreferenceManager.getStringValue(getString(R.string.last_name)));*/
         mEmailEdt.setText(mPreferenceManager.getStringValue(getString(R.string.email)));
         mFacebookId = mPreferenceManager.getStringValue(getString(R.string.facebookId));
@@ -586,6 +592,12 @@ public class ProfileFragment extends Fragment {
         bundle.putString(getString(R.string.weight_dimen), mWeightSpinner.getSelectedItem().toString());
         bundle.putDouble(getString(R.string.weight), Double.valueOf(mWeightEdt.getText().toString()));
         bundle.putString(getString(R.string.occupation), mOccupationSpinner.getSelectedItem().toString());
+        if(!mPreferenceManager.getStringValue(getString(R.string.occupation)).equalsIgnoreCase(mOccupationSpinner.getSelectedItem().toString())){
+            mPreferenceManager.setStringValue(getString(R.string.paramter1),"");
+            mPreferenceManager.setStringValue(getString(R.string.paramter2),"");
+            mPreferenceManager.setStringValue(getString(R.string.paramter3),"");
+            mPreferenceManager.setStringValue(getString(R.string.paramter4),"");
+        }
         mChildFragmentInteraction.changeChildFragment(bundle);
     }
 

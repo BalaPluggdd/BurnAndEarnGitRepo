@@ -25,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.utils.WebserviceHelper;
@@ -49,6 +50,7 @@ public class PrivateFirmFragment extends Fragment {
     private View mView;
     private Context mContext;
     private Bundle mExtrasBundle;
+    private PreferencesManager mPreferenceManager;
 
 
     public static PrivateFirmFragment getInstance(Bundle bundle) {
@@ -75,6 +77,21 @@ public class PrivateFirmFragment extends Fragment {
         mFunction = (AutoCompleteTextView) mView.findViewById(R.id.edt_function);
         mSociety = (AutoCompleteTextView) mView.findViewById(R.id.edt_society);
         mNextButton = (Button) mView.findViewById(R.id.btn_next);
+
+        // Set default value if already entered
+        mPreferenceManager = new PreferencesManager(mContext);
+        String companyName = mPreferenceManager.getStringValue(getString(R.string.paramter1));
+        if(!TextUtils.isEmpty(companyName))
+            mCompanyName.setText(companyName);
+        String businessUnit = mPreferenceManager.getStringValue(getString(R.string.paramter2));
+        if(!TextUtils.isEmpty(businessUnit))
+            mBusinessUnit.setText(businessUnit);
+        String function = mPreferenceManager.getStringValue(getString(R.string.paramter3));
+        if(!TextUtils.isEmpty(function))
+            mFunction.setText(function);
+        String society = mPreferenceManager.getStringValue(getString(R.string.paramter4));
+        if(!TextUtils.isEmpty(society))
+            mSociety.setText(society);
 
         if (new NetworkCheck().ConnectivityCheck(mContext)) {
             getPrivateFirmOccupationList();

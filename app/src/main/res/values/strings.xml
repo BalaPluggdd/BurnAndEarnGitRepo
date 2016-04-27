@@ -53,11 +53,11 @@
     <string name="steps">steps</string>
     <string name="steps_text">Steps</string>
     <string name="app_tour1_text_header">GET REWARDED TO BE ACTIVE</string>
-    <string name="app_tour1_content_text">Earn SweatPoints for every calorie that you burn while being active.Get rewarded for the points you accumulate.</string>
+    <string name="app_tour1_content_text">Earn SweatPoints for every calorie that you burn while being active.Use your earned \'SweatPoints\' to get awesome deals and discounts.</string>
     <string name="app_tour2_text_header">AUTOMATED ACTIVITY DETECTION</string>
     <string name="app_tour2_content_text">Burn&amp;Earn works with Google Fit and FitBit to automatically track your activities and determine the amount of calories burnt.</string>
     <string name="app_tour3_text_header">GET REWARDS THAT SUIT YOU</string>
-    <string name="app_tour3_content_text">Choose from long list of places where you can redeem your reward points,ranging from Apparel,Fitness Product,Wine and Dine,Travel and many more.</string>
+    <string name="app_tour3_content_text">Chose from a long list of places and business, where you can redeem your \'SweatPoints\', ranging from apparels, fitness products, wine and dine, travel and a lot more.</string>
     <string name="is_how_its_works_learned">how_it_works_learned</string>
     <string name="congratulations">Congratulations!</string>
     <string name="your_total_points">Your total earned points are now</string>
@@ -67,15 +67,15 @@
     <string name="distance_travelled">You have covered</string>
     <string name="steps_taken">You have taken</string>
     <string name="terms_and_conditions">Terms And Conditions*</string>
-    <string name="no_offer">Currently No Offers Exits. \n Try after somtime</string>
-    <string name="philosopy_behind">Philosophy behind</string>
-    <string name="philosopy_behind_data">While each one of us understands the necessity for physical activity in ensuring a healthy life, majority of us do not find just health as a motivating factor for excersing.  We are Burn&amp;Earn want to give you one more reason to excersize. As you burn your calories and get healthier, we reward you with points that you can use to get custom and tailor made offers, deals, complimentary things for yourself.</string>
-    <string name="why_how_it_helps">Why and how it helps?</string>
-    <string name="why_how_it_helps_data">We believe that physical activities, apart from keeping you healthy, ensure the general well being of the planet as well. How? Here are a few ways how:</string>
-    <string name="why_how_it_helps_entries">-Save Fuel when you walk or cycle to you. workplace \n- Lesser pollution as you walk or cycle \n- Lesser traffic \n- Saving money \n- Lesser expenditure on hospitals \n- Governments can focus on infra like schools hospitals etc, if we reduce congestion on roads</string>
+    <string name="no_offer">Business offer does not exists now</string>
+    <string name="motivation_and_objective">Motivation and Objective</string>
+    <string name="motivation_and_objective_data">An app that is designed and aimed at creating a sustainable ecosystem for drive health an fitness among users all across the board.</string>
+    <string name="how_it_helps">How does it work?</string>
+    <string name="why_how_it_helps_data">The app automatically detects the number of calories burnt using either Google Fit or FitBit (based on your choice). You do not have to worry about switching on/off our app to be able to accurately determine the number of calories burnt.\n\nThe total number of calories burnt are rewarded with SweatPoints. Accumulate SweatPoints to redeem them across a variety of offers and discounts from our partners.\n\nBe healthy and be rewarded to be healthy!</string>
+    <!--<string name="why_how_it_helps_entries">-Save Fuel when you walk or cycle to you. workplace \n- Lesser pollution as you walk or cycle \n- Lesser traffic \n- Saving money \n- Lesser expenditure on hospitals \n- Governments can focus on infra like schools hospitals etc, if we reduce congestion on roads</string>-->
     <string name="about_us_footer">So go, burn your calories, while we run around and gather things that you love!</string>
     <string name="we_are_there_for_you">We are there for you!</string>
-    <string name="let_us_know_how_we_can_help">Let us know how we can help...</string>
+    <string name="let_us_know_how_we_can_help">Let us know how can we help. If you have a request for a special offer, let us know and we shall try to curate it</string>
     <string name="hint_subject">Subject</string>
     <string name="hint_feedback_request">Feedback / Request</string>
     <string name="send">SEND</string>
@@ -90,7 +90,7 @@
     <string name="coupon_expiry_date">Coupon expiry date</string>
     <string name="redirect_url">redirect url</string>
     <string name="share">Share</string>
-    <string name="share_and_earn">Share with your friends and earn we shall add 500 points to your total</string>
+    <string name="share_and_earn">Help your friends and family use the app as well!\n\nShare our app on your Facebook page and we shall automatically add 500 SweatPoints to your account</string>
     <string name="facebook_share">Share with Facebook</string>
     <string name="goal_set_up_header">HANG ON !!! We need some additional information</string>
     <string name="choose_your_age_group">Choose your age group</string>
@@ -123,10 +123,11 @@
     <string name="start_time">StartTime</string>
     <string name="last_updated_calories_time">last updated calores time</string>
     <string name="calories_goal">calories goal</string>
-    <string name="points_earned">You have earned</string>
+    <string name="points_earned">Total SweatPoints</string>
     <string name="points">points</string>
     <string name="points_txt">POINTS</string>
-    <string name="no_business_offer">Burn more calories to avail offers</string>
+    <string name="no_offers">Currently, you do not have any offers to avail. You may want to burn a few more calories to accumulate SweatPoints</string>
+    <string name="no_business_offer">Burn More Calories To Avail Offers</string>
     <string name="business_id">businessId</string>
     <string name="goal_achieved_notification_header">Congrats Your Goal Achieved !!!</string>
     <string name="goal_achieved_notification_content">You have achieved your goal of burning</string>
@@ -236,5 +237,11 @@
     <string name="paramter4">parameter4</string>
     <string name="standard_occupation">Standard Occupation</string>
     <string name="cm">cm</string>
+    <string name="no_active_offer_text">You do not have any active offers</string>
+    <string name="no_inactive_offer_text">You do not have any expired offers</string>
+    <string name="school">school</string>
+    <string name="college">college</string>
+    <string name="registration">Registration</string>
+    <string name="source_flag">source flag</string>
 
 </resources>

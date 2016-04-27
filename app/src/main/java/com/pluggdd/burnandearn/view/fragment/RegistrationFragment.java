@@ -126,7 +126,6 @@ public class RegistrationFragment extends Fragment implements ChildFragmentInter
                         mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StudentFragment.getInstance(extras), true);
                         break;
                     case "Homemaker":
-                        extras.putInt(getString(R.string.standard_occupation),2);
                         mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StandardOccupaionFragment.getInstance(extras), false);
                         break;
                     case "Self-Employed":
@@ -139,11 +138,9 @@ public class RegistrationFragment extends Fragment implements ChildFragmentInter
                         mFragmentHelper.replaceFragment(R.id.registration_fragment_container, GovernmentFragment.getInstance(extras), false);
                         break;
                     case "Retired":
-                        extras.putInt(getString(R.string.standard_occupation),6);
                         mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StandardOccupaionFragment.getInstance(extras), false);
                         break;
                     case "Not Working":
-                        extras.putInt(getString(R.string.standard_occupation),7);
                         mFragmentHelper.replaceFragment(R.id.registration_fragment_container, StandardOccupaionFragment.getInstance(extras), false);
                         break;
                 }

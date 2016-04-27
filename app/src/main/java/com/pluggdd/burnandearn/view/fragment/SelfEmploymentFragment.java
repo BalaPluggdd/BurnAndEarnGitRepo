@@ -26,6 +26,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.utils.WebserviceHelper;
@@ -51,6 +52,7 @@ public class SelfEmploymentFragment extends Fragment {
     private View mView;
     private Bundle mExtrasBundle;
     private Context mContext;
+    private PreferencesManager mPreferenceManager;
 
     public SelfEmploymentFragment() {
         // Required empty public constructor
@@ -79,6 +81,19 @@ public class SelfEmploymentFragment extends Fragment {
         mNoOfEmployeesEdt = (EditText) mView.findViewById(R.id.edt_company_employees);
         mSociety = (AutoCompleteTextView) mView.findViewById(R.id.edt_society);
         mNextButton = (Button) mView.findViewById(R.id.btn_next);
+
+        // Set default value if already entered
+        mPreferenceManager = new PreferencesManager(mContext);
+        String companyName = mPreferenceManager.getStringValue(getString(R.string.paramter1));
+        if(!TextUtils.isEmpty(companyName))
+            mCompanyName.setText(companyName);
+        String no_of_employees = mPreferenceManager.getStringValue(getString(R.string.paramter2));
+        if(!TextUtils.isEmpty(no_of_employees))
+            mNoOfEmployeesEdt.setText(no_of_employees);
+        String society = mPreferenceManager.getStringValue(getString(R.string.paramter3));
+        if(!TextUtils.isEmpty(society))
+            mSociety.setText(society);
+
         if (new NetworkCheck().ConnectivityCheck(mContext)) {
             getSelfEmployeementOccupationList();
         } else {

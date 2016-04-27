@@ -26,6 +26,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.utils.ChildFragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
+import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.utils.WebserviceHelper;
@@ -50,12 +51,11 @@ public class StandardOccupaionFragment extends Fragment {
     private View mView;
     private Bundle mExtrasBundle;
     private Context mContext;
-
+    private PreferencesManager mPreferenceManager;
 
     public StandardOccupaionFragment() {
         // Required empty public constructor
     }
-
 
     public static StandardOccupaionFragment getInstance(Bundle bundle){
         StandardOccupaionFragment standardOccupationFragment = new StandardOccupaionFragment();
@@ -79,6 +79,12 @@ public class StandardOccupaionFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_standard_occupaion, container, false);
         mSociety = (AutoCompleteTextView) mView.findViewById(R.id.edt_society);
         mNextButton = (Button) mView.findViewById(R.id.btn_next);
+
+        // Set default value if already entered
+        mPreferenceManager = new PreferencesManager(mContext);
+        String society = mPreferenceManager.getStringValue(getString(R.string.paramter1));
+        if(!TextUtils.isEmpty(society))
+            mSociety.setText(society);
 
         if(new NetworkCheck().ConnectivityCheck(mContext)){
             getStandardOccupationList();
@@ -166,7 +172,7 @@ public class StandardOccupaionFragment extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("flag", String.valueOf(mExtrasBundle.getInt(getString(R.string.standard_occupation)))); // 2 - for Homemaker occupation
+                params.put("flag", "2"); // 2 - for Homemaker,Retired,Not Working occupation
                 return params;
             }
         });

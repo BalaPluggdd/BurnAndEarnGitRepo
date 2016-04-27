@@ -82,7 +82,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
         if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers))) { // Active My Offers
             holder.sCouponCodeText.setVisibility(View.VISIBLE);
             holder.sRedeemButton.setText(businessDetail.getCoupon());
-        }else if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers_inactive))) { // Active My Offers
+        }else if(mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers_inactive))) { //In Active My Offers
             holder.sDaysEndsInContainer.setVisibility(View.GONE);
             holder.sExpiredAtText.setVisibility(View.VISIBLE);
             LocalDateTime expirationDateTime = new LocalDateTime(businessDetail.getCoupon_expiry_date());
@@ -90,15 +90,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
             holder.sRedeemButton.setVisibility(View.GONE);
             //holder.sPhoneImage.setVisibility(View.GONE);
             //holder.sLocationImage.setVisibility(View.GONE);
-        }else{
-            /*if(businessDetail.getPoints_needed() >= mPreferenceManager.getIntValue(mContext.getString(R.string.your_total_points))){
-                holder.sRedeemButton.setVisibility(View.GONE);
-                holder.sPointsNeeded.setVisibility(View.VISIBLE);
-            }else{
-                holder.sPointsNeeded.setVisibility(View.INVISIBLE);
-                holder.sRedeemButton.setVisibility(View.GONE);
-            }*/
-         }
+        }
         if(!mPageFlag.equalsIgnoreCase(mContext.getString(R.string.my_offers_inactive))) { // Active My Offers
             // To calculate time left
             long date_difference = new LocalDateTime(businessDetail.getCoupon_expiry_date()).plusDays(1).toDateTime().getMillis() - new LocalDateTime().toDateTime().getMillis();
@@ -106,35 +98,6 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
             new CustomCountDownTimer(mContext,holder.sDaysEndsInContainer,holder.sDaysText,holder.sHourText,holder.sMinuteText,holder.sExpiredAtText,holder.sRedeemButton,holder.sCouponCodeText,businessDetail.getCoupon_expiry_date(),mPageFlag,date_difference,1000).start();
         }
 
-        /*holder.sPhoneImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    String uri = "tel:" + businessDetail.getPhone_number();
-                    Intent mCallIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(uri));
-                    mContext.startActivity(mCallIntent);
-                }catch(Exception e) {
-                    Toast.makeText(mContext, "Your call has failed...", Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-
-                }
-            }
-        });
-
-        holder.sLocationImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               try {
-                   Uri locationUri = Uri.parse("geo:0,0?q="+businessDetail.getAddress());
-                   Intent mMapIntent = new Intent(Intent.ACTION_VIEW, locationUri);
-                   mMapIntent.setPackage("com.google.android.apps.maps");
-                   mContext.startActivity(mMapIntent);
-               }catch (Exception e){
-                   e.printStackTrace();
-                   Toast.makeText(mContext, "Maps not available...", Toast.LENGTH_LONG).show();
-               }
-            }
-        });*/
 
         holder.sRedeemButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,15 +15,19 @@
         android:layout_height="wrap_content"
         android:text="@string/we_are_there_for_you"
         android:textSize="20sp"
-        android:textColor="@color/torqoise"/>
+        android:layout_gravity="center"
+        android:textColor="@color/primary_text"
+        app:typeface="robotoCondensed"/>
 
     <com.pluggdd.burnandearn.font.RobotoTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/let_us_know_how_we_can_help"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:layout_marginTop="10dp"
-        android:textColor="@android:color/black"/>
+        android:textColor="@color/secondary_text"
+        app:typeface="robotoCondensed"
+        />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -36,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_subject"
-            android:textColor="@android:color/black"
+            android:textColor="@color/secondary_text"
             android:backgroundTint="@color/colorAccent"/>
 
     </android.support.design.widget.TextInputLayout>
@@ -51,7 +55,7 @@
             android:id="@+id/edt_feedback_request"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
+            android:textColor="@color/secondary_text"
             android:backgroundTint="@color/colorAccent"
             android:hint="@string/hint_feedback_request" />
 

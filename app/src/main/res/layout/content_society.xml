@@ -3,17 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
     android:orientation="horizontal">
 
     <com.pluggdd.burnandearn.font.FontelloTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:minWidth="30dp"
+        android:minWidth="15dp"
         android:text="@string/fontello_social"
         android:textColor="@color/colorAccent"
-        android:textSize="28sp" />
+        android:textSize="18sp" />
 
     <AutoCompleteTextView
         android:id="@+id/edt_society"
@@ -24,8 +23,9 @@
         android:hint="@string/hint_society"
         android:inputType="textCapWords"
         android:maxLines="1"
+        android:textSize="16sp"
         android:imeOptions="actionDone"
-        android:textColor="@android:color/black"
+        android:textColor="@color/secondary_text"
         android:textColorHint="@android:color/darker_gray"
         android:theme="@style/AppTheme.PopupOverlay"/>
 

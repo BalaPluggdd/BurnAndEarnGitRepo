@@ -22,7 +22,7 @@
         android:paddingRight="3dp"
         android:paddingTop="5dp"
         android:text="@string/next"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
 
 </LinearLayout>
