@@ -243,5 +243,7 @@
     <string name="college">college</string>
     <string name="registration">Registration</string>
     <string name="source_flag">source flag</string>
+    <string name="google_fit_issue">Failed to connect to Google Fit</string>
+    <string name="fit_bit_issue">Failed to connect to FitBit</string>
 
 </resources>

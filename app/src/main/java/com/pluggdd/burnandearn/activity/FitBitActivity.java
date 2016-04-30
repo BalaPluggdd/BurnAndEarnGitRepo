@@ -15,11 +15,12 @@ import com.pluggdd.burnandearn.utils.FitBitApi;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.oauth.OAuthService;
 
-public class FitBitActivity extends AppCompatActivity {
+public class FitBitActivity extends AppCompatActivity{
 
     private static final String EXTRA_CUSTOM_TABS_SESSION = "android.support.customtabs.extra.SESSION";
     private static final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR = "android.support.customtabs.extra.TOOLBAR_COLOR";
     private OAuthService mOAuthSevice;
+    private boolean mIsCustomTabVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +32,13 @@ public class FitBitActivity extends AppCompatActivity {
                 .apiKey(getString(R.string.fit_bit_secret_key))
                 .apiSecret(getString(R.string.fit_bit_api_key))
                 .callback(getString(R.string.fit_bit_call_back_url))
-                .scope("profile activity")
+                .scope("activity")
                 .debug()
                 .build();
         Log.i("OAuth version",mOAuthSevice.getVersion()+"");
         String authUrl = mOAuthSevice.getAuthorizationUrl(null);
         try {
+            mIsCustomTabVisible = true;
             Intent customChromeTabIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(authUrl));
             Bundle extras = new Bundle();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -69,5 +71,15 @@ public class FitBitActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!mIsCustomTabVisible){
+            setResult(RESULT_CANCELED);
+            finish();
+        }
+        mIsCustomTabVisible = false;
     }
 }

@@ -100,7 +100,7 @@ public class InitialSetUpActivity extends AppCompatActivity implements FragmentI
                 break;
             case "CitySelectionFragment":
                 mToolBar.setVisibility(View.GONE);
-                mFragmentHelper.addFragment(R.id.fragment_container, AppIntroductionFragment.getInstance(getString(R.string.registration)));
+                mFragmentHelper.replaceFragment(R.id.fragment_container, AppIntroductionFragment.getInstance(getString(R.string.registration)),false);
                 break;
             case "AppIntroductionFragment":
                 if (extras.getString(getString(R.string.source_flag)).equalsIgnoreCase(getString(R.string.registration))) {

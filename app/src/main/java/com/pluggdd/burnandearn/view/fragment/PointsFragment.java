@@ -2,6 +2,7 @@ package com.pluggdd.burnandearn.view.fragment;
 
 import android.Manifest;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -215,7 +216,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     private void setFitnessSource() {
         int selected_fitness_source = mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source));
-        switch (selected_fitness_source){
+        switch (selected_fitness_source) {
             case 0: // Not selected
                 showSelectFitnessSourceDialog();
                 break;
@@ -223,11 +224,11 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 checkAndBuildGoogleApiClient();
                 break;
             case 2: // Fit Bit
-                if(mPreferenceManager.getBooleanValue(mContext.getString(R.string.is_fitbit_authenticated))){
+                if (mPreferenceManager.getBooleanValue(mContext.getString(R.string.is_fitbit_authenticated))) {
                     checkAndBuildFitBitApiClient();
                     new FitnessDataAsync().execute();
-                }else{
-                    startActivityForResult(new Intent(mContext, FitBitActivity.class),REQUEST_FITBIT_API);
+                } else {
+                    startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
                 }
                 break;
         }
@@ -244,10 +245,10 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         googleFit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              dialog.dismiss();
-              mPreferenceManager.setIntValue(mContext.getString(R.string.selected_fitness_source), FitnessSource.GOOGLE_FIT.getId());
-              checkAndBuildGoogleApiClient();
-              if(mGoogleAPIClient != null)
+                dialog.dismiss();
+                mPreferenceManager.setIntValue(mContext.getString(R.string.selected_fitness_source), FitnessSource.GOOGLE_FIT.getId());
+                checkAndBuildGoogleApiClient();
+                if (mGoogleAPIClient != null)
                     mGoogleAPIClient.connect();
 
             }
@@ -258,7 +259,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             public void onClick(View v) {
                 dialog.dismiss();
                 mPreferenceManager.setIntValue(mContext.getString(R.string.selected_fitness_source), FitnessSource.FITBIT.getId());
-                startActivityForResult(new Intent(mContext, FitBitActivity.class),REQUEST_FITBIT_API);
+                startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
             }
         });
         dialog.show();
@@ -330,7 +331,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void updateFitnessActivities(int position) {
-        if(mWeekFitnessHistoryList.size() > 0){
+        if (mWeekFitnessHistoryList.size() > 0) {
             ArrayList<FitnessActivity> mTodayFitnessActivityList = mWeekFitnessHistoryList.get(mWeekFitnessHistoryList.size() - 1).getFitnessActivitiesList();
             switch (position) {
                 case 0: // Calories
@@ -686,19 +687,28 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == getActivity().RESULT_OK) {
-            switch (requestCode){
-                case REQUEST_CODE_RESOLUTION :
+            switch (requestCode) {
+                case REQUEST_CODE_RESOLUTION:
                     mGoogleAPIClient.connect();
                     break;
-                case REQUEST_FITBIT_API :
-                    if(new NetworkCheck().ConnectivityCheck(mContext)){
+                case REQUEST_FITBIT_API:
+                    if (new NetworkCheck().ConnectivityCheck(mContext)) {
                         checkAndBuildFitBitApiClient();
                         String auth_token = data.getExtras().getString(mContext.getString(R.string.auth_token));
                         new FitBitAPIAsync().execute(auth_token);
-                    }else{
+                    } else {
                         // Hide progress bar
-                        Snackbar.make(mView,mContext.getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
+                    break;
+            }
+        } else if (resultCode == getActivity().RESULT_CANCELED) {
+            switch (requestCode) {
+                case REQUEST_CODE_RESOLUTION:
+                    Snackbar.make(mView, mContext.getString(R.string.google_fit_issue), Snackbar.LENGTH_SHORT).show();
+                    break;
+                case REQUEST_FITBIT_API:
+                    Snackbar.make(mView, mContext.getString(R.string.fit_bit_issue), Snackbar.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -903,13 +913,14 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected String doInBackground(Long... params) {
             try {
-                if(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                if (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()) {
                     mWeekFitnessHistoryList = mGoogleFitHelper.getLastWeekData();
-                }else{
-                    mWeekFitnessHistoryList = mFitBitHelper.getLastWeekData();
+                } else {
+                    //mWeekFitnessHistoryList = mFitBitHelper.getLastWeekData();
+                    mWeekFitnessHistoryList = mFitBitHelper.getLastWeekFitbitData();
                 }
                 return "success";
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return "failure";
             }
@@ -917,9 +928,14 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-             new BusinessListAsync().execute();
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if(result.equalsIgnoreCase("success")){
+                new BusinessListAsync().execute();
+            }else{
+                mActivitiesProgressBar.setVisibility(View.GONE);
+            }
+
             //new FitnessHistoryAsync().execute();
         }
     }
@@ -934,10 +950,10 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected Void doInBackground(Long... params) {
             try {
-                if(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                if (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()) {
                     mFitnessHistoryList = mGoogleFitHelper.getFitnessHistoryData();
-                }else{
-                    mFitnessHistoryList = mFitBitHelper.getFitnessHistoryData();
+                } else {
+                    mFitnessHistoryList = mFitBitHelper.getFitbitHistory();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -949,16 +965,16 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            if(new NetworkCheck().ConnectivityCheck(mContext)){
-                if(mFitnessHistoryList != null && mFitnessHistoryList.size() >0){
+            if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                if (mFitnessHistoryList != null && mFitnessHistoryList.size() > 0) {
                     getPointsList();
-                }else{
+                } else {
                     updateUI();
-                    Snackbar.make(mView,mContext.getString(R.string.no_google_fit_data),Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mView, mContext.getString(R.string.no_google_fit_data), Snackbar.LENGTH_SHORT).show();
                 }
-            }else{
+            } else {
                 updateUI();
-                Snackbar.make(mView,mContext.getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
             }
 
         }
@@ -1069,12 +1085,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                 }
             } else {
-                Snackbar.make(mView,"Can't able to get fitness data from Google Fit.Please try after sometime",Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView, "Can't able to get fitness data from Google Fit.Please try after sometime", Snackbar.LENGTH_SHORT).show();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            Snackbar.make(mView,"Unable to connect to our server.Please try after sometime",Snackbar.LENGTH_SHORT).show();
-        }finally {
+            Snackbar.make(mView, "Unable to connect to our server.Please try after sometime", Snackbar.LENGTH_SHORT).show();
+        } finally {
             mIsGetFitnessDataAsyncRunning = false;
         }
     }
@@ -1407,7 +1423,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void checkAndBuildFitBitApiClient() {
-        mOAuthSevice =  new ServiceBuilder()
+        mOAuthSevice = new ServiceBuilder()
                 .provider(FitBitApi.class)
                 .apiKey(mContext.getString(R.string.fit_bit_secret_key))
                 .apiSecret(mContext.getString(R.string.fit_bit_api_key))
@@ -1415,7 +1431,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 .scope("activity")
                 .debug()
                 .build();
-        mFitBitHelper = new FitBitHelper(mContext,mOAuthSevice);
+        mFitBitHelper = new FitBitHelper((Activity) mContext, mOAuthSevice);
 
     }
 
@@ -1543,7 +1559,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     Log.i("json request", json_request);
                     params.put("jsonrequest", json_request);
-                    params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
+                    params.put("fitness_source", String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
                     return params;
                 }
             });
@@ -1758,7 +1774,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private ArrayList<String> getPointsXAxisValues() {
         ArrayList<String> xAxis = new ArrayList<>();
         for (int i = 0; i < mWeeklyPointsList.size(); i++) {
-            LocalDateTime dateTime = new LocalDateTime().minusDays(7-i);
+            LocalDateTime dateTime = new LocalDateTime().minusDays(7 - i);
             xAxis.add(dateTime.toString("E"));
         }
         return xAxis;
@@ -1774,7 +1790,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingCaloriesBurnt(), (float) fitnessHistory.getRunningCaloriesBurnt(), (float) fitnessHistory.getCyclingCaloriesBurnt()}, i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry(new float[]{(float) (fitnessHistory.getWalkingDistance()/1000), (float) (fitnessHistory.getRunningDistance()/1000), (float) (fitnessHistory.getCyclingDistance()/1000)}, i);
+                        barEntry = new BarEntry(new float[]{(float) (fitnessHistory.getWalkingDistance() / 1000), (float) (fitnessHistory.getRunningDistance() / 1000), (float) (fitnessHistory.getCyclingDistance() / 1000)}, i);
                     else  // Steps
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getWalkingSteps(), (float) fitnessHistory.getRunningSteps(), (float) fitnessHistory.getCyclingSteps()}, i);
                     mBarEntry.add(barEntry);
@@ -1783,7 +1799,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry((float) fitnessHistory.getWalkingCaloriesBurnt(), i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry((float) fitnessHistory.getWalkingDistance()/1000, i);
+                        barEntry = new BarEntry((float) fitnessHistory.getWalkingDistance() / 1000, i);
                     else if (type.equalsIgnoreCase("steps")) // Steps
                         barEntry = new BarEntry(fitnessHistory.getWalkingSteps(), i);
                     if (barEntry != null)
@@ -1793,7 +1809,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningCaloriesBurnt()}, i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningDistance()/1000}, i);
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningDistance() / 1000}, i);
                     else  // Steps
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getRunningSteps()}, i);
                     if (barEntry != null)
@@ -1803,7 +1819,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     if (type.equalsIgnoreCase("calories"))
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingCaloriesBurnt()}, i);
                     else if (type.equalsIgnoreCase("distance"))
-                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingDistance()/1000}, i);
+                        barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingDistance() / 1000}, i);
                     else  // Steps
                         barEntry = new BarEntry(new float[]{(float) fitnessHistory.getCyclingSteps()}, i);
                     if (barEntry != null)
@@ -1856,24 +1872,24 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         return colors;
     }
 
-    class FitBitAPIAsync extends AsyncTask<String,Void,String>{
+    class FitBitAPIAsync extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             try {
                 Verifier verifier = new Verifier(params[0]);
-                Token accessToken = mOAuthSevice.getAccessToken(null,verifier);
-                if(accessToken != null){
-                    mPreferenceManager.setBooleanValue(mContext.getString(R.string.is_fitbit_authenticated),true);
-                    mPreferenceManager.setStringValue(mContext.getString(R.string.access_token),accessToken.getToken());
+                Token accessToken = mOAuthSevice.getAccessToken(null, verifier);
+                if (accessToken != null) {
+                    mPreferenceManager.setBooleanValue(mContext.getString(R.string.is_fitbit_authenticated), true);
+                    mPreferenceManager.setStringValue(mContext.getString(R.string.access_token), accessToken.getToken());
                     JSONObject accessTokenObject = new JSONObject(accessToken.getRawResponse());
-                    mPreferenceManager.setStringValue(mContext.getString(R.string.refresh_token),accessTokenObject.optString("refresh_token"));
-                    Log.i("access_token"," Response :" + accessToken.getRawResponse());
+                    mPreferenceManager.setStringValue(mContext.getString(R.string.refresh_token), accessTokenObject.optString("refresh_token"));
+                    Log.i("access_token", " Response :" + accessToken.getRawResponse());
                     return "success";
-                }else
+                } else
                     return "failure";
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return "failure";
             }
@@ -1883,11 +1899,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPostExecute(String status) {
             super.onPostExecute(status);
-            if(status.equalsIgnoreCase("success")){
+            if (status.equalsIgnoreCase("success")) {
                 new FitnessDataAsync().execute();
-            }else{
+            } else {
                 // Failure
                 // Hide Progress Bar
+                mActivitiesProgressBar.setVisibility(View.GONE);
             }
         }
     }

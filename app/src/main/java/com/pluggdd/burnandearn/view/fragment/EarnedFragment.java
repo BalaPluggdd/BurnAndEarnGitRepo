@@ -2,6 +2,7 @@ package com.pluggdd.burnandearn.view.fragment;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -346,7 +347,7 @@ public class EarnedFragment extends Fragment {
                 .scope("activity")
                 .debug()
                 .build();
-        mFitBitHelper = new FitBitHelper(mContext,mOAuthSevice);
+        mFitBitHelper = new FitBitHelper((Activity) mContext,mOAuthSevice);
 
     }
 
@@ -373,7 +374,7 @@ public class EarnedFragment extends Fragment {
             if(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
                 mFitnessHistoryList = new GoogleFitHelper(getActivity(), mGoogleAPIClient).getFitnessHistoryData();
             }else{
-                mFitnessHistoryList = mFitBitHelper.getFitnessHistoryData();
+                mFitnessHistoryList = mFitBitHelper.getFitbitHistory();
             }
             return null;
         }
@@ -601,7 +602,6 @@ public class EarnedFragment extends Fragment {
                 e.printStackTrace();
                 return "failure";
             }
-
         }
 
         @Override

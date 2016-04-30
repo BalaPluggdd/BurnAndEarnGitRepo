@@ -93,8 +93,8 @@ public class GoalFragment extends Fragment {
                 }else if(Integer.valueOf(goal) == 0){
                     Snackbar.make(mView, "Enter valid calories goal", Snackbar.LENGTH_SHORT).show();
                 }else {
-                    if(mPreferenceManager.getIntValue(getString(R.string.user_goal)) == Integer.valueOf(goal)){
-                        mPreferenceManager.setIntValue(mContext.getString(R.string.user_goal),Integer.valueOf(goal));
+                    if(mUserGoal == Integer.valueOf(goal)){
+                        mPreferenceManager.setIntValue(mContext.getString(R.string.user_goal),mUserGoal);
                         Bundle bundle = new Bundle();
                         bundle.putString(getString(R.string.page_flag), GoalFragment.class.getSimpleName());
                         mChildFragmentInteraction.changeChildFragment(bundle);
