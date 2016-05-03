@@ -163,6 +163,7 @@
     <string name="fontello_camera">&#xE815;</string>
     <string name="fontello_name">&#xE814;</string>
     <string name="fontello_goal">&#xE817;</string>
+    <string name="fontello_cart">&#xE818;</string>
     <string name="ends_in">ENDS IN</string>
     <string name="days">DAYS</string>
     <string name="minutes">MINUTES</string>
@@ -245,5 +246,15 @@
     <string name="source_flag">source flag</string>
     <string name="google_fit_issue">Failed to connect to Google Fit</string>
     <string name="fit_bit_issue">Failed to connect to FitBit</string>
+    <string name="offer_type">Offer Type</string>
+    <string name="billing">Billing Details</string>
+    <string name="delivery">Delivery Details</string>
+    <string name="deliver">Deliver</string>
+    <string name="hint_phone">Mobile Number</string>
+    <string name="hint_address">Address</string>
+    <string name="buy">BUY</string>
+    <string name="enter_mobile_number">Enter mobile number</string>
+    <string name="enter_address">Enter address</string>
+
 
 </resources>

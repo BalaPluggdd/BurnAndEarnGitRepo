@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:padding="15dp">
+
+
+            <com.pluggdd.burnandearn.font.FontelloTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/fontello_cart"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                app:typeface="robotoCondensed" />
+
+            <com.pluggdd.burnandearn.font.RobotoTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/delivery"
+                android:textSize="24sp"
+                android:textColor="@android:color/white"
+                android:layout_marginLeft="5dp"
+                app:typeface="robotoCondensed" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dp"
+            android:orientation="vertical"
+            android:paddingTop="2dp">
+
+            <EditText
+                android:id="@+id/edt_phone_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorAccent"
+                android:hint="@string/hint_phone"
+                android:inputType="phone"
+                android:textColor="@color/secondary_text"
+                android:textSize="16sp"
+                android:maxLength="12"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColorHint="@android:color/darker_gray" />
+
+            <EditText
+                android:id="@+id/edt_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorAccent"
+                android:hint="@string/hint_address"
+                android:inputType="textPersonName"
+                android:textColor="@color/secondary_text"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:minLines="2"
+                android:textSize="16sp"
+                android:textColorHint="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right">
+
+            <Button
+                android:id="@+id/btn_deliver"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:text="@string/deliver"
+                android:textSize="18sp"
+                android:textColor="@color/orange" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:text="@string/cancel"
+                android:textSize="18sp"
+                android:textColor="@color/orange" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>
+
+

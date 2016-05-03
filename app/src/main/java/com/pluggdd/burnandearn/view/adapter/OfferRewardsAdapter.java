@@ -117,6 +117,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
                         intent.putExtra(mContext.getString(R.string.coupon),businessDetail.getCoupon());
                         intent.putExtra(mContext.getString(R.string.website),businessDetail.getUrl());
                         intent.putExtra(mContext.getString(R.string.address), businessDetail.getAddress());
+                        intent.putExtra(mContext.getString(R.string.offer_type), businessDetail.getOffer_type());
                         intent.putExtra(mContext.getString(R.string.terms_and_conditions),businessDetail.getTerms_and_conditions());
                         intent.putExtra(mContext.getString(R.string.phone_number),businessDetail.getPhone_number());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

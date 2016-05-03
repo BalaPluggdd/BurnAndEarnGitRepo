@@ -19,4 +19,5 @@ public class WebserviceAPI {
     public static final String SEND_FEEDBACK = HOST_URL + "feedback.php";
     public static final String OCCUPATION_LIST = HOST_URL + "occupationlist.php";
     public static final String USER_GOAL_UPDATE = HOST_URL + "usergoalupdate.php";
+    public static final String OFFLINE_OFFER_REDEEM = HOST_URL + "online_offer_redem.php";
 }

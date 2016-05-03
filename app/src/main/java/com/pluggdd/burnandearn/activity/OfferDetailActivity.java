@@ -5,21 +5,18 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -33,23 +30,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
-import com.pluggdd.burnandearn.model.BusinessDetails;
 import com.pluggdd.burnandearn.utils.CustomCountDownTimer;
-import com.pluggdd.burnandearn.utils.HeaderView;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
-import com.pluggdd.burnandearn.view.adapter.OfferRewardsAdapter;
 
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +54,7 @@ public class OfferDetailActivity extends AppCompatActivity{
     private ProgressBar mLogoProgressBar,mOfferImageProgressBar;
     private Button mRedeemButton;
     private Bundle mExtra;
-    private int mBusinesId,mPhoneNumber;
+    private int mBusinesId,mPhoneNumber,mOffferType;
     private String mAddress;
     private PreferencesManager mPreferenceManager;
 
@@ -111,9 +102,13 @@ public class OfferDetailActivity extends AppCompatActivity{
         mExpirationDateText.setText(expirationDateTime.toString("MMM dd,YYYY"));
         mPhoneNumber = mExtra.getInt(getString(R.string.phone_number));
         mTermsAndConditionsText.setText(mExtra.getString(getString(R.string.terms_and_conditions)));
+        mOffferType = mExtra.getInt(getString(R.string.offer_type));
         long date_difference = expirationDateTime.plusDays(1).toDateTime().getMillis() - new LocalDateTime().toDateTime().getMillis();
         //date_difference = new LocalDateTime().plusMinutes(1).toDateTime().getMillis() - new LocalDateTime().toDateTime().getMillis();
         new CustomCountDownTimer(OfferDetailActivity.this,mDaysEndsInContainer,mDaysText,mHoursText,mMinutesText,null,mRedeemButton,null,expiration_date,"offer_detail",date_difference,1000).start();
+        // Change button text depending upon offer type
+        if(mOffferType == 1) // online
+              mRedeemButton.setText(getString(R.string.buy));
 
         mPhoneImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,8 +143,7 @@ public class OfferDetailActivity extends AppCompatActivity{
         mRedeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //addMyOffer();
-                if(mRedeemButton.getText().toString().equalsIgnoreCase(getString(R.string.redeem))){
+                if(mRedeemButton.getText().toString().equalsIgnoreCase(getString(R.string.redeem)) || mRedeemButton.getText().toString().equalsIgnoreCase(getString(R.string.buy))){
                     AlertDialog.Builder mConfirmDialog = new AlertDialog.Builder(OfferDetailActivity.this,R.style.AlertDialogStyle);
                     String message = getString(R.string.confirm_redeem_dialog_content)+" '"+mOfferPromoText.getText().toString().toUpperCase() +"' AT " + mBusinessTitleText.getText().toString().toUpperCase();
                     message += "\n\n YOUR ACCOUNT SHALL BE DEDUCTED OF "+mPointsNeededText.getText().toString()+" SWEAT POINTS";
@@ -158,12 +152,16 @@ public class OfferDetailActivity extends AppCompatActivity{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            if(new NetworkCheck().ConnectivityCheck(OfferDetailActivity.this)){
-                                addMyOffer();
-                            }else {
-                                Toast.makeText(OfferDetailActivity.this, getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+                            if(mOffferType == 0){ // Offline Offer
+                                if(new NetworkCheck().ConnectivityCheck(OfferDetailActivity.this)){
+                                    addMyOffer();
+                                    //showDeliveryDetailsDialog();
+                                }else {
+                                    Toast.makeText(OfferDetailActivity.this, getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+                                }
+                            }else{ // Online offer
+                                 showDeliveryDetailsDialog();
                             }
-
                         }
                     });
                     mConfirmDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -180,30 +178,31 @@ public class OfferDetailActivity extends AppCompatActivity{
         });
     }
 
-    private void showCouponDialog() {
-        final AlertDialog.Builder mCouponDialog = new AlertDialog.Builder(OfferDetailActivity.this);
-        View mView = LayoutInflater.from(OfferDetailActivity.this).inflate(R.layout.dialog_coupon, null);
-        mCouponDialog.setView(mView);
-        ImageView mCouponBusinessLogo = (ImageView) mView.findViewById(R.id.img_business_logo);
-        ProgressBar mLogoProgress = (ProgressBar) mView.findViewById(R.id.logo_progress_bar);
-        TextView mCouponCodeText = (TextView) mView.findViewById(R.id.txt_coupon_code);
-        TextView mCouponExpiryText = (TextView) mView.findViewById(R.id.txt_coupon_expiry);
-        Button mRedirectButton = (Button) mView.findViewById(R.id.btn_redirect);
-        final Button mCancelButton = (Button) mView.findViewById(R.id.btn_cancel);
-        new PicassoImageLoaderHelper(OfferDetailActivity.this,mCouponBusinessLogo,mLogoProgress).loadImage(mExtra.getString(getString(R.string.logo_url), ""));
-        mCouponCodeText.setText("Coupon Code : " + mExtra.getString(getString(R.string.coupon), ""));
-        mCouponExpiryText.setText("Expiry Date : "+ mExtra.getString(getString(R.string.coupon_expiry_date), ""));
-        mCouponDialog.setCancelable(true);
-        final AlertDialog dialog =  mCouponDialog.show();
+    private void showDeliveryDetailsDialog() {
+        final AlertDialog.Builder mDeliveryDetailDialog = new AlertDialog.Builder(OfferDetailActivity.this);
+        View mView = LayoutInflater.from(OfferDetailActivity.this).inflate(R.layout.dialog_buy_online_offer, null);
+        mDeliveryDetailDialog.setView(mView);
+        mDeliveryDetailDialog.setCancelable(true);
+        final EditText mobileNumber = (EditText) mView.findViewById(R.id.edt_phone_number);
+        final EditText address = (EditText) mView.findViewById(R.id.edt_address);
+        Button mRedirectButton = (Button) mView.findViewById(R.id.btn_deliver);
+        Button mCancelButton = (Button) mView.findViewById(R.id.btn_cancel);
+        final AlertDialog dialog =  mDeliveryDetailDialog.show();
         mRedirectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
-                try{
-                    Intent intent= new Intent(Intent.ACTION_VIEW, Uri.parse(mExtra.getString(getString(R.string.redirect_url), "")));
-                    startActivity(intent);
-                }catch (ActivityNotFoundException e){
-                    Toast.makeText(OfferDetailActivity.this,"Cannot open this link",Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(mobileNumber.getText())){
+                    mobileNumber.setError(getString(R.string.enter_mobile_number));
+                }else if(TextUtils.isEmpty(address.getText())){
+                    address.setError(getString(R.string.enter_address));
+                }else{
+                    if(new NetworkCheck().ConnectivityCheck(OfferDetailActivity.this)){
+                        dialog.dismiss();
+                        offlineOfferReedeem(mobileNumber.getText().toString(),address.getText().toString());
+                    }else {
+                        Toast.makeText(OfferDetailActivity.this, getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+                    }
+
                 }
 
             }
@@ -271,6 +270,55 @@ public class OfferDetailActivity extends AppCompatActivity{
                 params.put("userid",mPreferenceManager.getStringValue(getString(R.string.user_id)));
                 params.put("businessid",String.valueOf(mBusinesId));
                 params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
+                return params;
+            }
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
+    }
+
+    private void offlineOfferReedeem(final String mobile_number, final String address){
+        final ProgressDialog progressDialog = new ProgressDialog(OfferDetailActivity.this);
+        progressDialog.setMessage("Updating please wait !!!");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.OFFLINE_OFFER_REDEEM, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("response", response);
+                if (response != null) {
+                    try {
+                        progressDialog.dismiss();
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.optInt("status") == 1) {
+                            Toast.makeText(OfferDetailActivity.this,"Your offer will be processed soon",Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(OfferDetailActivity.this,responseJson.optString("msg"),Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    progressDialog.dismiss();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("user_id",mPreferenceManager.getStringValue(getString(R.string.user_id)));
+                params.put("business_id",String.valueOf(mBusinesId));
+                params.put("mobilenumber",mobile_number);
+                params.put("address",address);
                 return params;
             }
         });

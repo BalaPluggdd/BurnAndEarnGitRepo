@@ -147,6 +147,7 @@ public class OffersAndRewardsFragment extends Fragment {
                                     businessDetails.setUrl(business_object.optString("site"));
                                     businessDetails.setPhone_number(business_object.optInt("Phone No"));
                                     businessDetails.setAddress(business_object.optString("Address"));
+                                    businessDetails.setOffer_type(business_object.optInt("onlinestatus"));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
                                     businessDetails.setOfferLogo(business_object.optString("offerimage"));

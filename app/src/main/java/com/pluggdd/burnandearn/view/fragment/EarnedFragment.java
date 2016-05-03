@@ -69,7 +69,6 @@ import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.pluggdd.burnandearn.utils.VolleySingleton;
 import com.pluggdd.burnandearn.utils.WebserviceAPI;
-import com.pluggdd.burnandearn.view.adapter.BusinessOfferAdapter;
 import com.pluggdd.burnandearn.view.adapter.OfferRewardsAdapter;
 
 import org.joda.time.Days;
@@ -493,6 +492,7 @@ public class EarnedFragment extends Fragment {
                                     businessDetails.setUrl(business_object.optString("site"));
                                     businessDetails.setPhone_number(business_object.optInt("Phone No"));
                                     businessDetails.setAddress(business_object.optString("Address"));
+                                    businessDetails.setOffer_type(business_object.optInt("onlinestatus"));
                                     businessDetails.setTerms_and_conditions(business_object.optString("termsandconditions"));
                                     businessDetails.setCoupon(business_object.optString("couponCode"));
                                     businessDetails.setOfferLogo(business_object.optString("offerimage"));
