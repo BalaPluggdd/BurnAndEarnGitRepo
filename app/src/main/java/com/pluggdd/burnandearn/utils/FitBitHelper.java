@@ -391,10 +391,10 @@ public class FitBitHelper {
             if (activities_array != null && activities_array.length() > 0) {
                 for (int i = 0; i < activities_array.length(); i++) {
                     JSONObject activities_obj = activities_array.getJSONObject(i);
-                    String logType = activities_obj.optString("logType");
+                    String logType = activities_obj.optString("logType","");
                     if (logType.equalsIgnoreCase("auto_detected") /*|| logType.equalsIgnoreCase("manual")*/) {
                         FitnessActivity fitnessActivity = new FitnessActivity();
-                        int activityTypeID = activities_obj.optInt("activityTypeId");
+                        int activityTypeID = activities_obj.optInt("activityTypeId",0);
                         String startDateTimeString = activities_obj.optString("startTime");
                         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                         DateTime startDateTime = dateTimeFormatter.withOffsetParsed().parseDateTime(startDateTimeString);
@@ -403,21 +403,21 @@ public class FitBitHelper {
                         switch (activityTypeID) {
                             case 90013: // Walk
                                 fitnessActivity.setName(FitnessActivities.WALKING);
-                                fitnessActivity.setCalories_expended(activities_obj.optDouble("calories"));
-                                fitnessActivity.setDistance(activities_obj.optDouble("distance"));
-                                fitnessActivity.setStep_count(activities_obj.optInt("steps"));
+                                fitnessActivity.setCalories_expended(activities_obj.optDouble("calories",0));
+                                fitnessActivity.setDistance(activities_obj.optDouble("distance",0));
+                                fitnessActivity.setStep_count(activities_obj.optInt("steps",0));
                                 break;
                             case 90009: // Run
                                 fitnessActivity.setName(FitnessActivities.RUNNING);
-                                fitnessActivity.setCalories_expended(activities_obj.optDouble("calories"));
-                                fitnessActivity.setDistance(activities_obj.optDouble("distance"));
-                                fitnessActivity.setStep_count(activities_obj.optInt("steps"));
+                                fitnessActivity.setCalories_expended(activities_obj.optDouble("calories",0));
+                                fitnessActivity.setDistance(activities_obj.optDouble("distance",0));
+                                fitnessActivity.setStep_count(activities_obj.optInt("steps",0));
                                 break;
                             case 90001: // Cycling
                                 fitnessActivity.setName(FitnessActivities.BIKING);
-                                fitnessActivity.setCalories_expended(activities_obj.optDouble("calories"));
-                                fitnessActivity.setDistance(activities_obj.optDouble("distance"));
-                                fitnessActivity.setStep_count(activities_obj.optInt("steps"));
+                                fitnessActivity.setCalories_expended(activities_obj.optDouble("calories",0));
+                                fitnessActivity.setDistance(activities_obj.optDouble("distance",0));
+                                fitnessActivity.setStep_count(activities_obj.optInt("steps",0));
                                 break;
                         }
                         fitnessActivity.setStartDate(startDateTime.toString("yyyy-MM-dd"));
@@ -577,7 +577,7 @@ public class FitBitHelper {
                 JSONArray errorArray = responseObject.getJSONArray("errors");
                 for (int i = 0; i < errorArray.length(); i++) {
                     JSONObject errorObject = errorArray.getJSONObject(i);
-                    String errorType = errorObject.optString("errorType");
+                    String errorType = errorObject.optString("errorType","");
                     if (errorType != null && errorType.equalsIgnoreCase("expired_token")) {
                         return true;
                     }

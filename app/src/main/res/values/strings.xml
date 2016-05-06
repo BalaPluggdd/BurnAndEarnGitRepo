@@ -129,8 +129,8 @@
     <string name="no_offers">Currently, you do not have any offers to avail. You may want to burn a few more calories to accumulate SweatPoints</string>
     <string name="no_business_offer">Burn More Calories To Avail Offers</string>
     <string name="business_id">businessId</string>
-    <string name="goal_achieved_notification_header">Congrats Your Goal Achieved !!!</string>
-    <string name="goal_achieved_notification_content">You have achieved your goal of burning</string>
+    <string name="half_way_goal_achieved_notification_header">Congratulations, you have reached the halfway mark to your goal</string>
+    <string name="goal_achieved_notification_content">Congratulations, you have completed the goal for today</string>
     <string name="from_notification">From Notification</string>
     <string name="notification_time">notify time</string>
     <string name="title_activity_my_offers">My Offers</string>
@@ -183,6 +183,7 @@
     <string name="phone_number">phone_number</string>
     <string name="confirm_redeem_dialog_content">YOU HAVE CHOOSEN TO AVAIL THE OFFER</string>
     <string name="no_google_fit_data">Google fit data not available please try after sometime</string>
+    <string name="no_fitbit_data">FitBit data not available please try after sometime</string>
     <string name="show_coupon_text">SHOW THE CODE BELOW TO AVAIL</string>
     <string name="coupon_code">COUPON CODE</string>
     <string name="access_token">access token</string>
@@ -255,6 +256,8 @@
     <string name="buy">BUY</string>
     <string name="enter_mobile_number">Enter mobile number</string>
     <string name="enter_address">Enter address</string>
+    <string name="half_way_notification_time">half way notification time</string>
+    <string name="full_way_notification_time">full way notification time</string>
 
 
 </resources>

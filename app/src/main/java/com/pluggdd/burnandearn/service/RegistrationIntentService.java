@@ -64,7 +64,7 @@ public class RegistrationIntentService extends IntentService {
 
     private void sendRegistrationToServer() {
         // Add custom implementation, as needed.
-        if(!mPreferenceManager.getBooleanValue(getString(R.string.is_gcm_token_updated)) && !mPreferenceManager.getStringValue(getString(R.string.facebookId)).equalsIgnoreCase("")){
+        if(!mPreferenceManager.getBooleanValue(getString(R.string.is_gcm_token_updated)) && !mPreferenceManager.getStringValue(getString(R.string.user_id)).equalsIgnoreCase("")){
             updateGCMRegToken();
         }
         // Have to send updated code to server and add whether its sent or not in preference
@@ -101,7 +101,7 @@ public class RegistrationIntentService extends IntentService {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("fbId", mPreferenceManager.getStringValue(getString(R.string.facebookId)));
+                params.put("userId", mPreferenceManager.getStringValue(getString(R.string.user_id)));
                 params.put("deviceId", mPreferenceManager.getStringValue(getString(R.string.gcm_reg_id)));
                 params.put("deviceType", String.valueOf(0));
                 return params;

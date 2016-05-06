@@ -204,7 +204,7 @@ public class EarnedFragment extends Fragment {
     }
 
     private void buildGoogleFitnessClient() {
-        mGoogleAPIClient = new GoogleApiClient.Builder(getActivity())
+        mGoogleAPIClient = new GoogleApiClient.Builder(mContext)
                 .addApi(Fitness.HISTORY_API)
                 .addApi(Plus.API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
@@ -260,13 +260,13 @@ public class EarnedFragment extends Fragment {
      * Return the current state of the permissions needed.
      */
     private boolean checkLocationPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
+        int permissionState = ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean checkGetAccountsPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(getActivity(),
+        int permissionState = ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.GET_ACCOUNTS);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
@@ -340,9 +340,9 @@ public class EarnedFragment extends Fragment {
     private void checkAndBuildFitBitApiClient() {
         mOAuthSevice =  new ServiceBuilder()
                 .provider(FitBitApi.class)
-                .apiKey(getString(R.string.fit_bit_secret_key))
-                .apiSecret(getString(R.string.fit_bit_api_key))
-                .callback(getString(R.string.fit_bit_call_back_url))
+                .apiKey(mContext.getString(R.string.fit_bit_secret_key))
+                .apiSecret(mContext.getString(R.string.fit_bit_api_key))
+                .callback(mContext.getString(R.string.fit_bit_call_back_url))
                 .scope("activity")
                 .debug()
                 .build();
@@ -351,7 +351,7 @@ public class EarnedFragment extends Fragment {
     }
 
     private boolean addPermission(List<String> permissionsList, String permission) {
-        if (ActivityCompat.checkSelfPermission(getActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mContext, permission) != PackageManager.PERMISSION_GRANTED) {
             permissionsList.add(permission);
             // Check for Rationale Option
             if (!shouldShowRequestPermissionRationale(permission))
@@ -370,8 +370,8 @@ public class EarnedFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Long... params) {
-            if(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
-                mFitnessHistoryList = new GoogleFitHelper(getActivity(), mGoogleAPIClient).getFitnessHistoryData();
+            if(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                mFitnessHistoryList = new GoogleFitHelper(mContext, mGoogleAPIClient).getFitnessHistoryData();
             }else{
                 mFitnessHistoryList = mFitBitHelper.getFitbitHistory();
             }
@@ -384,7 +384,7 @@ public class EarnedFragment extends Fragment {
             if(new NetworkCheck().ConnectivityCheck(mContext)){
                 getBusinessList();
             }else{
-                Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mView,mContext.getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -469,13 +469,13 @@ public class EarnedFragment extends Fragment {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
                             int totalPointEarned = responseJson.optInt("yourpoint");
-                            mPreferenceManager.setIntValue(getString(R.string.your_total_points),totalPointEarned);
+                            mPreferenceManager.setIntValue(mContext.getString(R.string.your_total_points),totalPointEarned);
                             //mPointsEarnedText.setText(responseJson.optInt("yourpoint") + "!");
                             if (!responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000") ) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
-                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
+                                mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
                             } else
-                                mPreferenceManager.setLongValue(getString(R.string.last_updated_calories_time), -1);
+                                mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), -1);
                             JSONArray business_list = responseJson.optJSONArray("businesslist");
                             if (business_list != null && business_list.length() > 0) {
                                 for (int i = 0; i < business_list.length(); i++) {
@@ -532,7 +532,7 @@ public class EarnedFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 try {
                     if (!isDetached()) {
-                        Toast.makeText(getActivity(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Unable to connect to server", Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (Exception e) {
@@ -573,7 +573,7 @@ public class EarnedFragment extends Fragment {
                 }
                 Log.i("json request", json_request);
                 params.put("jsonrequest", json_request);
-                params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
+                params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
                 return params;
             }
         });

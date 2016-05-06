@@ -373,6 +373,14 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     // To update decoview
                     //walking_calories_percentage = 30 ; running_calories_percentage = 0; biking_calories_percentage = 10;
                     updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
+                    /*walking_calories_expended = 350;
+                    double totalCaloriesExpended = walking_calories_expended + running_calories_expended + biking_calories_expended;
+                    int calories_goal = mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal));
+                    if (totalCaloriesExpended >= calories_goal) {
+                        showNotification("goal_complete");
+                    } else if (totalCaloriesExpended >= (calories_goal/2)){
+                        showNotification("half_way");
+                    }*/
                     break;
                 case 1: // Distance
                     Log.i("distance average", mDistanceAverage + "");
@@ -930,9 +938,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(result.equalsIgnoreCase("success")){
+            if (result.equalsIgnoreCase("success")) {
                 new BusinessListAsync().execute();
-            }else{
+            } else {
                 mActivitiesProgressBar.setVisibility(View.GONE);
             }
 
@@ -970,11 +978,19 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     getPointsList();
                 } else {
                     updateUI();
-                    Snackbar.make(mView, mContext.getString(R.string.no_google_fit_data), Snackbar.LENGTH_SHORT).show();
+                    if (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()) {
+                        if (!isDetached())
+                            Snackbar.make(mView, mContext.getString(R.string.no_google_fit_data), Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        if (!isDetached())
+                            Snackbar.make(mView, mContext.getString(R.string.no_fitbit_data), Snackbar.LENGTH_SHORT).show();
+                    }
+
                 }
             } else {
                 updateUI();
-                Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                if (!isDetached())
+                    Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
             }
 
         }
@@ -1085,11 +1101,13 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                 }
             } else {
-                Snackbar.make(mView, "Can't able to get fitness data from Google Fit.Please try after sometime", Snackbar.LENGTH_SHORT).show();
+                if (!isDetached())
+                    Snackbar.make(mView, "Can't able to get fitness data from Google Fit.Please try after sometime", Snackbar.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Snackbar.make(mView, "Unable to connect to our server.Please try after sometime", Snackbar.LENGTH_SHORT).show();
+            if (!isDetached())
+                Snackbar.make(mView, "Unable to connect to our server.Please try after sometime", Snackbar.LENGTH_SHORT).show();
         } finally {
             mIsGetFitnessDataAsyncRunning = false;
         }
@@ -1465,7 +1483,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                                     mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
                                 } else
                                     mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), -1);
-
                                 JSONArray points_list = responseJson.optJSONArray("weeklist");
                                 int total_points = 0;
                                 if (points_list != null && points_list.length() > 0) {
@@ -1488,21 +1505,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                                     Toast.makeText(mContext, "Burn more calories to avail offers", Toast.LENGTH_SHORT).show();
                                 }
                             }
-                            // To show notification when user achieves his goal
-                            if (mTotalCaloriesExpended >= mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal))) {
-                                long last_notification_time = mPreferenceManager.getLongValue(mContext.getString(R.string.notification_time));
-                                if (last_notification_time == 0)
-                                    showNotification();
-                                else {
-                                    LocalDateTime startDate = new LocalDateTime(last_notification_time);
-                                    LocalDateTime currentDateTime = new LocalDateTime();
-                                    int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
-                                    if (days > 0) {
-                                        showNotification();
-                                    }
-                                }
 
-                            }
                         } catch (JSONException e) {
                             if (!isDetached()) {
                                 updateUI();
@@ -1520,7 +1523,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                             updateUI();
                             Toast.makeText(mContext, "Unable to connect to server", Toast.LENGTH_SHORT).show();
                         }
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1568,31 +1570,57 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void showNotification() {
-        NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(mContext);
-        mNotificationBuilder.setSmallIcon(R.drawable.ic_logo);
-        mNotificationBuilder.setContentTitle(mContext.getString(R.string.goal_achieved_notification_header));
-        mNotificationBuilder.setAutoCancel(true);
-        String content = mContext.getString(R.string.goal_achieved_notification_content) + " " + String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal))) + " " + mContext.getString(R.string.calories_unit);
-        mNotificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));
-        mNotificationBuilder.setContentText(content);
-        //Intent shareIntent = new Intent(mContext, ShareActivity.class);
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, content);
-        shareIntent.setType("text/plain");
-        /*shareIntent.putExtra(mContext.getString(R.string.from_notification), true);
+    private void showNotification(String type) {
+        boolean shouldShowNotification = false;
+        long last_notification_time;
+        String content="";
+        if (type.equalsIgnoreCase("half_way")) {
+            last_notification_time = mPreferenceManager.getLongValue(mContext.getString(R.string.half_way_notification_time));
+            content = mContext.getString(R.string.half_way_goal_achieved_notification_header) + " of " + String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal))) + " " + mContext.getString(R.string.calories_unit);
+        } else { // Goal Complete
+            last_notification_time = mPreferenceManager.getLongValue(mContext.getString(R.string.full_way_notification_time));
+            content = mContext.getString(R.string.goal_achieved_notification_content) + " of " + String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal))) + " " + mContext.getString(R.string.calories_unit);
+        }
+        shouldShowNotification = true;
+       /* if (last_notification_time == 0)
+            shouldShowNotification = true;
+        else {
+            LocalDateTime startDate = new LocalDateTime(last_notification_time);
+            LocalDateTime currentDateTime = new LocalDateTime();
+            int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
+            if (days > 0) {
+                shouldShowNotification = true;
+            }
+        }*/
+        if (shouldShowNotification) {
+            NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(mContext);
+            mNotificationBuilder.setSmallIcon(R.drawable.ic_logo);
+            mNotificationBuilder.setContentTitle(mContext.getString(R.string.congratulations));
+            mNotificationBuilder.setAutoCancel(true);
+            mNotificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));
+            mNotificationBuilder.setContentText(content);
+            //Intent shareIntent = new Intent(mContext, ShareActivity.class);
+            /*Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, content);
+            shareIntent.setType("text/plain");
+        shareIntent.putExtra(mContext.getString(R.string.from_notification), true);
         TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
         taskStackBuilder.addParentStack(ShareActivity.class);
         taskStackBuilder.addNextIntent(shareIntent);
         // To add pending intent
-        PendingIntent pendingIntent = taskStackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);*/
-        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, Intent.createChooser(shareIntent, "Share"), PendingIntent.FLAG_UPDATE_CURRENT);
-        // To add Share button
-        NotificationCompat.Action mShareAction = new NotificationCompat.Action.Builder(R.drawable.ic_share, "Share", pendingIntent).build();
-        mNotificationBuilder.addAction(mShareAction);
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(1, mNotificationBuilder.build());
-        mPreferenceManager.setLongValue(mContext.getString(R.string.notification_time), new LocalDateTime().toDateTime().getMillis());
+        PendingIntent pendingIntent = taskStackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, Intent.createChooser(shareIntent, "Share"), PendingIntent.FLAG_UPDATE_CURRENT);
+            // To add Share button
+            NotificationCompat.Action mShareAction = new NotificationCompat.Action.Builder(R.drawable.ic_share, "Share", pendingIntent).build();
+            mNotificationBuilder.addAction(mShareAction);*/
+            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(1, mNotificationBuilder.build());
+            if (type.equalsIgnoreCase("half_way")) {
+                mPreferenceManager.setLongValue(mContext.getString(R.string.half_way_notification_time), new LocalDateTime().toDateTime().getMillis());
+            } else { // Goal Complete
+                mPreferenceManager.setLongValue(mContext.getString(R.string.full_way_notification_time), new LocalDateTime().toDateTime().getMillis());
+            }
+        }
     }
 
 
@@ -1774,7 +1802,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private ArrayList<String> getPointsXAxisValues() {
         ArrayList<String> xAxis = new ArrayList<>();
         for (int i = 0; i < mWeeklyPointsList.size(); i++) {
-            LocalDateTime dateTime = new LocalDateTime().minusDays(7 - i);
+            LocalDateTime dateTime = new LocalDateTime().minusDays(6 - i);
             xAxis.add(dateTime.toString("E"));
         }
         return xAxis;
