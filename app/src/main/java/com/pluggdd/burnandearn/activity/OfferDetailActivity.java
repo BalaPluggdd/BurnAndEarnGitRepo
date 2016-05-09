@@ -242,9 +242,11 @@ public class OfferDetailActivity extends AppCompatActivity{
                         progressDialog.dismiss();
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
-                                mBurnAndLogoContainer.setVisibility(View.VISIBLE);
+                                /*mBurnAndLogoContainer.setVisibility(View.VISIBLE);
                                 mPointsNeededContainer.setVisibility(View.GONE);
-                                mRedeemButton.setText("Coupon code : " + mExtra.getString(getString(R.string.coupon)));
+                                mRedeemButton.setText("Coupon code : " + mExtra.getString(getString(R.string.coupon)));*/
+                            Toast.makeText(OfferDetailActivity.this,"Offer added to your account,you can redeem it under my offers section",Toast.LENGTH_SHORT).show();
+                            finish();
                             //showCouponDialog();
                         }else{
                             Toast.makeText(OfferDetailActivity.this,responseJson.optString("msg"),Toast.LENGTH_SHORT).show();

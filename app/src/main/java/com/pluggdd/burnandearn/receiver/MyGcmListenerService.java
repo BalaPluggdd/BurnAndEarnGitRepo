@@ -1,7 +1,9 @@
 package com.pluggdd.burnandearn.receiver;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -14,6 +16,7 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.pluggdd.burnandearn.R;
+import com.pluggdd.burnandearn.activity.BurnAndEarnMainActivity;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -68,6 +71,14 @@ public class MyGcmListenerService extends GcmListenerService {
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             if(bitmap != null)
                 mBuilder.setLargeIcon(bitmap);
+            if(!mMessage.contains("50%") && !mMessage.contains("100%")){
+                Intent homePageIntent = new Intent(context, BurnAndEarnMainActivity.class);
+                homePageIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                homePageIntent.putExtra(context.getString(R.string.page_flag),"notification");
+                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, homePageIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.setContentIntent(pendingIntent);
+            }
+            mBuilder.setAutoCancel(true);
             mNotificationManager.notify(MESSAGE_NOTIFICATION_ID, mBuilder.build());
         }
     }

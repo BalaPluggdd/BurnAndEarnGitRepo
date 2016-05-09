@@ -164,6 +164,8 @@
     <string name="fontello_name">&#xE814;</string>
     <string name="fontello_goal">&#xE817;</string>
     <string name="fontello_cart">&#xE818;</string>
+    <string name="fontello_mobile">&#xE819;</string>
+    <string name="fontello_address">&#xE81a;</string>
     <string name="ends_in">ENDS IN</string>
     <string name="days">DAYS</string>
     <string name="minutes">MINUTES</string>
@@ -258,6 +260,10 @@
     <string name="enter_address">Enter address</string>
     <string name="half_way_notification_time">half way notification time</string>
     <string name="full_way_notification_time">full way notification time</string>
+    <string name="set">SET</string>
+    <string name="enter_goal">Enter Goal</string>
+    <string name="user_goal_detected">detected user goal</string>
+    <string name="use_now">USE NOW</string>
 
 
 </resources>

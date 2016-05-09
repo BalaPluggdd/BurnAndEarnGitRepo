@@ -111,7 +111,7 @@ public class BurnAndEarnMainActivity extends BaseActivity /*implements FragmentI
     private void setUpHomePageTabs() {
         // To add Tabs
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new PointsFragment(), "BURNT");
+        adapter.addFragment(PointsFragment.newInstance(getIntent().getExtras() != null ? getIntent().getExtras().getString(getString(R.string.page_flag)):""), "BURNT");
         adapter.addFragment(new EarnedFragment(), "EARNED");
         mTabViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mTabViewPager);

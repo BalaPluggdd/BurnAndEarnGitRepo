@@ -80,6 +80,7 @@ public class WebserviceHelper {
                             mPreferenceManager.setStringValue(mContext.getString(R.string.paramter2),responseJson.optString("parameter2"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.paramter3),responseJson.optString("parameter3"));
                             mPreferenceManager.setStringValue(mContext.getString(R.string.paramter4),responseJson.optString("parameter4"));
+                            mPreferenceManager.setIntValue(mContext.getString(R.string.user_goal_detected),responseJson.optInt("usergoal"));
                             if (responseJson.optString("lastcaloriesupdate") != null && !responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());

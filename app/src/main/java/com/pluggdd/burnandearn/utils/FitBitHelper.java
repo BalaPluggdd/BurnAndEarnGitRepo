@@ -352,7 +352,7 @@ public class FitBitHelper {
         String accessToken = mPreferenceManager.getStringValue(mContext.getString(R.string.access_token));
         Response response = callFitBitAPI(activityUrl, accessToken);
         Log.i("response_activity", "Response : " + response.getBody());
-        if (response != null) {
+        if (response != null ) {
             try {
                 JSONObject responseObject = new JSONObject(response.getBody());
                 if (checkifAccessTokenExpired(responseObject)/*forCheck*/) {
@@ -591,31 +591,5 @@ public class FitBitHelper {
         }
     }
 
-    private void addNonWorkoutActivities(boolean isWalkingDone, boolean isRunningDone, boolean isCyclingDone, ArrayList<FitnessActivity> fitnessActivitiesListofDay) {
-        // To add not existing activity
-        if (!isWalkingDone) {
-            FitnessActivity activity = new FitnessActivity();
-            activity.setName(FitnessActivities.WALKING);
-            activity.setCalories_expended(0);
-            activity.setDistance(0);
-            activity.setStep_count(0);
-            fitnessActivitiesListofDay.add(activity);
-        }
-        if (!isRunningDone) {
-            FitnessActivity activity = new FitnessActivity();
-            activity.setName(FitnessActivities.RUNNING);
-            activity.setCalories_expended(0);
-            activity.setDistance(0);
-            activity.setStep_count(0);
-            fitnessActivitiesListofDay.add(activity);
-        }
-        if (!isCyclingDone) {
-            FitnessActivity activity = new FitnessActivity();
-            activity.setName(FitnessActivities.BIKING);
-            activity.setCalories_expended(0);
-            activity.setDistance(0);
-            activity.setStep_count(0);
-            fitnessActivitiesListofDay.add(activity);
-        }
-    }
+
 }

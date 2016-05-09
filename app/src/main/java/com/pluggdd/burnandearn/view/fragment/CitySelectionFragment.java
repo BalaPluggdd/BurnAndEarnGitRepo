@@ -53,8 +53,8 @@ public class CitySelectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_city_selection, container, false);
-        mCitySpinner = (Spinner) view.findViewById(R.id.spinner_city);
+        mView = inflater.inflate(R.layout.fragment_city_selection, container, false);
+        mCitySpinner = (Spinner) mView.findViewById(R.id.spinner_city);
         mCitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -74,7 +74,7 @@ public class CitySelectionFragment extends Fragment {
             }
         });
         getcityList();
-        return view;
+        return mView;
     }
 
     @Override

@@ -3,10 +3,12 @@ package com.pluggdd.burnandearn.view.fragment;
 import android.Manifest;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -29,11 +32,13 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -104,6 +109,7 @@ import java.util.concurrent.ExecutionException;
 public class PointsFragment extends Fragment implements View.OnClickListener {
     // Initialization of views and variables
     private final int REQUEST_CODE_RESOLUTION = 100, REQUEST_LOCATION_PERMISSIONS_REQUEST_CODE = 101, REQUEST_GETACCOUNTS_PERMISSIONS_REQUEST_CODE = 102, REQUEST_BOTH_PERMISSION_CODE = 103, REQUEST_FITBIT_API = 104;
+    private final static String PAGE_FLAG = "PAGE_FLAG";
     private View mView;
     private DecoView mCircularProgressDecoView;
     private ViewPager mActivitiesViewPager;
@@ -121,16 +127,32 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     //private Spinner mDateFilterSpinner;
     private boolean mIsPermissionRequestRaised, mIsGetFitnessDataAsyncRunning;
     private PreferencesManager mPreferenceManager;
-    private String mFitnessEmail = "", mCurrentFitnessActivity;
+    private String mFitnessEmail = "", mCurrentFitnessActivity, mPageFlag;
     private CustomPagerAdapter mActivitiesPagerAdapter;
     private GoogleFitHelper mGoogleFitHelper;
     private FitBitHelper mFitBitHelper;
     private ArrayList<FitnessHistory> mFitnessHistoryList = new ArrayList<>();
     private ArrayList<FitnessHistory> mWeekFitnessHistoryList = new ArrayList<>();
     private ArrayList<Integer> mWeeklyPointsList = new ArrayList<>();
+    private AlertDialog mGoalSetUpDialog;
 
     public PointsFragment() {
         // Required empty public constructor
+    }
+
+    public static PointsFragment newInstance(String page_flag) {
+        PointsFragment fragment = new PointsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(PAGE_FLAG, page_flag);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null)
+            mPageFlag = getArguments().getString(PAGE_FLAG, "");
     }
 
     @Override
@@ -153,8 +175,11 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         mBarChart = (BarChart) mView.findViewById(R.id.bar_chart);
         mPreferenceManager = new PreferencesManager(mContext);
         mActivitiesViewPager.setOffscreenPageLimit(1);
-        // Check and set selected fitness source ( Google Fit or FitBit)
-        setFitnessSource();
+        if (mPageFlag.equalsIgnoreCase("notification"))
+            showGoalSetUpDialog();
+        else
+            // Check and set selected fitness source ( Google Fit or FitBit)
+            setFitnessSource();
         initializeActivitiesBarChart();
         // Initial set up for circular decoview
         createBackgroundSeries();
@@ -217,52 +242,68 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private void setFitnessSource() {
         int selected_fitness_source = mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source));
         switch (selected_fitness_source) {
-            case 0: // Not selected
-                showSelectFitnessSourceDialog();
-                break;
             case 1: // Google Fit
                 checkAndBuildGoogleApiClient();
                 break;
             case 2: // Fit Bit
-                if (mPreferenceManager.getBooleanValue(mContext.getString(R.string.is_fitbit_authenticated))) {
-                    checkAndBuildFitBitApiClient();
-                    new FitnessDataAsync().execute();
+
+                if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                    if (mPreferenceManager.getBooleanValue(mContext.getString(R.string.is_fitbit_authenticated))) {
+                        checkAndBuildFitBitApiClient();
+                        //new FitnessDataAsync().execute();
+                    } else {
+                        startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
+                    }
                 } else {
-                    startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
+                    // Hide progress bar
+                    mActivitiesProgressBar.setVisibility(View.GONE);
+                    if (!isDetached())
+                        Toast.makeText(mContext, mContext.getString(R.string.no_network), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
 
-    private void showSelectFitnessSourceDialog() {
-        final Dialog dialog = new Dialog(mContext);
-        dialog.setContentView(R.layout.dialog_select_fitness_source);
-        dialog.setCancelable(false);
-        ImageView googleFit = (ImageView) dialog.findViewById(R.id.img_google_fit);
-        ImageView fitbit = (ImageView) dialog.findViewById(R.id.img_fitbit);
-
-        googleFit.setOnClickListener(new View.OnClickListener() {
+    private void showGoalSetUpDialog() {
+        final AlertDialog.Builder mGoalDialog = new AlertDialog.Builder(mContext);
+        View mView = LayoutInflater.from(mContext).inflate(R.layout.dialog_set_goal, null);
+        mGoalDialog.setView(mView);
+        mGoalDialog.setCancelable(false);
+        TextView mUserGoalHeaderText = (TextView) mView.findViewById(R.id.txt_user_goal_header);
+        mPreferenceManager = new PreferencesManager(mContext);
+        int goal = mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal_detected));
+        mUserGoalHeaderText.setText("We recommend " + mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal_detected)) + " calories based on your inputs for maintaining a healthy lifestyle, but you can choose your goal too. Input your goal if you differ from ours");
+        final EditText mGoalEdt = (EditText) mView.findViewById(R.id.edt_goal);
+        ImageView mProfileImage = (ImageView) mView.findViewById(R.id.img_profile);
+        ProgressBar mProfileLoadingProgress = (ProgressBar) mView.findViewById(R.id.loading_progress_bar);
+        Button mSetButton = (Button) mView.findViewById(R.id.btn_set);
+        Button mCancelButton = (Button) mView.findViewById(R.id.btn_cancel);
+        mGoalEdt.setText(String.valueOf(goal));
+        new PicassoImageLoaderHelper(getContext(), mProfileImage, mProfileLoadingProgress).loadImage(mPreferenceManager.getStringValue(getString(R.string.profile_image_url)));
+        mGoalSetUpDialog = mGoalDialog.show();
+        mSetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
-                mPreferenceManager.setIntValue(mContext.getString(R.string.selected_fitness_source), FitnessSource.GOOGLE_FIT.getId());
-                checkAndBuildGoogleApiClient();
-                if (mGoogleAPIClient != null)
-                    mGoogleAPIClient.connect();
+                if (TextUtils.isEmpty(mGoalEdt.getText())) {
+                    mGoalEdt.setError(getString(R.string.enter_goal));
+                } else {
+                    mGoalSetUpDialog.dismiss();
+                    updateUserGoal(Integer.valueOf(mGoalEdt.getText().toString()));
+                    mGoalSetUpDialog = null;
+                }
 
             }
         });
 
-        fitbit.setOnClickListener(new View.OnClickListener() {
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
-                mPreferenceManager.setIntValue(mContext.getString(R.string.selected_fitness_source), FitnessSource.FITBIT.getId());
-                startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
+                mGoalSetUpDialog.dismiss();
+                setFitnessSource();
+                mGoalSetUpDialog = null;
             }
         });
-        dialog.show();
     }
 
     private void initializeActivitiesBarChart() {
@@ -500,130 +541,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         return total_steps_of_week / 7;
     }
 
-    // To update fitness acitvity details in viewpager and in main view
-   /* private void updateFitnessActivities(int position) {
-        switch (position) {
-            case 0:
-                // To calculate walking calories percentage in total calories
-                int walking_calories_percentage = 0, running_calories_percentage = 0, biking_calories_percentage = 0;
-                double walking_calories_expended = mFitnessActivityList.get(0).getCalories_expended();
-                //walking_calories_expended = 1500;
-                if (walking_calories_expended != -1) {
-                    walking_calories_percentage = (int) Math.round((walking_calories_expended / mTotalCaloriesExpended) * 100);
-                    mWalkingActivityContainer.setVisibility(View.VISIBLE);
-                    mWalkingActivityValueText.setText(String.valueOf(Math.round(walking_calories_expended)));
-                    mWalkingActivityDimesionText.setText(mContext.getString(R.string.calories_unit));
-                } else {
-                    mWalkingActivityContainer.setVisibility(View.GONE);
-                }
-                // To calculate running calories percentage in total calories
-                double running_calories_expended = mFitnessActivityList.get(1).getCalories_expended();
-                //running_calories_expended = 2000;
-                if (running_calories_expended != -1) {
-                    running_calories_percentage = (int) Math.round((running_calories_expended / mTotalCaloriesExpended) * 100);
-                    mRunningActivityContainer.setVisibility(View.VISIBLE);
-                    mRunningActivityValueText.setText(String.valueOf(Math.round(running_calories_expended)));
-                    mRunningActivityDimensionText.setText(mContext.getString(R.string.calories_unit));
-                } else {
-                    mRunningActivityContainer.setVisibility(View.GONE);
-                }
-                // To calculate biking calories percentage in total calories
-                double biking_calories_expended = mFitnessActivityList.get(2).getCalories_expended();
-                //biking_calories_expended = 200;
-                if (biking_calories_expended != -1) {
-                    biking_calories_percentage = (int) Math.round((biking_calories_expended / mTotalCaloriesExpended) * 100);
-                    mBikingActivityContainer.setVisibility(View.VISIBLE);
-                    mCyclingActivityValueText.setText(String.valueOf(Math.round(biking_calories_expended)));
-                    mCyclingActivityDimensionText.setText(mContext.getString(R.string.calories_unit));
-                } else {
-                    mBikingActivityContainer.setVisibility(View.GONE);
-                }
-                // To update decoview
-                updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
-                break;
-            case 1:
-                // To calculate walking distance percentage in total distance travelled
-                int walking_distance_percentage = 0, running_distance_percentage = 0, biking_distance_percentage = 0;
-                double walking_distance = mFitnessActivityList.get(0).getDistance();
-                //walking_distance = 5.0;
-                if (walking_distance != -1) {
-                    walking_distance_percentage = (int) Math.round((walking_distance / mTotalDistanceTravelled) * 100);
-                    mWalkingActivityContainer.setVisibility(View.VISIBLE);
-                    mWalkingActivityValueText.setText(String.format("%.2f", walking_distance));
-                    mWalkingActivityDimesionText.setText(mContext.getString(R.string.distance_dimension));
-                } else {
-                    mWalkingActivityContainer.setVisibility(View.GONE);
-                }
-                // To calculate running distance percentage in total distance travelled
-                double running_distance = mFitnessActivityList.get(1).getDistance();
-                //running_distance = 5.0;
-                if (running_distance != -1) {
-                    running_distance_percentage = (int) Math.round((running_distance / mTotalDistanceTravelled) * 100);
-                    mRunningActivityContainer.setVisibility(View.VISIBLE);
-                    mRunningActivityValueText.setText(String.format("%.2f", running_distance));
-                    mRunningActivityDimensionText.setText(mContext.getString(R.string.distance_dimension));
-                } else {
-                    mRunningActivityContainer.setVisibility(View.GONE);
-                }
-                // To calculate biking distance percentage in total distance travelled
-                double biking_distance = mFitnessActivityList.get(2).getDistance();
-                // biking_distance = 6.0;
-                if (biking_distance != -1) {
-                    biking_distance_percentage = (int) Math.round((biking_distance / mTotalDistanceTravelled) * 100);
-                    mBikingActivityContainer.setVisibility(View.VISIBLE);
-                    mCyclingActivityValueText.setText((String.format("%.2f", biking_distance)));
-                    mCyclingActivityDimensionText.setText(mContext.getString(R.string.distance_dimension));
-                } else {
-                    mBikingActivityContainer.setVisibility(View.GONE);
-                }
-                // To update decoview
-                updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
-                break;
-            case 2:
-                // To calculate walking steps percentage in total steps taken
-                int walking_step_percentage = 0, running_step_percentage = 0, biking_step_percentage = 0;
-                double walking_step = mFitnessActivityList.get(0).getStep_count();
-                //walking_step = 1000;
-                if (walking_step != -1) {
-                    walking_step_percentage = (int) Math.round((walking_step / mTotalStepCount) * 100);
-                    mWalkingActivityContainer.setVisibility(View.VISIBLE);
-                    mWalkingActivityValueText.setText(String.valueOf(Math.round(walking_step)));
-                    mWalkingActivityDimesionText.setText(mContext.getString(R.string.steps_text));
-                } else {
-                    mWalkingActivityContainer.setVisibility(View.GONE);
-                }
-                // To calculate running steps percentage in total steps taken
-                double running_step = mFitnessActivityList.get(1).getStep_count();
-                //running_step = 20000;
-                if (running_step != -1) {
-                    running_step_percentage = (int) Math.round((running_step / mTotalStepCount) * 100);
-                    mRunningActivityContainer.setVisibility(View.VISIBLE);
-                    mRunningActivityValueText.setText(String.valueOf(running_step));
-                    mRunningActivityDimensionText.setText(mContext.getString(R.string.steps_text));
-                } else {
-                    mRunningActivityContainer.setVisibility(View.GONE);
-                }
-                // To calculate biking steps percentage in total steps taken
-                double biking_step = mFitnessActivityList.get(2).getStep_count();
-                //biking_step = 4000;
-                if (biking_step != -1) {
-                    biking_step_percentage = (int) Math.round((biking_step / mTotalStepCount) * 100);
-                    mBikingActivityContainer.setVisibility(View.VISIBLE);
-                    mCyclingActivityValueText.setText(String.valueOf(Math.round(biking_step)));
-                    mCyclingActivityDimensionText.setText(mContext.getString(R.string.steps_text));
-                } else {
-                    mBikingActivityContainer.setVisibility(View.GONE);
-                }
-                // To update decoview
-                updateProgressBar(walking_step_percentage, running_step_percentage, biking_step_percentage);
-                break;
-            case 3:
-                break;
-            default:
-                break;
-        }
-    }*/
-
     private void updateProgressBar(double walking_percentage, double running_percentage, double biking_percentage) {
         Log.i("activity percentage", walking_percentage + " " + running_percentage + " " + biking_percentage);
         if (biking_percentage > 0) {
@@ -679,16 +596,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
             //mCircularProgressDecoView.moveTo(mWalkingActivityIndex, 0);
         }
-        /*if (biking_percentage > 0) {
-            mCircularProgressDecoView.moveTo(mBikingActivityIndex, 100);
-            if (running_percentage > 0) {
-                mCircularProgressDecoView.moveTo(mRunningActivityIndex, running_percentage + walking_percentage);
-            }
-        } else if (running_percentage > 0) {
-            mCircularProgressDecoView.moveTo(mRunningActivityIndex, 100);
-        }
-        if (walking_percentage > 0)
-            mCircularProgressDecoView.moveTo(mWalkingActivityIndex, walking_percentage);*/
+
     }
 
     @Override
@@ -706,7 +614,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                         new FitBitAPIAsync().execute(auth_token);
                     } else {
                         // Hide progress bar
-                        Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                        mActivitiesProgressBar.setVisibility(View.GONE);
+                        if (!isDetached())
+                            Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
                     break;
             }
@@ -731,32 +641,46 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (mGoogleAPIClient == null && (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId())) {
-            if (checkLocationPermissions() && checkGetAccountsPermissions()) {
-                buildGoogleFitnessClient();
-            } else if (mIsPermissionRequestRaised) {
-                Snackbar.make(
-                        mView,
-                        R.string.permission_denied_explanation,
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
+        if (mGoalSetUpDialog == null) {
+            if(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+                if (mGoogleAPIClient == null ) {
+                    if (checkLocationPermissions() && checkGetAccountsPermissions()) {
+                        buildGoogleFitnessClient();
+                    } else if (mIsPermissionRequestRaised) {
+                        Snackbar.make(
+                                mView,
+                                R.string.permission_denied_explanation,
+                                Snackbar.LENGTH_INDEFINITE)
+                                .setAction(R.string.settings, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        // Build intent that displays the App settings screen.
+                                        Intent intent = new Intent();
+                                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null);
+                                        intent.setData(uri);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    }
+                                })
+                                .show();
+                    }
+                }
+                if (mGoogleAPIClient != null && !mGoogleAPIClient.isConnected())
+                    mGoogleAPIClient.connect();
+            }else{ // FITBIT
+                if(!mIsGetFitnessDataAsyncRunning){
+                    if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                        new FitnessDataAsync().execute();
+                    } else {
+                        // Hide progress bar
+                        mActivitiesProgressBar.setVisibility(View.GONE);
+                        if (!isDetached())
+                            Snackbar.make(mView,mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                    }
+                }
             }
         }
-        if (mGoogleAPIClient != null && !mGoogleAPIClient.isConnected())
-            mGoogleAPIClient.connect();
-
     }
 
     @Override
@@ -869,8 +793,17 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     public void onConnected(Bundle bundle) {
                         mFitnessEmail = Plus.AccountApi.getAccountName(mGoogleAPIClient);
                         mGoogleFitHelper = new GoogleFitHelper(mContext, mGoogleAPIClient);
-                        if (!mIsGetFitnessDataAsyncRunning)
-                            new FitnessDataAsync().execute();
+                        if (!mIsGetFitnessDataAsyncRunning) {
+                            if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                                new FitnessDataAsync().execute();
+                            } else {
+                                // Hide progress bar
+                                mActivitiesProgressBar.setVisibility(View.GONE);
+                                if (!isDetached())
+                                    Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+
                     }
 
                     @Override
@@ -899,6 +832,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                 })
                 .build();
+        mGoogleAPIClient.connect();
     }
 
 
@@ -939,7 +873,13 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equalsIgnoreCase("success")) {
-                new BusinessListAsync().execute();
+                if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                    new BusinessListAsync().execute();
+                } else {
+                    mActivitiesProgressBar.setVisibility(View.GONE);
+                    if (!isDetached())
+                        Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                }
             } else {
                 mActivitiesProgressBar.setVisibility(View.GONE);
             }
@@ -966,7 +906,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             return null;
         }
 
@@ -996,52 +935,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    /*public class FitnessHistoryAsync extends AsyncTask<Long, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Long... params) {
-            List<LocalDateTime> dates = new ArrayList<>();
-            LocalDateTime StartDate = new LocalDateTime().minusDays(7).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            int days = Days.daysBetween(StartDate, new LocalDateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0)).getDays();
-            for (int i = 0; i < days; i++) {
-                LocalDateTime d = StartDate.withFieldAdded(DurationFieldType.days(), i);
-                dates.add(d);
-            }
-            mWeekFitnessHistoryList = new ArrayList<>();
-            for (LocalDateTime date : dates) {
-                LocalDateTime endDayTime = date.plusDays(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-                //Log.i("start date : ", date.toString() + " " + date.toDateTime().getMillis() + " end date :" + endDayTime.toString());
-                getFitnessActivityDetails("chart", Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(date.toDateTime().getMillis(), endDayTime.toDateTime().getMillis())).await(1, TimeUnit.MINUTES), date, endDayTime);
-            }
-            *//*if (mGoogleAPIClient != null) {
-                return getFitnessActivityDetails(Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(params[0], params[1])).await(1, TimeUnit.MINUTES));
-
-            } else
-                return null;*//*
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void s) {
-            super.onPostExecute(s);
-            mBarChart.setVisibility(View.VISIBLE);
-            for (FitnessHistory history : mWeekFitnessHistoryList) {
-                Log.i("Time", history.getStartDateTime() + " " + history.getEndDateTime() + " " + history.getTotalCaloriesBurnt());
-                for (FitnessActivity activity : history.getFitnessActivitiesList()) {
-                    Log.i("Name", activity.getName());
-                    Log.i("calories", activity.getCalories_expended() + "");
-                    Log.i("distance", activity.getDistance() + "");
-                    Log.i("stepcount", activity.getStep_count() + "");
-                }
-            }
-
-        }
-    }*/
 
     private void plotActivityChart(String activity, String type) {
         BarData barData;
@@ -1058,14 +951,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     }
 
-   /* private void getTodayFitnessDetails(String flag) {
-        LocalDateTime currentDateTime = new LocalDateTime();
-        long endTime = currentDateTime.toDateTime().getMillis();
-        LocalDateTime startdateTime = currentDateTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-        long startTime = startdateTime.toDateTime().getMillis();
-        Log.i("Time :", startdateTime.toString() + " " + currentDateTime.toDateTime().toString());
-        getFitnessActivityDetails(flag, Fitness.HistoryApi.readData(mGoogleAPIClient, getFitnessData(startTime, endTime)).await(1, TimeUnit.MINUTES), startdateTime, currentDateTime);
-    }*/
 
     private void updateUI() {
         try {
@@ -1570,58 +1455,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void showNotification(String type) {
-        boolean shouldShowNotification = false;
-        long last_notification_time;
-        String content="";
-        if (type.equalsIgnoreCase("half_way")) {
-            last_notification_time = mPreferenceManager.getLongValue(mContext.getString(R.string.half_way_notification_time));
-            content = mContext.getString(R.string.half_way_goal_achieved_notification_header) + " of " + String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal))) + " " + mContext.getString(R.string.calories_unit);
-        } else { // Goal Complete
-            last_notification_time = mPreferenceManager.getLongValue(mContext.getString(R.string.full_way_notification_time));
-            content = mContext.getString(R.string.goal_achieved_notification_content) + " of " + String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.user_goal))) + " " + mContext.getString(R.string.calories_unit);
-        }
-        shouldShowNotification = true;
-       /* if (last_notification_time == 0)
-            shouldShowNotification = true;
-        else {
-            LocalDateTime startDate = new LocalDateTime(last_notification_time);
-            LocalDateTime currentDateTime = new LocalDateTime();
-            int days = Days.daysBetween(startDate.toDateTime().withTimeAtStartOfDay(), currentDateTime.toDateTime().withTimeAtStartOfDay()).getDays();
-            if (days > 0) {
-                shouldShowNotification = true;
-            }
-        }*/
-        if (shouldShowNotification) {
-            NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(mContext);
-            mNotificationBuilder.setSmallIcon(R.drawable.ic_logo);
-            mNotificationBuilder.setContentTitle(mContext.getString(R.string.congratulations));
-            mNotificationBuilder.setAutoCancel(true);
-            mNotificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));
-            mNotificationBuilder.setContentText(content);
-            //Intent shareIntent = new Intent(mContext, ShareActivity.class);
-            /*Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, content);
-            shareIntent.setType("text/plain");
-        shareIntent.putExtra(mContext.getString(R.string.from_notification), true);
-        TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
-        taskStackBuilder.addParentStack(ShareActivity.class);
-        taskStackBuilder.addNextIntent(shareIntent);
-        // To add pending intent
-        PendingIntent pendingIntent = taskStackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
-            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, Intent.createChooser(shareIntent, "Share"), PendingIntent.FLAG_UPDATE_CURRENT);
-            // To add Share button
-            NotificationCompat.Action mShareAction = new NotificationCompat.Action.Builder(R.drawable.ic_share, "Share", pendingIntent).build();
-            mNotificationBuilder.addAction(mShareAction);*/
-            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(1, mNotificationBuilder.build());
-            if (type.equalsIgnoreCase("half_way")) {
-                mPreferenceManager.setLongValue(mContext.getString(R.string.half_way_notification_time), new LocalDateTime().toDateTime().getMillis());
-            } else { // Goal Complete
-                mPreferenceManager.setLongValue(mContext.getString(R.string.full_way_notification_time), new LocalDateTime().toDateTime().getMillis());
-            }
-        }
-    }
+
 
 
     /*private void getBusinessList() {
@@ -1726,69 +1560,6 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         }));
     }*/
 
-    class CustomBusinessOfferListAdapter extends PagerAdapter {
-
-        private LayoutInflater mLayoutInflater;
-        private ArrayList<BusinessDetails> mBusinessList;
-
-        CustomBusinessOfferListAdapter(ArrayList<BusinessDetails> businessList) {
-            if (!isDetached()) {
-                mLayoutInflater = LayoutInflater.from(mContext);
-                mBusinessList = businessList;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return mBusinessList.size();
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            final BusinessDetails businessDetail = mBusinessList.get(position);
-            View itemView = mLayoutInflater.inflate(R.layout.list_row_business_offer, container, false);
-            TextView offerRewardsText = (TextView) itemView.findViewById(R.id.txt_offer_promo);
-            TextView nameText = (TextView) itemView.findViewById(R.id.txt_business_title);
-            ImageView businessImage = (ImageView) itemView.findViewById(R.id.img_business_logo);
-            ProgressBar logoProgressBar = (ProgressBar) itemView.findViewById(R.id.logo_progress_bar);
-            nameText.setText(businessDetail.getName());
-            nameText.setSelected(true);
-            if (!isDetached())
-                new PicassoImageLoaderHelper(mContext, businessImage, logoProgressBar).loadImage(businessDetail.getLogo());
-            offerRewardsText.setText(businessDetail.getPromo());
-            Button mGrabNowButton = (Button) itemView.findViewById(R.id.btn_grab_now);
-            mGrabNowButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    /*Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.page_flag), PointsFragment.this.getClass().getSimpleName());
-                    mListener.changeFragment(bundle);*/
-                    Intent intent = new Intent(mContext, OfferDetailActivity.class);
-                    intent.putExtra(mContext.getString(R.string.logo_url), businessDetail.getLogo());
-                    intent.putExtra(mContext.getString(R.string.business_name), businessDetail.getName());
-                    intent.putExtra(mContext.getString(R.string.offer_name), businessDetail.getOffer_name());
-                    intent.putExtra(mContext.getString(R.string.offer_promo), businessDetail.getPromo());
-                    intent.putExtra(mContext.getString(R.string.how_to_redeem), businessDetail.getHow_to_reedem());
-                    intent.putExtra(mContext.getString(R.string.coupon_expiry_date), businessDetail.getCoupon_expiry_date());
-                    intent.putExtra(mContext.getString(R.string.coupon), businessDetail.getCoupon());
-                    intent.putExtra(mContext.getString(R.string.redirect_url), businessDetail.getUrl() /*"https://play.google.com/store/apps/details?id=com.tingtongapp.android&hl=en"*/);
-                    startActivity(intent);
-                }
-            });
-            container.addView(itemView);
-            return itemView;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-    }
 
     private ArrayList<String> getXAxisValues() {
         ArrayList<String> xAxis = new ArrayList<>();
@@ -1928,7 +1699,16 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         protected void onPostExecute(String status) {
             super.onPostExecute(status);
             if (status.equalsIgnoreCase("success")) {
-                new FitnessDataAsync().execute();
+                if (!mIsGetFitnessDataAsyncRunning) {
+                    if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                        new FitnessDataAsync().execute();
+                    } else {
+                        // Hide progress bar
+                        mActivitiesProgressBar.setVisibility(View.GONE);
+                        if (!isDetached())
+                            Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                    }
+                }
             } else {
                 // Failure
                 // Hide Progress Bar
@@ -1937,4 +1717,55 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void updateUserGoal(final int goal) {
+        final ProgressDialog mLoadingProgress = new ProgressDialog(mContext);
+        mLoadingProgress.setMessage("Updating goal please wait!!!");
+        mLoadingProgress.setCancelable(false);
+        mLoadingProgress.show();
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.USER_GOAL_UPDATE, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("user goal response", response);
+                if (response != null) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.optInt("status") == 1) {
+                            mPreferenceManager.setIntValue(mContext.getString(R.string.user_goal), goal);
+                        } else {
+                            Snackbar.make(mView, responseJson.optString("msg"), Snackbar.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
+                    } finally {
+                        mLoadingProgress.dismiss();
+                        setFitnessSource();
+                    }
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                mLoadingProgress.dismiss();
+                setFitnessSource();
+                Snackbar.make(mView, "Unable to connect to our server", Snackbar.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("user_id", mPreferenceManager.getStringValue(mContext.getString(R.string.user_id)));
+                params.put("usergoal", String.valueOf(goal));
+                return params;
+            }
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
+    }
+
 }
+
+

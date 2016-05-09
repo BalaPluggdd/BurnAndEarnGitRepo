@@ -95,7 +95,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class EarnedFragment extends Fragment {
 
-    public static final int REQUEST_CODE_RESOLUTION = 1000, REQUEST_BOTH_PERMISSION_CODE = 1001 , REQUEST_FITBIT_API = 104;
+    public static final int REQUEST_CODE_RESOLUTION = 1000, REQUEST_BOTH_PERMISSION_CODE = 1001, REQUEST_FITBIT_API = 104;
     private Context mContext;
     private View mView;
     private ProgressBar mLoadingProgressBar;
@@ -132,9 +132,9 @@ public class EarnedFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser && !mIsFitnessOfferListLoaded){
+        if (isVisibleToUser && !mIsFitnessOfferListLoaded) {
             int fitness_source = mPreferenceManager.getIntValue(getString(R.string.selected_fitness_source));
-            if(fitness_source == 1){
+            if (fitness_source == 1) {
                 if (checkLocationPermissions() && checkGetAccountsPermissions()) {
                     checkAndBuildGoogleApiClient();
                     mIsFitnessOfferListLoaded = true;
@@ -157,13 +157,21 @@ public class EarnedFragment extends Fragment {
                             })
                             .show();
                 }
-            }else{
-                if(mPreferenceManager.getBooleanValue(getString(R.string.is_fitbit_authenticated))){
-                    checkAndBuildFitBitApiClient();
-                    new FitnessHistoryAsync().execute();
-                }else{
-                    startActivityForResult(new Intent(mContext, FitBitActivity.class),REQUEST_FITBIT_API);
+            } else {
+                if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                    if (mPreferenceManager.getBooleanValue(getString(R.string.is_fitbit_authenticated))) {
+                        checkAndBuildFitBitApiClient();
+                        new FitnessHistoryAsync().execute();
+                    } else {
+                        startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
+                    }
+                } else {
+                    // Hide progress bar
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                    if (!isDetached())
+                        Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                 }
+
             }
         }
 
@@ -172,24 +180,27 @@ public class EarnedFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == getActivity().RESULT_OK){
-            switch (requestCode){
+        if (resultCode == getActivity().RESULT_OK) {
+            switch (requestCode) {
                 case REQUEST_CODE_RESOLUTION:
                     mGoogleAPIClient.connect();
                     break;
-                case REQUEST_FITBIT_API :
-                    if(new NetworkCheck().ConnectivityCheck(mContext)){
+                case REQUEST_FITBIT_API:
+                    if (new NetworkCheck().ConnectivityCheck(mContext)) {
                         checkAndBuildFitBitApiClient();
                         String auth_token = data.getExtras().getString(getString(R.string.auth_token));
                         new FitBitAPIAsync().execute(auth_token);
-                    }else{
+                    } else {
                         // Hide progress bar
-                        Snackbar.make(mView,getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+                        mLoadingProgressBar.setVisibility(View.GONE);
+                        if (!isDetached())
+                            Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
                     }
                     break;
             }
         }
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -213,7 +224,15 @@ public class EarnedFragment extends Fragment {
                     @Override
                     public void onConnected(Bundle bundle) {
                         mFitnessEmail = Plus.AccountApi.getAccountName(mGoogleAPIClient);
-                        new FitnessHistoryAsync().execute();
+                        if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                            new FitnessHistoryAsync().execute();
+                        } else {
+                            // Hide progress bar
+                            mLoadingProgressBar.setVisibility(View.GONE);
+                            if (!isDetached())
+                                Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                        }
+
                         /*if (mDateFilterSpinner.getSelectedItemPosition() == 0) {
                             Log.i("Fitness Async", "called from onconnected callback");
                             if (!mIsGetFitnessDataAsyncRunning)
@@ -318,7 +337,7 @@ public class EarnedFragment extends Fragment {
 
     }
 
-   private void checkAndBuildGoogleApiClient() {
+    private void checkAndBuildGoogleApiClient() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             List<String> permissionsNeeded = new ArrayList<String>();
@@ -338,7 +357,7 @@ public class EarnedFragment extends Fragment {
     }
 
     private void checkAndBuildFitBitApiClient() {
-        mOAuthSevice =  new ServiceBuilder()
+        mOAuthSevice = new ServiceBuilder()
                 .provider(FitBitApi.class)
                 .apiKey(mContext.getString(R.string.fit_bit_secret_key))
                 .apiSecret(mContext.getString(R.string.fit_bit_api_key))
@@ -346,7 +365,7 @@ public class EarnedFragment extends Fragment {
                 .scope("activity")
                 .debug()
                 .build();
-        mFitBitHelper = new FitBitHelper((Activity) mContext,mOAuthSevice);
+        mFitBitHelper = new FitBitHelper((Activity) mContext, mOAuthSevice);
 
     }
 
@@ -370,9 +389,9 @@ public class EarnedFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Long... params) {
-            if(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()){
+            if (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()) {
                 mFitnessHistoryList = new GoogleFitHelper(mContext, mGoogleAPIClient).getFitnessHistoryData();
-            }else{
+            } else {
                 mFitnessHistoryList = mFitBitHelper.getFitbitHistory();
             }
             return null;
@@ -381,10 +400,11 @@ public class EarnedFragment extends Fragment {
         @Override
         protected void onPostExecute(Void s) {
             super.onPostExecute(s);
-            if(new NetworkCheck().ConnectivityCheck(mContext)){
+            if (new NetworkCheck().ConnectivityCheck(mContext)) {
                 getBusinessList();
-            }else{
-                Snackbar.make(mView,mContext.getString(R.string.no_network),Snackbar.LENGTH_SHORT).show();
+            } else {
+                if (!isDetached())
+                    Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -469,9 +489,9 @@ public class EarnedFragment extends Fragment {
                         JSONObject responseJson = new JSONObject(response);
                         if (responseJson.optInt("status") == 1) {
                             int totalPointEarned = responseJson.optInt("yourpoint");
-                            mPreferenceManager.setIntValue(mContext.getString(R.string.your_total_points),totalPointEarned);
+                            mPreferenceManager.setIntValue(mContext.getString(R.string.your_total_points), totalPointEarned);
                             //mPointsEarnedText.setText(responseJson.optInt("yourpoint") + "!");
-                            if (!responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000") ) {
+                            if (!responseJson.optString("lastcaloriesupdate").equalsIgnoreCase("") && !responseJson.optString("lastcaloriesupdate").startsWith("0000")) {
                                 LocalDateTime lastUpdateddatetime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").parseLocalDateTime(responseJson.optString("lastcaloriesupdate"));
                                 mPreferenceManager.setLongValue(mContext.getString(R.string.last_updated_calories_time), lastUpdateddatetime.toDateTime().getMillis());
                             } else
@@ -501,7 +521,7 @@ public class EarnedFragment extends Fragment {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.GONE);
                                 mBusinessOfferRecyclerView.setVisibility(View.VISIBLE);
-                                mBusinessOfferRecyclerView.setAdapter(new OfferRewardsAdapter(mContext,mBusinesOfferList,"offer_earned"));
+                                mBusinessOfferRecyclerView.setAdapter(new OfferRewardsAdapter(mContext, mBusinesOfferList, "offer_earned"));
                             } else {
                                 mLoadingProgressBar.setVisibility(View.GONE);
                                 mNoOfferText.setVisibility(View.VISIBLE);
@@ -573,7 +593,7 @@ public class EarnedFragment extends Fragment {
                 }
                 Log.i("json request", json_request);
                 params.put("jsonrequest", json_request);
-                params.put("fitness_source",String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
+                params.put("fitness_source", String.valueOf(mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)))); // 1 - google Fit , 2 - Fitbit
                 return params;
             }
         });
@@ -581,24 +601,24 @@ public class EarnedFragment extends Fragment {
         mRequestQueue.add(request);
     }
 
-    class FitBitAPIAsync extends AsyncTask<String,Void,String>{
+    class FitBitAPIAsync extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             try {
                 Verifier verifier = new Verifier(params[0]);
-                Token accessToken = mOAuthSevice.getAccessToken(null,verifier);
-                if(accessToken != null){
-                    mPreferenceManager.setBooleanValue(getString(R.string.is_fitbit_authenticated),true);
-                    mPreferenceManager.setStringValue(getString(R.string.access_token),accessToken.getToken());
+                Token accessToken = mOAuthSevice.getAccessToken(null, verifier);
+                if (accessToken != null) {
+                    mPreferenceManager.setBooleanValue(getString(R.string.is_fitbit_authenticated), true);
+                    mPreferenceManager.setStringValue(getString(R.string.access_token), accessToken.getToken());
                     JSONObject accessTokenObject = new JSONObject(accessToken.getRawResponse());
-                    mPreferenceManager.setStringValue(getString(R.string.refresh_token),accessTokenObject.optString("refresh_token"));
-                    Log.i("access_token"," Response :" + accessToken.getRawResponse());
+                    mPreferenceManager.setStringValue(getString(R.string.refresh_token), accessTokenObject.optString("refresh_token"));
+                    Log.i("access_token", " Response :" + accessToken.getRawResponse());
                     return "success";
-                }else
+                } else
                     return "failure";
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return "failure";
             }
@@ -607,11 +627,22 @@ public class EarnedFragment extends Fragment {
         @Override
         protected void onPostExecute(String status) {
             super.onPostExecute(status);
-            if(status.equalsIgnoreCase("success")){
-                new FitnessHistoryAsync().execute();
-            }else{
+            if (status.equalsIgnoreCase("success")) {
+                if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                    new FitnessHistoryAsync().execute();
+                } else {
+                    // Hide progress bar
+                    mLoadingProgressBar.setVisibility(View.GONE);
+                    if (!isDetached())
+                        Snackbar.make(mView, getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                }
+
+            } else {
                 // Failure
                 // Hide Progress Bar
+                mLoadingProgressBar.setVisibility(View.GONE);
+                if (!isDetached())
+                    Snackbar.make(mView, getString(R.string.fit_bit_issue), Snackbar.LENGTH_SHORT).show();
             }
         }
     }
