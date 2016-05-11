@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,12 +13,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +33,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.pluggdd.burnandearn.R;
 import com.pluggdd.burnandearn.activity.OfferDetailActivity;
 import com.pluggdd.burnandearn.model.BusinessDetails;
@@ -39,11 +47,16 @@ import com.pluggdd.burnandearn.utils.FragmentInteraction;
 import com.pluggdd.burnandearn.utils.NetworkCheck;
 import com.pluggdd.burnandearn.utils.PicassoImageLoaderHelper;
 import com.pluggdd.burnandearn.utils.PreferencesManager;
+import com.pluggdd.burnandearn.utils.VolleySingleton;
+import com.pluggdd.burnandearn.utils.WebserviceAPI;
 import com.pluggdd.burnandearn.view.fragment.OffersAndRewardsFragment;
 
 import org.joda.time.LocalDateTime;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +92,7 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
     }
 
     @Override
-    public void onBindViewHolder(final BusinessOfferViewHolder holder, int position) {
+    public void onBindViewHolder(final BusinessOfferViewHolder holder, final int position) {
         setAnimation(holder.sContainer, position);
         final BusinessDetails businessDetail = mBusinessOfferList.get(position);
         synchronized (mViewHoldersList) {
@@ -116,7 +129,11 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
                 mDialog.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(mContext,"Have to call webservice to make coupon as used ",Toast.LENGTH_SHORT).show();
+                        if(new NetworkCheck().ConnectivityCheck(mContext)){
+                            redeemOffer(businessDetail.getId(),position);
+                        }else{
+                            Toast.makeText(mContext,mContext.getString(R.string.no_network),Toast.LENGTH_SHORT).show();
+                        }
                         dialog.dismiss();
                     }
                 });
@@ -286,6 +303,61 @@ public class OfferRewardsAdapter extends RecyclerView.Adapter<OfferRewardsAdapte
                 handler.post(updateRemainingTimeRunnable);
             }
         }, 1000, 1000);
+    }
+
+    private void redeemOffer(final int businessId, final int position){
+        final ProgressDialog progressDialog = new ProgressDialog(mContext);
+        progressDialog.setMessage("Redeem offer please wait !!!");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        VolleySingleton volleyrequest = VolleySingleton.getSingletonInstance();
+        RequestQueue mRequestQueue = volleyrequest.getRequestQueue();
+        Request request = (new StringRequest(Request.Method.POST, WebserviceAPI.REDEEM_OFFER, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i("response", response);
+                if (response != null) {
+                    try {
+                        progressDialog.dismiss();
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.optInt("status") == 1) {
+                                /*mBurnAndLogoContainer.setVisibility(View.VISIBLE);
+                                mPointsNeededContainer.setVisibility(View.GONE);
+                                mRedeemButton.setText("Coupon code : " + mExtra.getString(getString(R.string.coupon)));*/
+                            Toast.makeText(mContext,"Successfully redeemed your offer",Toast.LENGTH_SHORT).show();
+                            Log.i("Position",position+"");
+                            mBusinessOfferList.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, getItemCount());
+                            //showCouponDialog();
+                        }else{
+                            Toast.makeText(mContext,responseJson.optString("msg"),Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    progressDialog.dismiss();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("userId",mPreferenceManager.getStringValue(mContext.getString(R.string.user_id)));
+                params.put("businessId",String.valueOf(businessId));
+                return params;
+            }
+        });
+        volleyrequest.setRequestPolicy(request);
+        mRequestQueue.add(request);
     }
 
 }

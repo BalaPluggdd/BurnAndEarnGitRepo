@@ -52,7 +52,7 @@ public class MyOffersActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabViewPager = (ViewPager) findViewById(R.id.tab_viewpager);
-        mTabViewPager.setOffscreenPageLimit(0);
+        mTabViewPager.setOffscreenPageLimit(1);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setUpTabs();

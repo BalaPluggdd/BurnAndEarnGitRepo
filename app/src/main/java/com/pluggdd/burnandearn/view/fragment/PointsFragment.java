@@ -239,7 +239,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         return mView;
     }
 
-    private void setFitnessSource() {
+    private void setFitnessSource() { // Flag - InitialSetUp , Flag - GoalSetUp
         int selected_fitness_source = mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source));
         switch (selected_fitness_source) {
             case 1: // Google Fit
@@ -250,7 +250,15 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 if (new NetworkCheck().ConnectivityCheck(mContext)) {
                     if (mPreferenceManager.getBooleanValue(mContext.getString(R.string.is_fitbit_authenticated))) {
                         checkAndBuildFitBitApiClient();
-                        //new FitnessDataAsync().execute();
+                        if (new NetworkCheck().ConnectivityCheck(mContext)) {
+                            new FitnessDataAsync().execute();
+                        } else {
+                            // Hide progress bar
+                            mActivitiesProgressBar.setVisibility(View.GONE);
+                            if (!isDetached())
+                                Snackbar.make(mView,mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                        }
+
                     } else {
                         startActivityForResult(new Intent(mContext, FitBitActivity.class), REQUEST_FITBIT_API);
                     }

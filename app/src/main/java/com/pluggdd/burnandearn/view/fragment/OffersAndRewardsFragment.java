@@ -88,12 +88,23 @@ public class OffersAndRewardsFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
             if(new NetworkCheck().ConnectivityCheck(mContext)){
+                if(mLoadingProgressBar != null && mNoOfferText != null && mOfferAndRewardsRecyclerView != null){
+                    mLoadingProgressBar.setVisibility(View.VISIBLE);
+                    mNoOfferText.setVisibility(View.GONE);
+                    mOfferAndRewardsRecyclerView.setVisibility(View.VISIBLE);
+                    mOfferAndRewardsRecyclerView.setAdapter(new OfferRewardsAdapter(mContext,new ArrayList<BusinessDetails>(),mPageFlag));
+                }
                 getBusinessOfferList();
             }else{
                 Toast.makeText(mContext,getString(R.string.no_network),Toast.LENGTH_SHORT).show();
             }
-
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     @Override

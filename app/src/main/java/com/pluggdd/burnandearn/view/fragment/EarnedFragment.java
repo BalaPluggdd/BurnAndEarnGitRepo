@@ -385,6 +385,7 @@ public class EarnedFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             mLoadingProgressBar.setVisibility(View.VISIBLE);
+            mBusinessOfferRecyclerView.setAdapter(new OfferRewardsAdapter(mContext, new ArrayList<BusinessDetails>(), "offer_earned"));
         }
 
         @Override
