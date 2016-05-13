@@ -28,5 +28,6 @@
     <dimen name="stroke_width">2dp</dimen>
     <dimen name="long_check_mark_bar">20dp</dimen>
     <dimen name="short_check_mark_bar">10dp</dimen>
+    <item name="decoview_width" format="float" type="dimen">40</item>
 
 </resources>

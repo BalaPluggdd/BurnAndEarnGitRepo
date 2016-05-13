@@ -1,0 +1,4 @@
+<resources>
+    <item name="decoview_width" format="float" type="dimen">60</item>
+
+</resources>

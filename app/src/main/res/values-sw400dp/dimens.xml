@@ -16,5 +16,6 @@
     <dimen name="detail_offer_image_height">225dp</dimen>
     <dimen name="login_margin">100dp</dimen>
     <dimen name="app_tour_content">18sp</dimen>
+<!--    <item name="decoview_width" format="float" type="dimen">50</item>-->
 
 </resources>

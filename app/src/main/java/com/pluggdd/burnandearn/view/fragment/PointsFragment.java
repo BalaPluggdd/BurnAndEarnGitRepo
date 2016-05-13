@@ -34,6 +34,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,6 +136,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
     private ArrayList<FitnessHistory> mWeekFitnessHistoryList = new ArrayList<>();
     private ArrayList<Integer> mWeeklyPointsList = new ArrayList<>();
     private AlertDialog mGoalSetUpDialog;
+    private float mDecoviewWidth;
 
     public PointsFragment() {
         // Required empty public constructor
@@ -182,6 +184,9 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             setFitnessSource();
         initializeActivitiesBarChart();
         // Initial set up for circular decoview
+        TypedValue typedValue = new TypedValue();
+        getResources().getValue(R.dimen.decoview_width,typedValue,true);
+        mDecoviewWidth = typedValue.getFloat();
         createBackgroundSeries();
         createBikingActivitySeries();
         createRunningActivitySeries();
@@ -256,7 +261,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                             // Hide progress bar
                             mActivitiesProgressBar.setVisibility(View.GONE);
                             if (!isDetached())
-                                Snackbar.make(mView,mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                                Toast.makeText(mContext,mContext.getString(R.string.no_network), Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
@@ -341,9 +346,10 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
 
     // Initial grey circle series
     private void createBackgroundSeries() {
+        TypedValue typedValue = new TypedValue();
         SeriesItem initial_grey_circle_progress = new SeriesItem.Builder(Color.parseColor("#a9a9a9"))
                 .setRange(0, 100, 0)
-                .setLineWidth(50f)
+                .setLineWidth(mDecoviewWidth)
                 .build();
         mBackIndex = mCircularProgressDecoView.addSeries(initial_grey_circle_progress);
         mCircularProgressDecoView.addEvent(new DecoEvent.Builder(100).setIndex(mBackIndex).build());
@@ -354,7 +360,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         SeriesItem walking_activity_series = new SeriesItem.Builder(Color.parseColor("#53B6CD"))
                 .setRange(0, 100, 0)
                 .setInitialVisibility(false)
-                .setLineWidth(50f)
+                .setLineWidth(mDecoviewWidth)
                 .build();
         mWalkingActivityIndex = mCircularProgressDecoView.addSeries(walking_activity_series);
     }
@@ -364,7 +370,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         SeriesItem running_activity_series = new SeriesItem.Builder(Color.parseColor("#F8C900"))
                 .setRange(0, 100, 0)
                 .setInitialVisibility(false)
-                .setLineWidth(50f)
+                .setLineWidth(mDecoviewWidth)
                 .build();
         mRunningActivityIndex = mCircularProgressDecoView.addSeries(running_activity_series);
     }
@@ -374,7 +380,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
         SeriesItem biking_activity_series = new SeriesItem.Builder(Color.parseColor("#B0C53C"))
                 .setRange(0, 100, 0)
                 .setInitialVisibility(false)
-                .setLineWidth(50f)
+                .setLineWidth(mDecoviewWidth)
                 .build();
         mBikingActivityIndex = mCircularProgressDecoView.addSeries(biking_activity_series);
     }
@@ -395,7 +401,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //walking_calories_expended = 100;
                     Log.i("walking calories", walking_calories_expended + "");
-                    walking_calories_percentage = (walking_calories_expended / mCaloriesAverage) * 100;
+                    walking_calories_percentage = (mCaloriesAverage == 0) ? walking_calories_expended : (walking_calories_expended / mCaloriesAverage) * 100;
                     // To calculate running calories percentage in total calories
                     double running_calories_expended = 0;
                     for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
@@ -406,7 +412,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //running_calories_expended = 60;
                     Log.i("running calories", running_calories_expended + "");
-                    running_calories_percentage = (running_calories_expended / mCaloriesAverage) * 100;
+                    running_calories_percentage = (mCaloriesAverage == 0) ? running_calories_expended : (running_calories_expended / mCaloriesAverage) * 100;
                     // To calculate biking calories percentage in total calories
                     double biking_calories_expended = 0;
                     //biking_calories_expended = 200;
@@ -418,7 +424,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //biking_calories_expended = 10;
                     Log.i("biking calories", biking_calories_expended + "");
-                    biking_calories_percentage = (biking_calories_expended / mCaloriesAverage) * 100;
+                    biking_calories_percentage = (mCaloriesAverage == 0) ? biking_calories_expended : (biking_calories_expended / mCaloriesAverage) * 100;
                     // To update decoview
                     //walking_calories_percentage = 30 ; running_calories_percentage = 0; biking_calories_percentage = 10;
                     updateProgressBar(walking_calories_percentage, running_calories_percentage, biking_calories_percentage);
@@ -443,7 +449,8 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //walking_calories_expended = 100;
                     Log.i("walking distance", walking_distance_travelled + "");
-                    walking_distance_percentage = (walking_distance_travelled / mDistanceAverage) * 100;
+                    walking_distance_percentage = (mDistanceAverage == 0) ? walking_distance_travelled : (walking_distance_travelled / mDistanceAverage) * 100;
+                    //walking_distance_percentage = ;
                     // To calculate running calories percentage in total calories
                     double running_distance_travelled = 0;
                     for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
@@ -454,7 +461,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //running_calories_expended = 60;
                     Log.i("running distance", running_distance_travelled + "");
-                    running_distance_percentage = (running_distance_travelled / mDistanceAverage) * 100;
+                    running_distance_percentage = (mDistanceAverage == 0) ? running_distance_travelled : (running_distance_travelled / mDistanceAverage) * 100;
                     // To calculate biking calories percentage in total calories
                     double biking_distance_travelled = 0;
                     //biking_calories_expended = 200;
@@ -466,7 +473,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //biking_calories_expended = 10;
                     Log.i("biking distance", biking_distance_travelled + "");
-                    biking_distance_percentage = (biking_distance_travelled / mDistanceAverage) * 100;
+                    biking_distance_percentage = (mDistanceAverage == 0) ? biking_distance_travelled : (biking_distance_travelled / mDistanceAverage) * 100;
                     // To update decoview
                     //walking_distance_percentage = 0 ; running_distance_percentage = 20; biking_distance_percentage = 10;
                     updateProgressBar(walking_distance_percentage, running_distance_percentage, biking_distance_percentage);
@@ -483,7 +490,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //walking_calories_expended = 100;
                     Log.i("walking distance", walking_steps_taken + "");
-                    walking_steps_percentage = (walking_steps_taken / mStepsAverage) * 100;
+                    walking_steps_percentage = (mStepsAverage == 0) ? walking_steps_taken : (walking_steps_taken / mStepsAverage) * 100;
                     // To calculate running calories percentage in total calories
                     double running_steps_taken = 0;
                     for (FitnessActivity fitnessActivity : mTodayFitnessActivityList) {
@@ -494,7 +501,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //running_calories_expended = 60;
                     Log.i("running distance", running_steps_taken + "");
-                    running_steps_percentage = (running_steps_taken / mStepsAverage) * 100;
+                    running_steps_percentage = (mStepsAverage == 0) ? running_steps_taken : (running_steps_taken / mStepsAverage) * 100;
                     // To calculate biking calories percentage in total calories
                     double biking_steps_taken = 0;
                     //biking_calories_expended = 200;
@@ -506,7 +513,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //biking_calories_expended = 10;
                     Log.i("biking distance", biking_steps_taken + "");
-                    biking_steps_percentage = (biking_steps_taken / mStepsAverage) * 100;
+                    biking_steps_percentage = (mStepsAverage == 0) ? biking_steps_taken : (biking_steps_taken / mStepsAverage) * 100;
                     //walking_steps_percentage = 10 ; running_steps_percentage = 80; biking_steps_percentage = 0;
                     // To update decoview
                     updateProgressBar(walking_steps_percentage, running_steps_percentage, biking_steps_percentage);
@@ -520,7 +527,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                     }
                     //walking_calories_expended = 100;
                     Log.i("today points", today_points + "");
-                    today_points_percentage = (today_points / mPointsAverage) * 100;
+                    today_points_percentage = (mPointsAverage == 0) ? today_points : (today_points / mPointsAverage) * 100;
                     // To update decoview
                     //today_points_percentage = 20 ;
                     updateProgressBar(today_points_percentage, 0, 0);
@@ -684,7 +691,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                         // Hide progress bar
                         mActivitiesProgressBar.setVisibility(View.GONE);
                         if (!isDetached())
-                            Snackbar.make(mView,mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                            Toast.makeText(mContext,mContext.getString(R.string.no_network),Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -884,9 +891,14 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 if (new NetworkCheck().ConnectivityCheck(mContext)) {
                     new BusinessListAsync().execute();
                 } else {
-                    mActivitiesProgressBar.setVisibility(View.GONE);
-                    if (!isDetached())
-                        Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                    try {
+                        mActivitiesProgressBar.setVisibility(View.GONE);
+                        if (!isDetached())
+                            Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 }
             } else {
                 mActivitiesProgressBar.setVisibility(View.GONE);
@@ -924,20 +936,30 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 if (mFitnessHistoryList != null && mFitnessHistoryList.size() > 0) {
                     getPointsList();
                 } else {
-                    updateUI();
-                    if (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()) {
-                        if (!isDetached())
-                            Snackbar.make(mView, mContext.getString(R.string.no_google_fit_data), Snackbar.LENGTH_SHORT).show();
-                    } else {
-                        if (!isDetached())
-                            Snackbar.make(mView, mContext.getString(R.string.no_fitbit_data), Snackbar.LENGTH_SHORT).show();
+                    try {
+                        updateUI();
+                        if (mPreferenceManager.getIntValue(mContext.getString(R.string.selected_fitness_source)) == FitnessSource.GOOGLE_FIT.getId()) {
+                            if (!isDetached())
+                                Snackbar.make(mView, mContext.getString(R.string.no_google_fit_data), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            if (!isDetached())
+                                Snackbar.make(mView, mContext.getString(R.string.no_fitbit_data), Snackbar.LENGTH_SHORT).show();
+                        }
+
+                    }catch (Exception e){
+                           e.printStackTrace();
                     }
 
                 }
             } else {
-                updateUI();
-                if (!isDetached())
-                    Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                try {
+                    updateUI();
+                    if (!isDetached())
+                        Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
             }
 
         }
@@ -995,12 +1017,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                 }
             } else {
                 if (!isDetached())
-                    Snackbar.make(mView, "Can't able to get fitness data from Google Fit.Please try after sometime", Snackbar.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Can't able to get fitness data from Google Fit.Please try after sometime", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
             if (!isDetached())
-                Snackbar.make(mView, "Unable to connect to our server.Please try after sometime", Snackbar.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Unable to connect to our server.Please try after sometime", Toast.LENGTH_SHORT).show();
         } finally {
             mIsGetFitnessDataAsyncRunning = false;
         }
@@ -1714,7 +1736,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                         // Hide progress bar
                         mActivitiesProgressBar.setVisibility(View.GONE);
                         if (!isDetached())
-                            Snackbar.make(mView, mContext.getString(R.string.no_network), Snackbar.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, mContext.getString(R.string.no_network), Toast.LENGTH_SHORT).show();
                     }
                 }
             } else {
@@ -1746,7 +1768,7 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        Snackbar.make(mView, "Failure response from server", Snackbar.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Failure response from server", Toast.LENGTH_SHORT).show();
                     } finally {
                         mLoadingProgress.dismiss();
                         setFitnessSource();
@@ -1759,7 +1781,12 @@ public class PointsFragment extends Fragment implements View.OnClickListener {
             public void onErrorResponse(VolleyError error) {
                 mLoadingProgress.dismiss();
                 setFitnessSource();
-                Snackbar.make(mView, "Unable to connect to our server", Snackbar.LENGTH_SHORT).show();
+                try {
+                    Snackbar.make(mView, "Unable to connect to our server", Snackbar.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
             }
         }) {
             @Override
